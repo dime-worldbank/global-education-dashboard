@@ -19,7 +19,7 @@ iecodebook template ///
 			/// path to RWA
 			using `"${mastData}/codebooks/schools.xlsx"'	/// path to codebook
 			, surveys(`"${countries}"') ///
-			gen(`"${countries}"')
+			gen(`"${countrynames}"')	// identify source of each obs
 
 
 		/*excel editing happens manually here. */
@@ -32,8 +32,18 @@ iecodebook append ///
 			/// path to MOZ
 			/// path to RWA
 			using `"${mastData}/codebooks/schools.xlsx"'	/// path to codebook
-			, clear
+			, clear ///
+			generate(`"${countrynames}"') 	/// identify where each
 
+
+
+
+
+
+
+									* | Append | *
+
+						
 
 
 
