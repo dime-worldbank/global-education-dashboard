@@ -1,2 +1,2 @@
 # global-edu-dashboard
-A global 
+A global Education Dashboard
