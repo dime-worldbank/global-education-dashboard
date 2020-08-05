@@ -1,10 +1,10 @@
 /*--------------- ---------- --------- -------- ------- ------ ----- ---- --- --
-Name: clean-school.do
+Name: clean-po.do
 Function: handles missing values.
 -- --- ---- ----- ------ ------- -------- -------- --------- -------------------*/
 
 
-use	 	"${A_sch}", replace
+use	 	"${A_po}", replace
 
 
 							* | 	store values in varlist 		| *
@@ -25,7 +25,6 @@ local 	misvars: list varlist - except		// this list of vars are the ones we care
 * drop observations that are missing on all survey values
 	missings dropobs 	`misvars' ///
 						, force
-
 
 
 

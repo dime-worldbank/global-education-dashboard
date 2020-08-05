@@ -162,7 +162,7 @@
 								school_emis_preload school_info_correct m1s0q2_name m1s0q2_code m1s0q2_emis
 		gl 			piipo 		interview__id interview__key office_preload survey_time occupational_category ///
 								professional_service sub_professional_service resp_finance_planning director_hr ///
-								education DEM1q2 DEM1q1 DEM1q6						
+								education DEM1q2 DEM1q1 DEM1q6
 
 
 

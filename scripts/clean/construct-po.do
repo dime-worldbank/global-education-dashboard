@@ -1,11 +1,19 @@
 /*--------------- ---------- --------- -------- ------- ------ ----- ---- --- --
-Name: construct-school.do
+Name: construct-po.do
 Function: adds new variables, include z-scores.
 -- --- ---- ----- ------ ------- -------- -------- --------- -------------------*/
 
 
-use	 	"${B_sch}", replace
+use	 	"${B_po}", replace
 
+
+							* | 	re-construction of BI 	| *
+						/* since all secondary and tertiary variables are averages of groups of
+						   raw qustions, we could average these manually. */
+
+	if (`s1' == 1) {
+		do `"${scripts_clone}/mother/utils/bi-reconstruct.do"'
+	}
 
 
 							* | 	imputations 		| *
@@ -40,4 +48,4 @@ foreach v of global schoutcome {
 
 
 
-save "${C_sch}", replace
+save "${C_po}", replace

@@ -183,6 +183,14 @@
 *iefolder*3*RunDofiles*baseline*baseline****************************************
 *iefolder will not work properly if the line above is edited
 
+* [Settings]
+/*set all settings to 1 if you want to run, default == 0 */
+
+gl s1	= 0		// reconstruct bi vars
+gl s2	= 0 	// generate top p-tile vars for BI 
+
+
+
 * [Cleaning]
 * Import, Clean, Construct, Deidentify
 

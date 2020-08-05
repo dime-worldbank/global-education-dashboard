@@ -32,5 +32,5 @@ do `"${scripts_clone}/clean/construct-po.do"'
 	* In: constructed datasets: C_*
 	* Out: removed pii, merge with mother dataset to pull values . D_*
 
-do `"${scripts_clone}/clean/deiden-school.do"'
-do `"${scripts_clone}/clean/deiden-po.do"'
+do `"${scripts_clone}/clean/deidentify-school.do"'
+do `"${scripts_clone}/clean/deidentify-po.do"'
