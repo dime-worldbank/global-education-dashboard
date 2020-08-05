@@ -3,6 +3,8 @@ Name: main-clean.do
 Function: runs all the scripts for the cleaning portion.
 -- --- ---- ----- ------ ------- -------- -------- --------- -------------------*/
 
+* global setup for clean
+do `"${scripts_clone}/clean/clean-global-setup.do"'
 
 * 1. Import
 	* In: Raw Stata files.
