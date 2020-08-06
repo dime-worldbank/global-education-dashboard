@@ -3,6 +3,7 @@
 
 library(rio)
 library(tidyverse)
+library(readstata13)
 
                       # ----------------------------- #
                       # Load+append schools datasets  #----
@@ -48,46 +49,103 @@ m.school <- bind_rows("Peru" = peru_school,
 
 
 
-                                    # ----------------------------- #
-                                    # Load+append officials datasets#----
-                                    # ----------------------------- #
-vault <- file.path("A:/Countries")
+
+                        # ----------------------------- #
+                        # Load+append officials datasets#----
+                        # ----------------------------- #
+
+tiers <- c("Ministry of Education (or equivalent)", 
+           "Regional office (or equivalent)",
+           "District office (or equivalent)")
 
 # Peru
-peru_po <- import(file.path(vault, 
-                                "Peru/Data/Full_Data/public_officials_indicators_data.RData"),
-                      which = "public_officials_dta_clean") %>%
-  select(interview__id:director_hr, ORG1q1a:ENUMq8)
+peru_po <- read.dta13(file.path(vault, 
+                                "Mozambique/Data/public_officials_survey_data.dta"),
+                      convert.factors = TRUE,
+                      generate.factors = TRUE ,
+                      nonint.factors = TRUE) 
+
 
 # Jordan
-jordan_po <- import(file.path(vault, 
-                              "Jordan/Data/Full_Data/public_officials_indicators_data.RData"),
-                    which = "public_officials_dta_clean") %>%
-  select(interview__id:director_hr, ORG1q1a:ENUMq8)
+jordan_po <- read.dta13(file.path(vault, 
+                                  "Mozambique/Data/public_officials_survey_data.dta"),
+                        convert.factors = TRUE,
+                        generate.factors = TRUE ,
+                        nonint.factors = TRUE) 
+
 
 # Mozambique :: note there is no Rdata file. 
-mozambique_po <- import(file.path(vault, 
-                                  "Mozambique/Data/public_officials_survey_data.dta")) %>%
-  select(interview__id:director_hr, ORG1q1a:ENUMq8) %>%
-   # convert to factor, alter factor levels fct_recode?
+mozambique_po <- read.dta13(file.path(vault, 
+                                  "Mozambique/Data/public_officials_survey_data.dta"),
+                            convert.factors = TRUE,
+                            generate.factors = TRUE ,
+                            nonint.factors = TRUE) 
+
 
 # Rwanda
-rwanda_po <- import(file.path(vault, 
-                              "Rwanda/Data/Full_Data/public_officials_indicators_data.RData"),
-                    which = "public_officials_dta_clean") %>%
-  select(interview__id:director_hr, ORG1q1a:ENUMq8) %>%
-  rename(end_time = "ENUMq1")
+rwanda_po <- read.dta13(file.path(vault, 
+                                  "Mozambique/Data/public_officials_survey_data.dta"),
+                        convert.factors = TRUE,
+                        generate.factors = TRUE ,
+                        nonint.factors = TRUE)  %>%
+  rename(end_time = "ENUMq1") 
   # convert ENUMq1 to numeric. issue is that this is not the duration but the end time
   # (must subract from start). For now I will simply rename as new variable called "end_time"
+
 
 # bind rows 
 m.po <-     bind_rows("Peru"   = peru_po,
                       "Jordan" = jordan_po,
                       "Rwanda" = rwanda_po,
-                      #"Mozambique" = mozambique_po,
-                      .id = "Country")
-# type convert
+                      "Mozambique" = mozambique_po,
+                      .id = "Country") %>%
+  mutate(
+    govt_tier = fct_recode(govt_tier, # recode factor levels
+                           "MinEDU Central" = "Ministry of Education (or equivalent)", 
+                           "Region Office" = "Regional office (or equivalent)",
+                           "District Office" = "District office (or equivalent)"
+                           ))
 
 
 
 
+
+                        # ----------------------------- #
+                        # Generate project ID           #----
+                        # ----------------------------- #
+
+        # the project id will be randomly generated here:
+        #   dataset           |     project id  |   raw id
+        #     schools          = idschool       =   school_code
+        #     public officials = idpo           =   interview__id
+        #     
+        # and the purpose will be joined to the working datasets with the raw id 
+        # before de-identification.
+
+
+# generate project id for schools (idschool)
+set.seed(47)
+m.school$idschool <- runif(length(m.school$school_code)) %>%
+  rank()
+
+  
+
+
+# generate project id for public officials (idpo)
+set.seed(417)
+m.po$idpo <- runif(length(m.po$interview__id)) %>%
+  rank()
+
+
+
+
+
+
+
+
+
+# save as main datasets
+saveRDS(m.school,
+        file = "A:/main/m-school.Rda")
+saveRDS(m.po,
+        file = "A:/main/m-po.Rda")
