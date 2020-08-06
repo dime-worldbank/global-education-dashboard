@@ -13,10 +13,10 @@ Function: runs all the scripts for the cleaning portion.
 
 * create a template using iecodebook
 iecodebook template ///
-			/// path to PER survey %
-			/// path to JOR
-			/// path to MOZ
-			/// path to RWA
+			`"${rawencrypt}/Peru/Data/school_indicator_dta_confidential.dta"' /// path to PER survey
+			`"${rawencrypt}/Jordan/Data/final_indicator_school_data.dta"' /// path to JOR
+			`"${rawencrypt}/Mozambique/Data/school_inicators_data.dta"' /// path to MOZ
+			`"${rawencrypt}/Rwanda/Data/final_indicator_school_data.dta"' /// path to RWA
 			using `"${mastData}/codebooks/schools.xlsx"'	/// path to codebook
 			, surveys(`"${countries}"') ///
 			gen(country)	// variable that identifies source of each obs
@@ -27,10 +27,10 @@ iecodebook template ///
 
 * apply to all datasets
 iecodebook append ///
-			/// path to PER survey %
-			/// path to JOR
-			/// path to MOZ
-			/// path to RWA
+			`"${rawencrypt}/Peru/Data/school_indicator_dta_confidential.dta"' /// path to PER survey
+			`"${rawencrypt}/Jordan/Data/final_indicator_school_data.dta"' /// path to JOR
+			`"${rawencrypt}/Mozambique/Data/school_inicators_data.dta"' /// path to MOZ
+			`"${rawencrypt}/Rwanda/Data/final_indicator_school_data.dta"' /// path to RWA
 			using `"${mastData}/codebooks/schools.xlsx"'	/// path to codebook
 			, clear ///
 			gen(country) 	// identify where each

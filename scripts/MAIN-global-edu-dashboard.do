@@ -110,16 +110,15 @@
 *iefolder will not work properly if the line above is edited
 
    global mastData               "$dataWorkFolder/MasterData"
-   global encryptFolder          "$dataWorkFolder/EncryptedData"
 
 
    *publicofficial folder globals
-   global publicofficial         "$mastData/publicofficial"
-   global publicofficial_encrypt "$encryptFolder/Master-publicofficial-Encrypted"
+   global publicofficial         "$mastData/public-official"
+   global publicofficial_encrypt "$encryptFolder/public-official"
 
    *school folder globals
    global school                 "$mastData/school"
-   global school_encrypt         "$encryptFolder/Master-school-Encrypted"
+   global school_encrypt         "$encryptFolder/school"
 
 *iefolder*1*FolderGlobals*encrypted*********************************************
 *iefolder will not work properly if the line above is edited
@@ -187,7 +186,7 @@
 /*set all settings to 1 if you want to run, default == 0 */
 
 gl s1	= 0		// reconstruct bi vars
-gl s2	= 0 	// generate top p-tile vars for BI 
+gl s2	= 0 	// generate top p-tile vars for BI
 
 
 
@@ -198,36 +197,8 @@ gl s2	= 0 	// generate top p-tile vars for BI
 
 
 
-
-*****************
-   * Construction 	WARNing: you can't run construction and the rest of the files at same time re macro drop
-	if (0) {
-		do "${scripts_clone}/GLOBE_po_append.do"
-	 	do "${scripts_clone}/GLOBE_sch_append.do"
-	 	do "${scripts_clone}/GLOBE_merge_append.do"
-	}
-		* HISTOGRAMS
-   if (0) { //Change the 0 to 1 to run the baseline master dofile
-	  * do 	"$scripts_clone/GLOBE_MASTER_asys+pt+A.do"
-	  * do "$scripts_clone/GLOBE_asys_SumStats.do"
-		*do  "$scripts_clone/GLOBE_histograms.do"		// this may not exist, done in AptA
-   }
-
-	* ANALYSIS pt. A
-	if (0) {
-		do "${scripts_clone}/GLOBE_MASTER_asys+pt+A.do"		// calls master script
-	}
-
-	* panel1 explore
-	if (1) {
-		do "${scripts_clone}/expl-regs/p1-explore.do"		// calls master script
-	}
-
-	* sampling
-	if (0) {
-		do "${scripts_clone}/GLOBE_MASTER_sampling.do"		// calls master script
-	}
 *iefolder*3*End_RunDofiles******************************************************
 *iefolder will not work properly if the line above is edited
+
 /* credits!
 Prof. Oscar Reyna-Torres https://www.princeton.edu/~otorres/Panel101.pdf

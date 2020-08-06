@@ -11,12 +11,12 @@ Function: runs all the scripts for the cleaning portion.
 								across all datasets 		*/
 
 
-* create a template using iecodebook
+* create a template using iecodebook %% note, will use files with long names
 iecodebook template ///
-			/// path to PER survey %
-			/// path to JOR
-			/// path to MOZ
-			/// path to RWA
+			`"${rawencrypt}/Peru/Data/public_official_dta_confidential.dta"' /// path to PER survey %
+			`"${rawencrypt}/Jordan/Data/public_officials_survey_data.dta"' /// path to JOR
+			`"${rawencrypt}/Mozambique/Data/public_official_dta_confidential.dta"' /// path to MOZ
+			`"${rawencrypt}/Rwanda/Data/public_officials_survey_data.dta"' /// path to RWA
 			using `"${mastData}/codebooks/po.xlsx"'	/// path to codebook
 			, surveys(`"${countries}"') ///
 			gen(country)	// variable that identifies source of each obs
@@ -27,10 +27,10 @@ iecodebook template ///
 
 * apply to all datasets
 iecodebook append ///
-			/// path to PER survey %
-			/// path to JOR
-			/// path to MOZ
-			/// path to RWA
+			`"${rawencrypt}/Peru/Data/public_official_dta_confidential.dta"' /// path to PER survey %
+			`"${rawencrypt}/Jordan/Data/public_officials_survey_data.dta"' /// path to JOR
+			`"${rawencrypt}/Mozambique/Data/public_official_dta_confidential.dta"' /// path to MOZ
+			`"${rawencrypt}/Rwanda/Data/public_officials_survey_data.dta"' /// path to RWA
 			using `"${mastData}/codebooks/po.xlsx"'	/// path to codebook
 			, clear ///
 			gen(country) 	// identify where each
