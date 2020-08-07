@@ -4,6 +4,7 @@
 library(rio)
 library(tidyverse)
 library(readstata13)
+library(sf)
 
                       # ----------------------------- #
                       # Load+append schools datasets  #----
