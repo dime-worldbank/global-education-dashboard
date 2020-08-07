@@ -123,6 +123,9 @@ m.po <-     bind_rows("Peru"   = peru_po,
         # and the purpose will be joined to the working datasets with the raw id 
         # before de-identification.
 
+# determine that each row is unique
+any(duplicated(m.school, by = c("school_code", "country")))
+
 
 # generate project id for schools (idschool)
 set.seed(47)
@@ -130,6 +133,8 @@ m.school$idschool <- runif(length(m.school$school_code)) %>%
   rank()
 
   
+# determine that each row is unique
+any(duplicated(m.po, by = c("interview__id", "country")))
 
 
 # generate project id for public officials (idpo)
