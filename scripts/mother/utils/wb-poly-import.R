@@ -38,25 +38,72 @@ wbpoly <- "C:/Users/WB551206/OneDrive - WBG/Documents/WB_data/names+boundaries/2
 wb.poly <- st_read(file.path(wbpoly, "GeoJSON/g2015_2014_2.geojson")) %>%
   filter(ADM0_NAME == "Peru" | ADM0_NAME == "Jordan" | ADM0_NAME == "Mozambique" | ADM0_NAME == "Rwanda")
 
-# save as Rda file for now. 
-saveRDS(wb.poly,
-        file = "A:/main/wb-poly4.Rda")
-
-# load Rda
-wb.poly <- readRDS("A:/main/wb-poly4.Rda")
-
-
 # check for duplicates
 assert_that(anyDuplicated(wb.poly$ADM2_CODE) == 0)
 
-# create random g0 id (ADM0_CODE)
-set.seed(417)
-wb.poly %>% 
+
+
+
+
+                        # ------------------------------------- # 
+                        #         random ID creation            # ----
+                        # ------------------------------------- # 
+
+
+# create random g0 id (ADM0_CODE): country
+wbpoly0 <- as.data.frame(select(wb.poly, ADM0_CODE)) %>%
   group_by(ADM0_CODE) %>%
-  mutate( g0 = runif(length(ADM0_CODE)))  %>%
-            rank()
+  summarize()   #collapse by unique value of ADM0_code
+
+set.seed(417)
+wbpoly0$g0 <- 
+  runif(length(wbpoly0$ADM0_CODE))  %>% # generate a random id based on seed
+        rank()
+  
 
 
-duplicated(wb.poly$ADM1_CODE, by = c("ADM1_CODE", "ADM0_CODE"))
-group_indices(wb.poly, ADM0_CODE)
+# create random g1 id (ADM1_CODE): region
+wbpoly1 <- as.data.frame(select(wb.poly, ADM1_CODE, ADM0_CODE)) %>%
+  group_by(ADM1_CODE, ADM0_CODE) %>%
+  summarize()    #collapse by unique value of ADM0_code
 
+set.seed(417)
+wbpoly1$g1 =  runif(length(wbpoly1$ADM1_CODE))  %>% # generate a random id based on seed
+      rank()
+
+
+
+# create random g2 id (ADM2_CODE): district
+wbpoly2 <- as.data.frame(select(wb.poly, ADM2_CODE, ADM1_CODE, ADM0_CODE)) %>%
+  group_by(ADM2_CODE, ADM1_CODE, ADM0_CODE) %>%
+  summarize()    #collapse by unique value of ADM0_code
+
+set.seed(417)
+wbpoly2$g2 =  runif(length(wbpoly2$ADM2_CODE))  %>% # generate a random id based on seed
+  rank()
+
+
+
+# merge id's back to world poly
+wb.poly.m <- 
+  left_join(wb.poly, wbpoly0, by = "ADM0_CODE") %>%
+  left_join(wbpoly1, by = c("ADM0_CODE", "ADM1_CODE")) %>%
+  left_join(wbpoly2, by =  c("ADM0_CODE", "ADM1_CODE", "ADM2_CODE"))
+
+# assert that there are no duplicates of the three randomized ids
+assert_that(anyDuplicated(wb.poly.m$g2,
+                          wb.poly.m$g1,
+                          wb.poly.m$g0) == 0)
+
+
+
+
+
+                          # ------------------------------------- # 
+                          #   spatial join with main dataset      # ----
+                          # ------------------------------------- # 
+
+
+
+saveRDS(wb.poly,
+        file = "A:/main/wb-poly4.Rda")
