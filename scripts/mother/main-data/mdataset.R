@@ -100,12 +100,12 @@ m.po <-     bind_rows("Peru"   = peru_po,
                       "Rwanda" = rwanda_po,
                       "Mozambique" = mozambique_po,
                       .id = "country") %>%
-  mutate(
-    govt_tier = fct_recode(govt_tier, # recode factor levels
-                           "MinEDU Central" = "Ministry of Education (or equivalent)", 
-                           "Region Office" = "Regional office (or equivalent)",
-                           "District Office" = "District office (or equivalent)"
-                           ))
+            mutate(
+                    govt_tier = fct_recode(govt_tier, # recode factor levels
+                                     "MinEDU Central" = "Ministry of Education (or equivalent)", 
+                                     "Region Office" = "Regional office (or equivalent)",
+                                     "District Office" = "District office (or equivalent)"
+                                     ))
 
 
 
@@ -124,25 +124,23 @@ m.po <-     bind_rows("Peru"   = peru_po,
         # before de-identification.
 
 # determine that each row is unique 
-any(duplicated(m.school, by = c("school_code", "country")))
-  # remove the one obs of mozambique that is duplicated %%
-m.school$dups <- duplicated(m.school, by = c("school_code", "country"))
+m.school <- distinct(m.school, country, school_code, lat, lon, student_knowledge,
+           .keep_all = TRUE)  # dyplr will keep first value of dups across these vars
 
+m.po <- distinct(m.po, country, interview__id, lat, lon, national_learning_goals, 
+           .keep_all = TRUE) # remove dups across these variables
 
+# make sure no missings for key variables
+assert_that(any(is.na(m.school$country)) == 0) #no country codes are missing
+assert_that(any(is.na(m.school$school_code)) == 0) #no school codes are missing
+assert_that(any(is.na(m.po$country)) == 0) #no country codes are missing
+assert_that(any(is.na(m.po$interview__id)) == 0) #no school codes are missing
 
-anyDuplicated(m.school$school_code, m.school$country)
-assert_that(any(is.na(m.school$country)) == 0)
-assert_that(any(duplicated(m.school$school_code,
-                          m.school$country)) == 0)
 
 # generate project id for schools (idschool)
 set.seed(47)
 m.school$idschool <- runif(length(m.school$school_code)) %>%
   rank()
-
-  
-# determine that each row is unique
-any(duplicated(m.po, by = c("interview__id", "country")))
 
 
 # generate project id for public officials (idpo)
@@ -170,11 +168,11 @@ wbpoly <-
   "C:/Users/WB551206/OneDrive - WBG/Documents/WB_data/names+boundaries/20160921_GAUL_GeoJSON_TopoJSON"
 
 wb.poly <- st_read(file.path(wbpoly, "GeoJSON/g2015_2014_2.geojson")) %>%
-  filter(ADM0_NAME == "Peru" | ADM0_NAME == "Jordan" | ADM0_NAME == "Mozambique" | ADM0_NAME == "Rwanda")
+  filter(ADM0_NAME == "Peru" | ADM0_NAME == "Jordan" | ADM0_NAME == "Mozambique" | ADM0_NAME == "Rwanda") %>%
+  distinct(ADM2_CODE, ADM1_CODE, ADM0_CODE, .keep_all = TRUE)  # remove any possible duplicates
 
-# check for duplicates
+# check for duplicates: district code
 assert_that(anyDuplicated(wb.poly$ADM2_CODE) == 0)
-
 
 
 
@@ -222,13 +220,16 @@ wbpoly2$g2 =  runif(length(wbpoly2$ADM2_CODE))  %>% # generate a random id based
 wb.poly.m <- 
   left_join(wb.poly, wbpoly0, by = "ADM0_CODE") %>%
   left_join(wbpoly1, by = c("ADM0_CODE", "ADM1_CODE")) %>%
-  left_join(wbpoly2, by =  c("ADM0_CODE", "ADM1_CODE", "ADM2_CODE"))
+  left_join(wbpoly2, by =  c("ADM0_CODE", "ADM1_CODE", "ADM2_CODE")) %>%
+  distinct(g0, g1, g2, .keep_all = TRUE)
 
 # assert that there are no duplicates of the three randomized ids
 assert_that(anyDuplicated(wb.poly.m$g2,
                           wb.poly.m$g1,
                           wb.poly.m$g0) == 0)
 
+        # we were pretty sure of this as we used distinct() above 
+        # but just to make be sure.
 
 
 
@@ -244,6 +245,7 @@ assert_that(anyDuplicated(wb.poly.m$g2,
 
 
 
-saveRDS(wb.poly,
-        file = "A:/main/wb-poly4.Rda")
+#saveRDS(wb.poly, file = "A:/main/wb-poly4.Rda")
+# credits: https://stackoverflow.com/questions/6986657/find-duplicated-rows-based-on-2-columns-in-data-frame-in-r
+
 
