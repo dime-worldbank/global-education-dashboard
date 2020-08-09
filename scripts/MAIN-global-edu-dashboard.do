@@ -154,7 +154,7 @@
    * standardization, different sets of control variables,
    * adofile paths etc.
 
-   do `"${scripts_clone}/GLOBE_global_setup.do"'
+  * do `"${scripts_clone}/GLOBE_global_setup.do"'
 
 
 *iefolder*2*End_StandardGlobals*************************************************
