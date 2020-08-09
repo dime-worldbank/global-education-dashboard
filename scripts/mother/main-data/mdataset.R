@@ -1,11 +1,12 @@
 # Mdataset.R
 # appends all schools datasets and all public officials dataset (raw)
 
-library(rio)
+
 library(tidyverse)
 library(readstata13)
 library(sf)
 library(assertthat)
+library(rio)
 
                       # ----------------------------- #
                       # Load+append schools datasets  #----
@@ -60,19 +61,15 @@ tiers <- c("Ministry of Education (or equivalent)",
            "District office (or equivalent)")
 
 # Peru
-peru_po <- read.dta13(file.path(vault, 
-                                "Mozambique/Data/public_officials_survey_data.dta"),
-                      convert.factors = TRUE,
-                      generate.factors = TRUE ,
-                      nonint.factors = TRUE) 
+peru_po <- import(file.path(vault, 
+                            "Peru/Data/Full_Data/public_officials_indicators_data.RData"),
+                  which = "school_dta_short")
 
 
 # Jordan
-jordan_po <- read.dta13(file.path(vault, 
-                                  "Mozambique/Data/public_officials_survey_data.dta"),
-                        convert.factors = TRUE,
-                        generate.factors = TRUE ,
-                        nonint.factors = TRUE) 
+jordan_po <- import(file.path(vault, 
+                              "Jordan/Data/Full_Data/public_officials_indicators_data.RData"),
+                    which = "school_dta_short")
 
 
 # Mozambique :: note there is no Rdata file. 
@@ -85,7 +82,7 @@ mozambique_po <- read.dta13(file.path(vault,
 
 # Rwanda
 rwanda_po <- read.dta13(file.path(vault, 
-                                  "Mozambique/Data/public_officials_survey_data.dta"),
+                                  "Rwanda/Data/public_officials_survey_data.dta"),
                         convert.factors = TRUE,
                         generate.factors = TRUE ,
                         nonint.factors = TRUE)  %>%
@@ -231,6 +228,8 @@ assert_that(anyDuplicated(wb.poly.m$g2,
         # we were pretty sure of this as we used distinct() above 
         # but just to make be sure.
 
+saveRDS(wb.poly.m,
+         file = "A:/main/wb-poly-m.Rda")
 
 
                             
@@ -240,8 +239,62 @@ assert_that(anyDuplicated(wb.poly.m$g2,
 
 # use st_join to match mother dataset obs to geographic location based on gps 
 
+# convert po + school dataset to sf objects 
+    
+    # set geometry/point column first 
+    
 
+po <- st_as_sf(m.po,
+               coords = c("lon", "lat"),
+               na.fail = FALSE)
 
+school <- st_as_sf(m.school,
+                   coords = c("lon", "lat"),
+                   na.fail = FALSE)
+
+    
+    # set the crs of school + po as the same as the world poly crs
+    st_crs(po) <- st_crs(wb.poly.m)
+    st_crs(school) <- st_crs(wb.poly.m)
+    st_crs(wb.poly.m)
+    st_crs(po)
+    
+    st_is_longlat(po)
+    st_is_longlat(wb.poly.m)
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+# st contains, nothing matches 
+    po.test3 = st_join(po, # syntax: must contain points 
+                      wb.poly.m["ADM0_NAME"] # syntax, must contain polys
+                      ) %>%
+      select(country, geometry, ADM0_NAME)
+  
+    
+# when using within, nothing matches    
+po.test2<- st_join(po, # syntax: must contain points 
+                      wb.poly.m, # syntax, must contain polys
+                      join = st_within)
+
+# wne using nearest features everytthing maps to either peru or jordan...   
+po.test<- st_join(po, # syntax: must contain points 
+                  wb.poly.m, # syntax, must contain polys
+                  join = st_nearest_feature)
+
+lst = st_join(po, wb.poly.m, 
+                    sparse = FALSE)
+lst
+
+class(wb.poly.m$geometry)
+class(po$geometry)
 
 
 
