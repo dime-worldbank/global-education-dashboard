@@ -285,50 +285,43 @@ school <- st_as_sf(m.school,
     
 
 # join poly and po datasets
+order <- c("ADM0_NAME", "ADM1_NAME", "ADM2_NAME", 
+           "ADM0_CODE", "ADM1_CODE", "ADM2_CODE",
+           "g0", "g1", "g2")
+    
 main_po_data <- st_join(po, # points
                         wb.poly.m) %>% #polys
-                left_join(m.po,
-                          by = "interview__id",
-                          ) 
-                select()
+                left_join(m.po.gps, # join back to gps coords for reference 
+                          by = c("interview__id", "country")
+                          ) %>%
+                select(idpo, interview__id, order, everything())
     
     
 # join poly and school datasets
 main_school_data <- st_join(school, # points
-                            wb.poly.m) %>% # polys
-                            select()
+                            wb.poly.m) %>% #polys
+                    left_join(m.school.gps, # join back to gps coords for reference 
+                              by = c("school_code", "country")
+                    ) %>%
+                    select(idschool, school_code, order, everything())
     
     
-    
-    
-    
-# st contains, nothing matches %% yay, this works!
-#     po.test3 = st_join(po, # syntax: must contain points 
-#                       wb.poly.m["ADM0_NAME"] # syntax, must contain polys
-#                       ) %>%
-#       select(country, geometry, ADM0_NAME)
-#   
-#     
-# # when using within, nothing matches    
-# po.test2<- st_join(po, # syntax: must contain points 
-#                       wb.poly.m, # syntax, must contain polys
-#                       join = st_within)
-# 
-# # wne using nearest features everytthing maps to either peru or jordan...   
-# po.test<- st_join(po, # syntax: must contain points 
-#                   wb.poly.m, # syntax, must contain polys
-#                   join = st_nearest_feature)
-# 
-# lst = st_join(po, wb.poly.m, 
-#                     sparse = FALSE)
-# lst
-# 
-# class(wb.poly.m$geometry)
-# class(po$geometry)
-# 
-# 
-# 
-# #saveRDS(wb.poly, file = "A:/main/wb-poly4.Rda")
+# save as rds/stata 
+save(main_po_data, main_school_data,
+     m.po, m.school, 
+     wb.poly.m,
+     tiers,
+     file = "A:/main/final_main_data.Rdata") 
+
+# error here, can't convert to dta %%
+save.dta13(data = main_po_data, 
+           file = "A:/main/final_main_po_data.dta"
+           )
+
+write_dta(main_school_data, 
+           path = "A:/main/final_main_school_data.dta"
+           )
+
 # # credits: https://stackoverflow.com/questions/6986657/find-duplicated-rows-based-on-2-columns-in-data-frame-in-r
 # 
 # 
