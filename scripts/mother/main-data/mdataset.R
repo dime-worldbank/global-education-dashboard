@@ -1,11 +1,12 @@
 # Mdataset.R
 # appends all schools datasets and all public officials dataset (raw)
 
-library(rio)
+
 library(tidyverse)
 library(readstata13)
 library(sf)
 library(assertthat)
+library(rio)
 
                       # ----------------------------- #
                       # Load+append schools datasets  #----
@@ -60,36 +61,33 @@ tiers <- c("Ministry of Education (or equivalent)",
            "District office (or equivalent)")
 
 # Peru
-peru_po <- read.dta13(file.path(vault, 
-                                "Mozambique/Data/public_officials_survey_data.dta"),
-                      convert.factors = TRUE,
-                      generate.factors = TRUE ,
-                      nonint.factors = TRUE) 
+peru_po <- import(file.path(vault, 
+                            "Peru/Data/Full_Data/public_officials_indicators_data.RData"),
+                  which = "public_officials_dta_clean")
 
 
 # Jordan
-jordan_po <- read.dta13(file.path(vault, 
-                                  "Mozambique/Data/public_officials_survey_data.dta"),
-                        convert.factors = TRUE,
-                        generate.factors = TRUE ,
-                        nonint.factors = TRUE) 
+jordan_po <- import(file.path(vault, 
+                              "Jordan/Data/Full_Data/public_officials_indicators_data.RData"),
+                    which = "public_officials_dta_clean")
 
 
 # Mozambique :: note there is no Rdata file. 
 mozambique_po <- read.dta13(file.path(vault, 
                                   "Mozambique/Data/public_officials_survey_data.dta"),
                             convert.factors = TRUE,
-                            generate.factors = TRUE ,
-                            nonint.factors = TRUE) 
+                            generate.factors = FALSE ,
+                            nonint.factors = FALSE) 
+      # will levels be same as rest by when converting from numeric to factor?
+      #mozambique_po$govt_tier <- factor(mozambique_po$govt_tier, levels = tiers) %>%
+                                factor()
 
 
 # Rwanda
-rwanda_po <- read.dta13(file.path(vault, 
-                                  "Mozambique/Data/public_officials_survey_data.dta"),
-                        convert.factors = TRUE,
-                        generate.factors = TRUE ,
-                        nonint.factors = TRUE)  %>%
-  rename(end_time = "ENUMq1") 
+rwanda_po <- import(file.path(vault, 
+                              "Rwanda/Data/Full_Data/public_officials_indicators_data.RData"),
+                    which = "public_officials_dta_clean")  %>%
+                    rename(end_time = "ENUMq1") 
   # convert ENUMq1 to numeric. issue is that this is not the duration but the end time
   # (must subract from start). For now I will simply rename as new variable called "end_time"
 
@@ -106,8 +104,6 @@ m.po <-     bind_rows("Peru"   = peru_po,
                                      "Region Office" = "Regional office (or equivalent)",
                                      "District Office" = "District office (or equivalent)"
                                      ))
-
-
 
 
 
@@ -156,6 +152,19 @@ saveRDS(m.school,
 saveRDS(m.po,
         file = "A:/main/m-po.Rda")
 
+# gerenate gps only datasets with country id, 
+m.po.gps <- select(m.po, 
+                   country, 
+                   interview__id, 
+                   lon,
+                   lat)
+
+m.school.gps <- select(m.school, 
+                       country, 
+                       school_code, 
+                       lon,
+                       lat)
+
 
 
 
@@ -164,12 +173,17 @@ saveRDS(m.po,
                                 # ------------------------------------- # 
                                 # import WB subnational geojson files   # ----
                                 # ------------------------------------- # 
+imprt <- 0 
+
+if (imprt == 1) {
+
 wbpoly <-
   "C:/Users/WB551206/OneDrive - WBG/Documents/WB_data/names+boundaries/20160921_GAUL_GeoJSON_TopoJSON"
 
 wb.poly <- st_read(file.path(wbpoly, "GeoJSON/g2015_2014_2.geojson")) %>%
   filter(ADM0_NAME == "Peru" | ADM0_NAME == "Jordan" | ADM0_NAME == "Mozambique" | ADM0_NAME == "Rwanda") %>%
   distinct(ADM2_CODE, ADM1_CODE, ADM0_CODE, .keep_all = TRUE)  # remove any possible duplicates
+
 
 # check for duplicates: district code
 assert_that(anyDuplicated(wb.poly$ADM2_CODE) == 0)
@@ -231,8 +245,14 @@ assert_that(anyDuplicated(wb.poly.m$g2,
         # we were pretty sure of this as we used distinct() above 
         # but just to make be sure.
 
+saveRDS(wb.poly.m,
+         file = "A:/main/wb-poly-m.Rda")
 
+}
 
+if (imprt == 0) {
+  wb.poly.m <- readRDS("A:/main/wb-poly-m.Rda")
+}
                             
                             # ------------------------------------- # 
                             #   spatial join with main dataset      # ----
@@ -240,12 +260,68 @@ assert_that(anyDuplicated(wb.poly.m$g2,
 
 # use st_join to match mother dataset obs to geographic location based on gps 
 
+# convert po + school dataset to sf objects 
+    
+    # set geometry/point column first 
+    
 
+po <- st_as_sf(m.po,
+               coords = c("lon", "lat"),
+               na.fail = FALSE)
 
+school <- st_as_sf(m.school,
+                   coords = c("lon", "lat"),
+                   na.fail = FALSE)
 
+    
+    # set the crs of school + po as the same as the world poly crs
+    st_crs(po) <- st_crs(wb.poly.m)
+    st_crs(school) <- st_crs(wb.poly.m)
+    st_crs(wb.poly.m)
+    st_crs(po)
+    
+    st_is_longlat(po)
+    st_is_longlat(wb.poly.m)
+    
 
+# join poly and po datasets
+order <- c("ADM0_NAME", "ADM1_NAME", "ADM2_NAME", 
+           "ADM0_CODE", "ADM1_CODE", "ADM2_CODE",
+           "g0", "g1", "g2")
+    
+main_po_data <- st_join(po, # points
+                        wb.poly.m) %>% #polys
+                left_join(m.po.gps, # join back to gps coords for reference 
+                          by = c("interview__id", "country")
+                          ) %>%
+                select(idpo, interview__id, order, everything())
+    
+    
+# join poly and school datasets
+main_school_data <- st_join(school, # points
+                            wb.poly.m) %>% #polys
+                    left_join(m.school.gps, # join back to gps coords for reference 
+                              by = c("school_code", "country")
+                    ) %>%
+                    select(idschool, school_code, order, everything())
+    
+    
+# save as rds/stata 
+save(main_po_data, main_school_data,
+     m.po, m.school, 
+     wb.poly.m,
+     tiers,
+     file = "A:/main/final_main_data.Rdata") 
 
-#saveRDS(wb.poly, file = "A:/main/wb-poly4.Rda")
-# credits: https://stackoverflow.com/questions/6986657/find-duplicated-rows-based-on-2-columns-in-data-frame-in-r
+# error here, can't convert to dta %%
+save.dta13(data = main_po_data, 
+           file = "A:/main/final_main_po_data.dta"
+           )
 
+write_dta(main_school_data, 
+           path = "A:/main/final_main_school_data.dta"
+           )
 
+# # credits: https://stackoverflow.com/questions/6986657/find-duplicated-rows-based-on-2-columns-in-data-frame-in-r
+# 
+# 
