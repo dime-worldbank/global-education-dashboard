@@ -35,7 +35,7 @@
 	macro drop _all
    *Install all packages that this project requires:
    *(Note that this never updates outdated versions of already installed commands, to update commands use adoupdate)
-   local user_commands ietoolkit zscore //labutil      //Fill this list will all user-written commands this project requires
+   local user_commands ietoolkit scores // labutil      //Fill this list will all user-written commands this project requires
    foreach command of local user_commands {
        cap which `command'
        if _rc == 111 {
