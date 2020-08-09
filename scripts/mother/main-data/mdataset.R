@@ -63,30 +63,31 @@ tiers <- c("Ministry of Education (or equivalent)",
 # Peru
 peru_po <- import(file.path(vault, 
                             "Peru/Data/Full_Data/public_officials_indicators_data.RData"),
-                  which = "school_dta_short")
+                  which = "public_officials_dta_clean")
 
 
 # Jordan
 jordan_po <- import(file.path(vault, 
                               "Jordan/Data/Full_Data/public_officials_indicators_data.RData"),
-                    which = "school_dta_short")
+                    which = "public_officials_dta_clean")
 
 
 # Mozambique :: note there is no Rdata file. 
 mozambique_po <- read.dta13(file.path(vault, 
                                   "Mozambique/Data/public_officials_survey_data.dta"),
                             convert.factors = TRUE,
-                            generate.factors = TRUE ,
-                            nonint.factors = TRUE) 
+                            generate.factors = FALSE ,
+                            nonint.factors = FALSE) 
+      # will levels be same as rest by when converting from numeric to factor?
+      #mozambique_po$govt_tier <- factor(mozambique_po$govt_tier, levels = tiers) %>%
+                                factor()
 
 
 # Rwanda
-rwanda_po <- read.dta13(file.path(vault, 
-                                  "Rwanda/Data/public_officials_survey_data.dta"),
-                        convert.factors = TRUE,
-                        generate.factors = TRUE ,
-                        nonint.factors = TRUE)  %>%
-  rename(end_time = "ENUMq1") 
+rwanda_po <- import(file.path(vault, 
+                              "Rwanda/Data/Full_Data/public_officials_indicators_data.RData"),
+                    which = "public_officials_dta_clean")  %>%
+                    rename(end_time = "ENUMq1") 
   # convert ENUMq1 to numeric. issue is that this is not the duration but the end time
   # (must subract from start). For now I will simply rename as new variable called "end_time"
 
@@ -103,8 +104,6 @@ m.po <-     bind_rows("Peru"   = peru_po,
                                      "Region Office" = "Regional office (or equivalent)",
                                      "District Office" = "District office (or equivalent)"
                                      ))
-
-
 
 
 
@@ -153,6 +152,19 @@ saveRDS(m.school,
 saveRDS(m.po,
         file = "A:/main/m-po.Rda")
 
+# gerenate gps only datasets with country id, 
+m.po.gps <- select(m.po, 
+                   country, 
+                   interview__id, 
+                   lon,
+                   lat)
+
+m.school.gps <- select(m.school, 
+                       country, 
+                       school_code, 
+                       lon,
+                       lat)
+
 
 
 
@@ -161,12 +173,17 @@ saveRDS(m.po,
                                 # ------------------------------------- # 
                                 # import WB subnational geojson files   # ----
                                 # ------------------------------------- # 
+imprt <- 0 
+
+if (imprt == 1) {
+
 wbpoly <-
   "C:/Users/WB551206/OneDrive - WBG/Documents/WB_data/names+boundaries/20160921_GAUL_GeoJSON_TopoJSON"
 
 wb.poly <- st_read(file.path(wbpoly, "GeoJSON/g2015_2014_2.geojson")) %>%
   filter(ADM0_NAME == "Peru" | ADM0_NAME == "Jordan" | ADM0_NAME == "Mozambique" | ADM0_NAME == "Rwanda") %>%
   distinct(ADM2_CODE, ADM1_CODE, ADM0_CODE, .keep_all = TRUE)  # remove any possible duplicates
+
 
 # check for duplicates: district code
 assert_that(anyDuplicated(wb.poly$ADM2_CODE) == 0)
@@ -231,7 +248,11 @@ assert_that(anyDuplicated(wb.poly.m$g2,
 saveRDS(wb.poly.m,
          file = "A:/main/wb-poly-m.Rda")
 
+}
 
+if (imprt == 0) {
+  wb.poly.m <- readRDS("A:/main/wb-poly-m.Rda")
+}
                             
                             # ------------------------------------- # 
                             #   spatial join with main dataset      # ----
@@ -263,42 +284,51 @@ school <- st_as_sf(m.school,
     st_is_longlat(wb.poly.m)
     
 
+# join poly and po datasets
+main_po_data <- st_join(po, # points
+                        wb.poly.m) %>% #polys
+                left_join(m.po,
+                          by = "interview__id",
+                          ) 
+                select()
+    
+    
+# join poly and school datasets
+main_school_data <- st_join(school, # points
+                            wb.poly.m) %>% # polys
+                            select()
     
     
     
     
     
-    
-    
-    
-    
-# st contains, nothing matches 
-    po.test3 = st_join(po, # syntax: must contain points 
-                      wb.poly.m["ADM0_NAME"] # syntax, must contain polys
-                      ) %>%
-      select(country, geometry, ADM0_NAME)
-  
-    
-# when using within, nothing matches    
-po.test2<- st_join(po, # syntax: must contain points 
-                      wb.poly.m, # syntax, must contain polys
-                      join = st_within)
-
-# wne using nearest features everytthing maps to either peru or jordan...   
-po.test<- st_join(po, # syntax: must contain points 
-                  wb.poly.m, # syntax, must contain polys
-                  join = st_nearest_feature)
-
-lst = st_join(po, wb.poly.m, 
-                    sparse = FALSE)
-lst
-
-class(wb.poly.m$geometry)
-class(po$geometry)
-
-
-
-#saveRDS(wb.poly, file = "A:/main/wb-poly4.Rda")
-# credits: https://stackoverflow.com/questions/6986657/find-duplicated-rows-based-on-2-columns-in-data-frame-in-r
-
-
+# st contains, nothing matches %% yay, this works!
+#     po.test3 = st_join(po, # syntax: must contain points 
+#                       wb.poly.m["ADM0_NAME"] # syntax, must contain polys
+#                       ) %>%
+#       select(country, geometry, ADM0_NAME)
+#   
+#     
+# # when using within, nothing matches    
+# po.test2<- st_join(po, # syntax: must contain points 
+#                       wb.poly.m, # syntax, must contain polys
+#                       join = st_within)
+# 
+# # wne using nearest features everytthing maps to either peru or jordan...   
+# po.test<- st_join(po, # syntax: must contain points 
+#                   wb.poly.m, # syntax, must contain polys
+#                   join = st_nearest_feature)
+# 
+# lst = st_join(po, wb.poly.m, 
+#                     sparse = FALSE)
+# lst
+# 
+# class(wb.poly.m$geometry)
+# class(po$geometry)
+# 
+# 
+# 
+# #saveRDS(wb.poly, file = "A:/main/wb-poly4.Rda")
+# # credits: https://stackoverflow.com/questions/6986657/find-duplicated-rows-based-on-2-columns-in-data-frame-in-r
+# 
+# 
