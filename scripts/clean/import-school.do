@@ -9,13 +9,13 @@ Function: runs all the scripts for the cleaning portion.
 							/* 	use iecodebook to harmonized
 								variable names
 								across all datasets 		*/
-								
+
 use 			"A:/main/final_main_school_data.dta", clear  // path to PER survey
 
 if (1) {
 * create a template using iecodebook %% must import with value label attributes
 iecodebook template ///
-			using `"${mastData}/codebooks/schools.xlsx"'	/// path to codebook
+			using `"${mastData}/codebooks/schools-4countries.xlsx"'	/// path to codebook
 			, replace
 }
 
@@ -26,7 +26,7 @@ iecodebook template ///
 * %% this will not run unless you delete the _appended.xlsx, and replace option wont work
 iecodebook append ///
 			`"${rawencrypt}/main/final_main_school_data.dta"' /// path to PER survey
-			using `"${mastData}/codebooks/schools.xlsx"'	// path to codebook
+			using `"${mastData}/codebooks/schools-4countries.xlsx"'	// path to codebook
 
 
 
