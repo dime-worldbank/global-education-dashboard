@@ -19,7 +19,8 @@ iecodebook template ///
 			 "A:/Countries/Mozambique/Data/MOZ_po_survey_data_short.dta" /// path to moz
 			 "A:/Countries/Rwanda/Data/RWA_po_survey_data_short.dta" /// path to rwanda
 			 using `"${mastData}/codebooks/po.xlsx"' /// path to codebook
-			, replace surveys($countrynames) generate(country)
+			, replace surveys($countrynames) generate(country) ///
+			match
 }
 		/*excel editing happens manually here. */
 
@@ -31,7 +32,7 @@ iecodebook apply ///
 			 "A:/Countries/Mozambique/Data/MOZ_po_survey_data_short.dta" /// path to moz
 			 "A:/Countries/Rwanda/Data/RWA_po_survey_data_short.dta" /// path to rwanda
 			 using `"${mastData}/codebooks/po.xlsx"' /// path to codebook
-			, replace surveys($countrynames) generate(country) clear 
+			, replace surveys($countrynames) generate(country) clear
 
 }
 

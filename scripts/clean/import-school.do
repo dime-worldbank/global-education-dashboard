@@ -33,7 +33,7 @@ iecodebook append ///
 			 "A:/Countries/Mozambique/Data/school_inicators_data.dta" /// path to moz
 			 "A:/Countries/Rwanda/Data/final_indicator_school_data.dta" /// path to rwanda
 			 using `"${mastData}/codebooks/schools.xlsx"' /// path to codebook
-			, replace surveys($countrynames) generate(country) clear match 
+			, replace surveys($countrynames) generate(country) clear
 
 
 
