@@ -18,7 +18,7 @@ iecodebook template ///
 			`"${rawencrypt}/Mozambique/Data/public_official_dta_confidential.dta"' /// path to MOZ
 			`"${rawencrypt}/Rwanda/Data/public_officials_survey_data.dta"' /// path to RWA
 			using `"${mastData}/codebooks/po.xlsx"'	/// path to codebook
-			, surveys(`"${countries}"') ///
+			, surveys(${countrynames}) ///
 			gen(country)	// variable that identifies source of each obs
 
 
@@ -33,7 +33,7 @@ iecodebook append ///
 			`"${rawencrypt}/Rwanda/Data/public_officials_survey_data.dta"' /// path to RWA
 			using `"${mastData}/codebooks/po.xlsx"'	/// path to codebook
 			, clear ///
-			gen(country) 	// identify where each
+			gen(country) surveys(`"${countrynames}"') 	// identify where each
 
 
 

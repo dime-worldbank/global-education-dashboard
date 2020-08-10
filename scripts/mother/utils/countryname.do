@@ -7,7 +7,7 @@ levelsof 	country, miss
 assert 		r(r) == ${c_n} 		// should only be the number of values as the no of countries
 
 * generate the country number 
-gen 		int countryname = ""
+gen 		countryname = ""
 replace 	countryname = "Peru" if country == 1
 replace 	countryname = "Jordan" if country == 2
 replace 	countryname = "Mozambique" if country == 3
