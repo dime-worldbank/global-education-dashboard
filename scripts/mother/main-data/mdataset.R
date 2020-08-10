@@ -7,6 +7,7 @@ library(readstata13)
 library(sf)
 library(assertthat)
 library(rio)
+library(haven)
 
                       # ----------------------------- #
                       # Load+append schools datasets  #----
@@ -325,13 +326,20 @@ save(main_po_data, main_school_data,
      tiers,
      file = "A:/main/final_main_data.Rdata") 
 
-# error here, can't convert to dta %%
-main_po_data %>% st_set_geometry(NULL) %>%
-            save.dta13(file = "A:/main/final_main_po_data.dta"
-               )
+#determine list of vars to change length 
+varlist_p <- as.data.frame(colnames(main_po_data))
+to.change_p <- varlist_p %>%
+  filter(str_length(colnames(main_po_data)) > 26 )
+      
+main_po_data %>% st_set_geometry(., NULL) %>% # %% start here.
+  rename_at(.vars=)
+  write_dta(path = "A:/main/final_main_po_data.dta", 
+            version = 14
+     ) # default, leave factors as value labels, use variable name as var label, abbreviate?
 
 main_school_data %>% st_set_geometry(NULL) %>%
-  save.dta13(file = "A:/main/final_main_school_data.dta"
+  write_dta(path = "A:/main/final_main_school_data.dta",
+            version = 14 # v15 causes problems with </sortlist>
            )
 
 # # credits: https://stackoverflow.com/questions/6986657/find-duplicated-rows-based-on-2-columns-in-data-frame-in-r
