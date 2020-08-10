@@ -24,8 +24,7 @@ iecodebook template ///
 
 * apply to all datasets
 * %% this will not run unless you delete the _appended.xlsx, and replace option wont work
-iecodebook append ///
-			`"${rawencrypt}/main/final_main_school_data.dta"' /// path to PER survey
+iecodebook apply ///
 			using `"${mastData}/codebooks/schools-4countries.xlsx"'	// path to codebook
 
 
