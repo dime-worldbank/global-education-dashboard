@@ -59,14 +59,14 @@
 		 global 	raw_po					"${jointencrypt}/Rwanda/Data/public_officials_survey_data_short.dta"
 		 global 	raw_sch					"${jointencrypt}\Rwanda\Data\final_indicator_school_data.dta"
 		 * Imported
-		 global	A_po 					"${encryptFolder}/Master publicofficial Encrypted/DataSet/A_PO.dta"
-		 global	A_sch					"${encryptFolder}/Master school Encrypted/DataSet/A_school.dta"
+		 global	A_po 					"${encryptFolder}/public-official/A_PO.dta"
+		 global	A_sch					"${encryptFolder}/school/A_school.dta"
 		 * clean
-		 global  B_sch					"${encryptFolder}/Master school Encrypted/DataSet/B_school.dta"
-		 global  B_po					"${encryptFolder}/Master publicofficial Encrypted/DataSet/B_PO.dta"
+		 global  B_sch					"${encryptFolder}/school/B_school.dta"
+		 global  B_po					"${encryptFolder}/public-official/B_PO.dta"
 		 * construct
-		 global  C_po 					"${encryptFolder}/Master publicofficial Encrypted/DataSet/C_PO.dta"
-		 global  C_sch					"${encryptFolder}/Master school Encrypted/DataSet/C_school.dta"
+		 global  C_po 					"${encryptFolder}/public-official/C_PO.dta"
+		 global  C_sch					"${encryptFolder}/school/C_school.dta"
 		 * deidentified, merged with master
 		 global	D_sch					"${baseline_dt}/Deidentified/D_sch.dta"
 		 global	D_po					"${baseline_dt}/Deidentified/D_po.dta"
