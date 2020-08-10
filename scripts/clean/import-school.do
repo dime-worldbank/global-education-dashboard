@@ -13,7 +13,7 @@ Function: runs all the scripts for the cleaning portion.
 use 			"A:/main/final_main_school_data.dta", clear  // path to PER survey
 
 if (1) {
-* create a template using iecodebook
+* create a template using iecodebook %% must import with value label attributes
 iecodebook template ///
 			using `"${mastData}/codebooks/schools.xlsx"'	/// path to codebook
 			, replace
