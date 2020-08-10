@@ -9,13 +9,14 @@ Function: runs all the scripts for the cleaning portion.
 							/* 	use iecodebook to harmonized
 								variable names
 								across all datasets 		*/
+								
+use 			"A:/main/final_main_school_data.dta", clear  // path to PER survey
 
 if (1) {
 * create a template using iecodebook
 iecodebook template ///
-			`"A:/main/final_main_school_data.dta"' /// path to PER survey
 			using `"${mastData}/codebooks/schools.xlsx"'	/// path to codebook
-			, surveys(main)
+			, replace
 }
 
 		/*excel editing happens manually here. */
