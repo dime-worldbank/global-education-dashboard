@@ -13,7 +13,7 @@ Function: runs all the scripts for the cleaning portion.
 if (1) {
 * create a template using iecodebook
 iecodebook template ///
-			`"${rawencrypt}/main/final_main_school_data.dta"' /// path to PER survey
+			`"A:/main/final_main_school_data.dta"' /// path to PER survey
 			using `"${mastData}/codebooks/schools.xlsx"'	/// path to codebook
 			, surveys(main)
 }
