@@ -10,21 +10,30 @@ Function: runs all the scripts for the cleaning portion.
 								variable names
 								across all datasets 		*/
 
-use 			"A:/main/final_main_po_data.dta", clear  // path to PER survey
 
-* create a template using iecodebook %% note, will use files with long names
+* create a template using iecodebook
+if (1) {
 iecodebook template ///
-			using `"${mastData}/codebooks/po-4countries.xlsx"', replace	// path to codebook
-
-
+			 "A:/Countries/Peru/Data/PER_po_survey_data_short.dta" /// path to Peru
+			 "A:/Countries/Jordan/Data/JOR_po_survey_data_short.dta" /// Path to jordan
+			 "A:/Countries/Mozambique/Data/MOZ_po_survey_data_short.dta" /// path to moz
+			 "A:/Countries/Rwanda/Data/RWA_po_survey_data_short.dta" /// path to rwanda
+			 using `"${mastData}/codebooks/po.xlsx"' /// path to codebook
+			, replace surveys($countrynames) generate(country)
+}
 		/*excel editing happens manually here. */
 
-
+if (0) {
 * apply to all datasets
 iecodebook apply ///
-			using `"${mastData}/codebooks/po-4countries.xlsx"'	// path to codebook
+			 "A:/Countries/Peru/Data/PER_po_survey_data_short.dta" /// path to Peru
+			 "A:/Countries/Jordan/Data/JOR_po_survey_data_short.dta" /// Path to jordan
+			 "A:/Countries/Mozambique/Data/MOZ_po_survey_data_short.dta" /// path to moz
+			 "A:/Countries/Rwanda/Data/RWA_po_survey_data_short.dta" /// path to rwanda
+			 using `"${mastData}/codebooks/po.xlsx"' /// path to codebook
+			, replace surveys($countrynames) generate(country)
 
-
+}
 
 
 
