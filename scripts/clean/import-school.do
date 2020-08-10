@@ -34,7 +34,7 @@ iecodebook append ///
 			 "A:/Countries/Rwanda/Data/final_indicator_school_data.dta" /// path to rwanda
 			 using `"${mastData}/codebooks/schools.xlsx"' /// path to codebook
 			, replace surveys($countrynames) generate(country) clear
-}
+
 
 
 
