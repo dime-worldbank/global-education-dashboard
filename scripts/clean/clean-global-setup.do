@@ -52,8 +52,9 @@
    *  country file shortcuts
    * ******************************************************************** *
 		* master dataset
-		gl 			sch0 					"${encryptFolder}/Master publicofficial Encrypted/DataSet/master-schools.dta"
-
+		gl 			sch0 					"A:/main/final_main_school_data.dta"
+		gl 			po0 					"A:/main/final_main_po_data.dta"
+		
 		 *-_-_ Main Datasets _-_-*
 		 * Raw Stata
 		 global 	raw_po					"${jointencrypt}/Rwanda/Data/public_officials_survey_data_short.dta"
