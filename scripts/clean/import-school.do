@@ -10,7 +10,6 @@ Function: runs all the scripts for the cleaning portion.
 								variable names
 								across all datasets 		*/
 
-use 			"A:/main/final_main_school_data.dta", clear  // path to PER survey
 
 if (0) {
 * create a template using iecodebook
@@ -30,7 +29,7 @@ iecodebook template ///
 * %% this will not run unless you delete the _appended.xlsx, and replace option wont work
 iecodebook append ///
 			 "A:/Countries/Peru/Data/school_indicator_dta_confidential.dta" /// path to Peru
-			 "A:/Countries/Jordan/Data/final_indicator_school_data.dta" /// Path to jordan 
+			 "A:/Countries/Jordan/Data/final_indicator_school_data.dta" /// Path to jordan
 			 "A:/Countries/Mozambique/Data/school_inicators_data.dta" /// path to moz
 			 "A:/Countries/Rwanda/Data/final_indicator_school_data.dta" /// path to rwanda
 			 using `"${mastData}/codebooks/schools.xlsx"' /// path to codebook
