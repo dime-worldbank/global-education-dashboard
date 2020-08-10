@@ -14,7 +14,8 @@ if (1) {
 * create a template using iecodebook
 iecodebook template ///
 			`"${rawencrypt}/main/final_main_school_data.dta"' /// path to PER survey
-			using `"${mastData}/codebooks/schools.xlsx"'	// path to codebook
+			using `"${mastData}/codebooks/schools.xlsx"'	/// path to codebook
+			, surveys(main)
 }
 
 		/*excel editing happens manually here. */
