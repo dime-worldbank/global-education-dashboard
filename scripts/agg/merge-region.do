@@ -9,12 +9,12 @@ Function: merges the region-level averages to countries
 
 	use `"${D_sch}"', clear  					// start with schools dataset
 
-		sort countryno g1 g2
+		sort countryname g1 g2
 
 		preserve
 
 		* merge on region (g1)
-				merge 		m:1 	countryno g2 	///
+				merge 		m:1 	countryname g2 	///
 									using "${publicofficial}/Dataset/col_po_g1_alltier.dta" ///
 									, gen(merge)
 

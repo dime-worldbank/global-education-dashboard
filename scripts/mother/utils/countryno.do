@@ -1,4 +1,4 @@
-* countryno.do
+* countryname.do
 * assigns a numeric country number based on string country name and checks.
 
 
@@ -13,5 +13,5 @@ replace 	countryname = "Jordan" if country == 2
 replace 	countryname = "Mozambique" if country == 3
 replace 	countryname = "Rwanda" if country == 4
 
-mdesc 		countryname		// check to make sure no missings of countryno
+mdesc 		countryname		// check to make sure no missings of countryname
 assert 		r(miss) == 0

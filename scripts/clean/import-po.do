@@ -42,7 +42,7 @@ iecodebook append ///
 								* | Add country number var | *
 
 * convert to categorical variable with labels (move this into script?)
-do `"${scripts_clone}/mother/utils/countryno.do"'
+do `"${scripts_clone}/mother/utils/countryname.do"'
 
 
 
@@ -50,16 +50,16 @@ do `"${scripts_clone}/mother/utils/countryno.do"'
 
 									* | ID Check | *
 
-						/* countryno and school code should uniquely identify
+						/* countryname and school code should uniquely identify
 						each observation. */
 
 
-capture  	isid countryno interview__id
+capture  	isid countryname interview__id
 
 	if _rc {
-		duplicates 	drop 	countryno interview__id national_learning_goals lat lon, force	// drop obs that are same on these vars
+		duplicates 	drop 	countryname interview__id national_learning_goals lat lon, force	// drop obs that are same on these vars
 							/*it is very unlikely to have two schools with the same id and test score that are dif */
-		isid 				countryno interview__id
+		isid 				countryname interview__id
 	}
 
 	save "${A_po}", replace

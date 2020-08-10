@@ -9,10 +9,10 @@ Function: merges the district-level averages to countries
 
 	use `"${D_sch}"', clear  					// start with schools dataset
 
-		sort countryno g1 g2
+		sort countryname g1 g2
 
 		preserve
-			merge 			m:1 	countryno g2 	///
+			merge 			m:1 	countryname g2 	///
 									using "${publicofficial}/Dataset/col_po_g2_alltier.dta" ///
 									, gen(merge)
 
@@ -45,7 +45,7 @@ Function: merges the district-level averages to countries
 					* | Merge at district level, only district level bureaucrats | *
 
 
-		sort countryno g1 g2
+		sort countryname g1 g2
 
 		preserve
 
@@ -53,7 +53,7 @@ Function: merges the district-level averages to countries
 				keep if 		govt_tier == 3 	// where 3 == district
 
 			* merge
-				merge 		m:1 	countryno g2 	///
+				merge 		m:1 	countryname g2 	///
 									using "${publicofficial}/Dataset/col_po_g2_tier3.dta" ///
 									, gen(merge)
 

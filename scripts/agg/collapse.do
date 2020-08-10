@@ -21,8 +21,8 @@ loc numeric 	= r(varlist)
 	* By Region
 		preserve
 
-			sort		countryno g1
-			collapse 	(mean) `numeric', by(countryno g1)
+			sort		countryname g1
+			collapse 	(mean) `numeric', by(countryname g1)
 
 				if (${s2} == 1) {
 				*>> Now Create Averages for BI by region
@@ -45,7 +45,7 @@ loc numeric 	= r(varlist)
 				*2A. By District
 					preserve
 
-						sort		countryno g1 g2
+						sort		countryname g1 g2
 						collapse 	(mean) `numeric', by(g2)
 						drop 		idpo g3
 						*do 		${labscript}
@@ -60,8 +60,8 @@ loc numeric 	= r(varlist)
 * By District
 	preserve
 
-		sort		countryno g1 g2
-		collapse 	(mean) `numeric', by(countryno g1 g2)
+		sort		countryname g1 g2
+		collapse 	(mean) `numeric', by(countryname g1 g2)
 		drop 		idpo g3
 		do 			"${scripts_clone}/mother/utils/labpreserve.do"
 		save 		"${publicofficial}/Dataset/col_po_g2_alltier.dta", replace
@@ -75,8 +75,8 @@ loc numeric 	= r(varlist)
 
 				keep if 	govt_tier == 3 		// where 3 == district officials
 
-				sort		countryno g1 g2
-				collapse 	(mean) `numeric', by(countryno g1 g2)
+				sort		countryname g1 g2
+				collapse 	(mean) `numeric', by(countryname g1 g2)
 				drop 		idpo g3
 				do 			"${scripts_clone}/mother/utils/labpreserve.do"
 				save 		"${publicofficial}/Dataset/col_po_g2_tier3.dta", replace
