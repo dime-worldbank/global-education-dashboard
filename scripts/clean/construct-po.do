@@ -18,30 +18,19 @@ use	 	"${B_po}", replace
 
 							* | 	imputations 		| *
 
-					/* we will only impute the list of ~11 key outcome Variables
-						we will replace the main variable and leave original as
-						another variable that is "unimputed". We will also replace
-						mising values with the country average. */
-
-forvalues i = 1/$c_n	{							// iterate over all countries
-	foreach v of global schoutcome {
-		clonevar 	`v'_raw = `v'					// clone the var with missing values, label raw
-
-		qui sum 	`v'		if country == `i'		// save sum for each country
-		replace 	`v' 	= r(mean) 	///
-							if `v' == . 			// replace only if the variable is missing
-		label var	`v'_raw "Unimputed `v'"			// label the raw variable
-	}
-}
+					/* we won't do imputations for po, but if we did,
+					 	it'd be like that of schools. */
 
 
 
 							* | 	z-scores 		| *
 
 					/* here we will use a stata package instead of manual,
-					sorted out by country */
+					sorted out by country, on all numeric variables */
+ds , has(type numeric)
+local numeric
 
-foreach v of global schoutcome {
+foreach v of local numeric {
 	bysort countryname: scores `v'_z = mean(`v'), sc(z)
 }
 

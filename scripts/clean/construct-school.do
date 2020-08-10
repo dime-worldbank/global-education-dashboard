@@ -15,15 +15,19 @@ use	 	"${B_sch}", replace
 						another variable that is "unimputed". We will also replace
 						mising values with the country average. */
 
-forvalues i = 1/$c_n	{							// iterate over all countries
 	foreach v of global schoutcome {
-		clonevar 	`v'_raw = `v'					// clone the var with missing values, label raw
 
-		qui sum 	`v'		if country == `i'		// save sum for each country
-		replace 	`v' 	= r(mean) 	///
-							if `v' == . 			// replace only if the variable is missing
+		clonevar 	`v'_raw = `v'					// clone the var with missing values, label raw
 		label var	`v'_raw "Unimputed `v'"			// label the raw variable
-	}
+
+		// generate a by-country mean of each var
+		egen m_`v' = mean(`v') by country
+
+		// replace the real var's value if that obs is missings
+		replace `v' = m`v' 	if `v' == .
+
+		// drop the egened var
+		drop m_`v' 
 }
 
 
