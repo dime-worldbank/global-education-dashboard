@@ -8,6 +8,7 @@ library(sf)
 library(assertthat)
 library(rio)
 library(haven)
+library(sjlabelled)
 
                       # ----------------------------- #
                       # Load+append schools datasets  #----
@@ -351,6 +352,15 @@ main_school_data_export <- main_school_data %>%
   st_set_geometry(., NULL) %>% # take out geometry
   rename_at(.vars=varlist_to_change_s, ~str_trunc(.,30,"center", ellipsis="")) %>% # rename long vars
   select(-contains("enumerator_name")) # take out enumerator name variable
+
+# # add varlabels
+# labelled(colnames(main_po_data_export), labels = names(main_po_data_export))
+# var_labels(main_po_data_export)
+# is.labelled(main_po_data_export)
+# 
+# varnames<- list(colnames(main_po_data_export))
+# main_po_data_export <- set_label(main_po_data_export, varnames)
+
 
 
 
