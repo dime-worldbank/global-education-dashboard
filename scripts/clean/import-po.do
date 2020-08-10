@@ -26,7 +26,7 @@ iecodebook template ///
 
 if (1) {
 * apply to all datasets
-iecodebook apply ///
+iecodebook append ///
 			 "A:/Countries/Peru/Data/PER_po_survey_data_short.dta" /// path to Peru
 			 "A:/Countries/Jordan/Data/JOR_po_survey_data_short.dta" /// Path to jordan
 			 "A:/Countries/Mozambique/Data/MOZ_po_survey_data_short.dta" /// path to moz
