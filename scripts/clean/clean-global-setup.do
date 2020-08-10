@@ -24,7 +24,7 @@
         global countries        `"PER JRD MOZ RWA"'
 		global countries3		`"PER JRD RWA"'		// this takes out MOZ as it's missing all sch vars
 
-		global countrynames		"Peru Jordan Mozambique Rwanda" // make sure this order is the same!!
+		global countrynames		Peru Jordan Mozambique Rwanda // make sure this order is the same!!
 		*global
 
 		* I need to create this now to standardize and minimize across all do-files

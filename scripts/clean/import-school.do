@@ -10,7 +10,7 @@ Function: runs all the scripts for the cleaning portion.
 								variable names
 								across all datasets 		*/
 
-
+if (0) {
 * create a template using iecodebook
 iecodebook template ///
 			`"${rawencrypt}/Peru/Data/school_indicator_dta_confidential.dta"' /// path to PER survey
@@ -18,22 +18,23 @@ iecodebook template ///
 			`"${rawencrypt}/Mozambique/Data/school_inicators_data.dta"' /// path to MOZ
 			`"${rawencrypt}/Rwanda/Data/final_indicator_school_data.dta"' /// path to RWA
 			using `"${mastData}/codebooks/schools.xlsx"'	/// path to codebook
-			, surveys(`"${countries}"') ///
+			, surveys(${countrynames}) ///
 			gen(country)	// variable that identifies source of each obs
-
+}
 
 		/*excel editing happens manually here. */
 
 
 * apply to all datasets
+* %% this will not run unless you delete the _appended.xlsx, and replace option wont work
 iecodebook append ///
 			`"${rawencrypt}/Peru/Data/school_indicator_dta_confidential.dta"' /// path to PER survey
 			`"${rawencrypt}/Jordan/Data/final_indicator_school_data.dta"' /// path to JOR
 			`"${rawencrypt}/Mozambique/Data/school_inicators_data.dta"' /// path to MOZ
 			`"${rawencrypt}/Rwanda/Data/final_indicator_school_data.dta"' /// path to RWA
 			using `"${mastData}/codebooks/schools.xlsx"'	/// path to codebook
-			, clear ///
-			gen(country) 	// identify where each
+			, clear replace surveys(${countrynames}) ///
+			gen(country)	// identify where each
 
 
 
