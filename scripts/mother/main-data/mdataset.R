@@ -326,16 +326,45 @@ save(main_po_data, main_school_data,
      tiers,
      file = "A:/main/final_main_data.Rdata") 
 
-#determine list of vars to change length 
+#determine lists of vars to change length 
 varlist_p <- as.data.frame(colnames(main_po_data))
 to.change_p <- varlist_p %>%
   filter(str_length(colnames(main_po_data)) > 26 )
-      
-main_po_data %>% st_set_geometry(., NULL) %>% # %% start here.
-  rename_at(.vars=)
-  write_dta(path = "A:/main/final_main_po_data.dta", 
-            version = 14
-     ) # default, leave factors as value labels, use variable name as var label, abbreviate?
+
+varlist_to_change_p<-as.character(to.change_p$`colnames(main_po_data)`)
+
+
+varlist_s <- as.data.frame(colnames(main_school_data))
+to.change_s <- varlist_s %>%
+  filter(str_length(colnames(main_school_data)) > 30 )
+
+varlist_to_change_s<-as.character(to.change_s$`colnames(main_school_data)`)
+
+
+# change the dataset accordingly
+main_po_data_export <- main_po_data %>% 
+  st_set_geometry(., NULL) %>% # take out geometry
+  rename_at(.vars=varlist_to_change_p, ~str_trunc(.,26,"center", ellipsis="")) %>% # rename long vars
+  select(-contains("enumerator_name")) # take out enumerator name variable
+
+main_school_data_export <- main_school_data %>% 
+  st_set_geometry(., NULL) %>% # take out geometry
+  rename_at(.vars=varlist_to_change_s, ~str_trunc(.,26,"center", ellipsis="")) %>% # rename long vars
+  select(-contains("enumerator_name")) # take out enumerator name variable
+
+
+
+# export as dta      
+write_dta(data = main_po_data_export,
+          path = "A:/main/final_main_po_data.dta", 
+          version = 14
+     ) # default, leave factors as value labels, use variable name as var label
+
+  
+write_dta(data = main_school_data_export,
+          path = "A:/main/final_main_school_data.dta", 
+          version = 14
+) # default, leave factors as value labels, use variable name as var label
 
 main_school_data %>% st_set_geometry(NULL) %>%
   write_dta(path = "A:/main/final_main_school_data.dta",
