@@ -11,7 +11,7 @@ library(foreign)
 RWA_public_officials_dta_clean <- read_dta("A:/Countries/Rwanda/Data/public_officials_survey_data.dta") # either load using read dta or find Rdata
 MOZ_public_officials_dta_clean <- read_dta("A:/Countries/Mozambique/Data/public_officials_survey_data.dta") # either load using read dta or find Rdata
 JOR_public_officials_dta_clean <- read_dta("A:/Countries/Jordan/Data/public_officials_survey_data.dta") # either load using read dta or find Rdata
-PER_public_officials_dta_clean <- read_dta("A:/Countries/Peru/Data/school_indicator_dta_confidential.dta") # either load using read dta or find Rdata
+PER_public_officials_dta_clean <- read_dta("A:/Countries/Peru/Data/public_official_dta_confidential.dta") # either load using read dta or find Rdata
 
 # for Rwanda, 
 var_list<-as.data.frame(colnames(RWA_public_officials_dta_clean))
