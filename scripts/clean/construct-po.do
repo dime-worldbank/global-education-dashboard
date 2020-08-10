@@ -11,7 +11,7 @@ use	 	"${B_po}", replace
 						/* since all secondary and tertiary variables are averages of groups of
 						   raw qustions, we could average these manually. */
 
-	if (`s1' == 1) {
+	if (${s1} == 1) {
 		do `"${scripts_clone}/mother/utils/bi-reconstruct.do"'
 	}
 
