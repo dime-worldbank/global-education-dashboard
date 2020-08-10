@@ -349,7 +349,7 @@ main_po_data_export <- main_po_data %>%
 
 main_school_data_export <- main_school_data %>% 
   st_set_geometry(., NULL) %>% # take out geometry
-  rename_at(.vars=varlist_to_change_s, ~str_trunc(.,26,"center", ellipsis="")) %>% # rename long vars
+  rename_at(.vars=varlist_to_change_s, ~str_trunc(.,30,"center", ellipsis="")) %>% # rename long vars
   select(-contains("enumerator_name")) # take out enumerator name variable
 
 
