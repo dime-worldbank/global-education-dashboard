@@ -25,7 +25,7 @@ use	 	"${B_sch}", replace
 		by 		country: 	egen m_`v' = mean(`v')
 
 		// replace the real var's value if that obs is missings
-		replace `v' = m`v' 	if `v' == .
+		replace `v' = m_`v' 	if `v' == .
 
 		// drop the egened var
 		drop m_`v'
