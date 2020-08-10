@@ -305,6 +305,18 @@ main_school_data <- st_join(school, # points
                     ) %>%
                     select(idschool, school_code, order, everything())
     
+
+
+
+                              
+
+
+
+                              # ------------------------------------- # 
+                              #               export                  # ----
+                              # ------------------------------------- # 
+
+
     
 # save as rds/stata 
 save(main_po_data, main_school_data,
@@ -314,14 +326,14 @@ save(main_po_data, main_school_data,
      file = "A:/main/final_main_data.Rdata") 
 
 # error here, can't convert to dta %%
-save.dta13(data = main_po_data, 
-           file = "A:/main/final_main_po_data.dta"
-           )
+main_po_data %>% st_set_geometry(NULL) %>%
+            save.dta13(file = "A:/main/final_main_po_data.dta"
+               )
 
-write_dta(main_school_data, 
-           path = "A:/main/final_main_school_data.dta"
+main_school_data %>% st_set_geometry(NULL) %>%
+  save.dta13(file = "A:/main/final_main_school_data.dta"
            )
 
 # # credits: https://stackoverflow.com/questions/6986657/find-duplicated-rows-based-on-2-columns-in-data-frame-in-r
-# 
+# https://gis.stackexchange.com/questions/224915/extracting-data-frame-from-simple-features-object-in-r
 # 
