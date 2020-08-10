@@ -54,7 +54,7 @@
 		* master dataset
 		gl 			sch0 					"A:/main/final_main_school_data.dta"
 		gl 			po0 					"A:/main/final_main_po_data.dta"
-		
+
 		 *-_-_ Main Datasets _-_-*
 		 * Raw Stata
 		 global 	raw_po					"${jointencrypt}/Rwanda/Data/public_officials_survey_data_short.dta"
@@ -161,10 +161,15 @@
 		gl 			piisch	 	school_code school_province_preload school_district_preload ///
 								lat lon ///
 								school_name_preload school_address_preload school_code_preload survey_time ///
-								school_emis_preload school_info_correct m1s0q2_name m1s0q2_code m1s0q2_emis
+								school_emis_preload school_info_correct m1s0q2_name m1s0q2_code m1s0q2_emis ///
+								ADM0_NAME ADM1_NAME ADM2_NAME ADM0_CODE ADM1_CODE ADM2_CODE STR2_YEAR ///
+								EXP2_YEAR STATUS DISP_AREA Shape_Leng Shape_Le_1 Shape_Area
+								
 		gl 			piipo 		interview__id interview__key office_preload survey_time occupational_category ///
 								professional_service sub_professional_service resp_finance_planning director_hr ///
-								education DEM1q2 DEM1q1 DEM1q6
+								education DEM1q2 DEM1q1 DEM1q6 ///
+								ADM0_NAME ADM1_NAME ADM2_NAME ADM0_CODE ADM1_CODE ADM2_CODE STR2_YEAR EXP2_YEAR ///
+								STATUS DISP_AREA Shape_Leng Shape_Le_1 Shape_Area
 
 
 

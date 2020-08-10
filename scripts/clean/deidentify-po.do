@@ -18,7 +18,7 @@ merge 1:1 	countryname school_code 	/// this will connect two datasets
 
 							* | 	drop pii variables		| *
 
-drop 		${piipo}
+drop 		${piipo} _merge
 
 
 

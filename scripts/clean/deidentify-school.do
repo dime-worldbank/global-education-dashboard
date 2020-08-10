@@ -4,21 +4,24 @@ Function: merges to master dataset, replaces some vars with random id, remove pi
 -- --- ---- ----- ------ ------- -------- -------- --------- -------------------*/
 
 use "${C_sch}", clear
-loc keep 		// these variables will be kept from merge.
 
 							* | 	merge to master 		| *
 
 merge 1:1 	countryname school_code 	/// this will connect two datasets
 			using "${sch0}" 		/// use master dataset
-			, assert(match) 		/// every single obseration should match perfectly
-			keep(`keep')			// keep only these variables
+			, assert(match master) 		/// every single obseration should match perfectly
+			keep(match)			// keep only these variables
+
+			/* note that the variables that don't match are ones that are in the masterdataset,
+			 	and these unmatched variables do not have any shcool info, so we can keep only the matched ones
+				*/
 
 
 
 
 							* | 	drop pii variables		| *
 
-drop 		${piisch}
+drop 		${piisch} _merge
 
 
 
