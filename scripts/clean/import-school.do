@@ -10,16 +10,11 @@ Function: runs all the scripts for the cleaning portion.
 								variable names
 								across all datasets 		*/
 
-if (0) {
+if (1) {
 * create a template using iecodebook
 iecodebook template ///
-			`"${rawencrypt}/Peru/Data/school_indicator_dta_confidential.dta"' /// path to PER survey
-			`"${rawencrypt}/Jordan/Data/final_indicator_school_data.dta"' /// path to JOR
-			`"${rawencrypt}/Mozambique/Data/school_inicators_data.dta"' /// path to MOZ
-			`"${rawencrypt}/Rwanda/Data/final_indicator_school_data.dta"' /// path to RWA
-			using `"${mastData}/codebooks/schools.xlsx"'	/// path to codebook
-			, surveys(${countrynames}) ///
-			gen(country)	// variable that identifies source of each obs
+			`"${rawencrypt}/main/final_main_school_data.dta"' /// path to PER survey
+			using `"${mastData}/codebooks/schools.xlsx"'	// path to codebook
 }
 
 		/*excel editing happens manually here. */
@@ -28,13 +23,8 @@ iecodebook template ///
 * apply to all datasets
 * %% this will not run unless you delete the _appended.xlsx, and replace option wont work
 iecodebook append ///
-			`"${rawencrypt}/Peru/Data/school_indicator_dta_confidential.dta"' /// path to PER survey
-			`"${rawencrypt}/Jordan/Data/final_indicator_school_data.dta"' /// path to JOR
-			`"${rawencrypt}/Mozambique/Data/school_inicators_data.dta"' /// path to MOZ
-			`"${rawencrypt}/Rwanda/Data/final_indicator_school_data.dta"' /// path to RWA
-			using `"${mastData}/codebooks/schools.xlsx"'	/// path to codebook
-			, clear replace surveys(${countrynames}) ///
-			gen(country)	// identify where each
+			`"${rawencrypt}/main/final_main_school_data.dta"' /// path to PER survey
+			using `"${mastData}/codebooks/schools.xlsx"'	// path to codebook
 
 
 
