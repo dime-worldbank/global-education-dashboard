@@ -19,7 +19,7 @@ forvalues i = 1/$c_n	{							// iterate over all countries
 	foreach v of global schoutcome {
 		clonevar 	`v'_raw = `v'					// clone the var with missing values, label raw
 
-		qui sum 	`v'		if countryname == `i'		// save sum for each country
+		qui sum 	`v'		if country == `i'		// save sum for each country
 		replace 	`v' 	= r(mean) 	///
 							if `v' == . 			// replace only if the variable is missing
 		label var	`v'_raw "Unimputed `v'"			// label the raw variable
