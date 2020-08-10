@@ -74,7 +74,7 @@
    * ---------------------
 
     if $user == 1 {
-        global WBOneDrive	"C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard"
+        global WBOneDrive		"C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard"
         global WBclone		    "C:/Users/WB551206/local/GitHub"
         global avrclone		     ""
     }
