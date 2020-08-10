@@ -12,7 +12,7 @@ Function: runs all the scripts for the cleaning portion.
 
 
 * create a template using iecodebook
-if (1) {
+if (0) {
 iecodebook template ///
 			 "A:/Countries/Peru/Data/PER_po_survey_data_short.dta" /// path to Peru
 			 "A:/Countries/Jordan/Data/JOR_po_survey_data_short.dta" /// Path to jordan
@@ -24,7 +24,7 @@ iecodebook template ///
 }
 		/*excel editing happens manually here. */
 
-if (0) {
+if (1) {
 * apply to all datasets
 iecodebook apply ///
 			 "A:/Countries/Peru/Data/PER_po_survey_data_short.dta" /// path to Peru
