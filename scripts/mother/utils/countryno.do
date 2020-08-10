@@ -7,11 +7,11 @@ levelsof 	country, miss
 assert 		r(r) == ${c_n} 		// should only be the number of values as the no of countries
 
 * generate the country number 
-gen 		countryno = .
-replace 	countryno = 1 if country == "Peru"
-replace 	countryno = 2 if country == "Jordan"
-replace 	countryno = 3 if country == "Mozambique"
-replace 	countryno = 4 if country == "Rwanda"
+gen 		int countryname = ""
+replace 	countryname = "Peru" if country == 1
+replace 	countryname = "Jordan" if country == 2
+replace 	countryname = "Mozambique" if country == 3
+replace 	countryname = "Rwanda" if country == 4
 
-mdesc 		countryno		// check to make sure no missings of countryno
+mdesc 		countryname		// check to make sure no missings of countryno
 assert 		r(miss) == 0

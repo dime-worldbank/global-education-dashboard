@@ -21,8 +21,8 @@
    *  country list
    * ******************************************************************** *
 
-        global countries        `"PER JRD MOZ RWA"'
-		global countries3		`"PER JRD RWA"'		// this takes out MOZ as it's missing all sch vars
+        global countries        "PER JRD MOZ RWA"
+		global countries3		PER JRD RWA	// this takes out MOZ as it's missing all sch vars
 
 		global countrynames		Peru Jordan Mozambique Rwanda // make sure this order is the same!!
 		*global
@@ -36,7 +36,8 @@
 		global pos_3 MOZ
 		global pos_4 RWA
 
-		global c_n : list sizeof countries
+		global c_n = 4		// : list sizeof countries does not work
+		di "$c_n"
 
 
 
