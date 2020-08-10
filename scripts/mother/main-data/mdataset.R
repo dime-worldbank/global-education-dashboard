@@ -47,7 +47,7 @@ m.school <- bind_rows("Peru" = peru_school,
                       "Jordan" = jordan_school,
                       "Rwanda" = rwanda_school,
                       "Mozambique" = mozambique_school,
-                      .id = "country")
+                      .id = "countryname")
 
 
 
@@ -99,7 +99,7 @@ m.po <-     bind_rows("Peru"   = peru_po,
                       "Jordan" = jordan_po,
                       "Rwanda" = rwanda_po,
                       "Mozambique" = mozambique_po,
-                      .id = "country") %>%
+                      .id = "countryname") %>%
             mutate(
                     govt_tier = fct_recode(govt_tier, # recode factor levels
                                      "MinEDU Central" = "Ministry of Education (or equivalent)", 
@@ -122,16 +122,16 @@ m.po <-     bind_rows("Peru"   = peru_po,
         # before de-identification.
 
 # determine that each row is unique 
-m.school <- distinct(m.school, country, school_code, lat, lon, student_knowledge,
+m.school <- distinct(m.school, countryname, school_code, lat, lon, student_knowledge,
            .keep_all = TRUE)  # dyplr will keep first value of dups across these vars
 
-m.po <- distinct(m.po, country, interview__id, lat, lon, national_learning_goals, 
+m.po <- distinct(m.po, countryname, interview__id, lat, lon, national_learning_goals, 
            .keep_all = TRUE) # remove dups across these variables
 
 # make sure no missings for key variables
-assert_that(any(is.na(m.school$country)) == 0) #no country codes are missing
+assert_that(any(is.na(m.school$countryname)) == 0) #no country codes are missing
 assert_that(any(is.na(m.school$school_code)) == 0) #no school codes are missing
-assert_that(any(is.na(m.po$country)) == 0) #no country codes are missing
+assert_that(any(is.na(m.po$countryname)) == 0) #no country codes are missing
 assert_that(any(is.na(m.po$interview__id)) == 0) #no school codes are missing
 
 
@@ -156,13 +156,13 @@ saveRDS(m.po,
 
 # gerenate gps only datasets with country id, 
 m.po.gps <- select(m.po, 
-                   country, 
+                   countryname, 
                    interview__id, 
                    lon,
                    lat)
 
 m.school.gps <- select(m.school, 
-                       country, 
+                       countryname, 
                        school_code, 
                        lon,
                        lat)
@@ -294,7 +294,7 @@ order <- c("ADM0_NAME", "ADM1_NAME", "ADM2_NAME",
 main_po_data <- st_join(po, # points
                         wb.poly.m) %>% #polys
                 left_join(m.po.gps, # join back to gps coords for reference 
-                          by = c("interview__id", "country")
+                          by = c("interview__id", "countryname")
                           ) %>%
                 select(idpo, interview__id, order, everything())
     
@@ -303,7 +303,7 @@ main_po_data <- st_join(po, # points
 main_school_data <- st_join(school, # points
                             wb.poly.m) %>% #polys
                     left_join(m.school.gps, # join back to gps coords for reference 
-                              by = c("school_code", "country")
+                              by = c("school_code", "countryname")
                     ) %>%
                     select(idschool, school_code, order, everything())
     
