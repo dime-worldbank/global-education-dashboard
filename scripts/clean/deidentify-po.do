@@ -8,10 +8,10 @@ loc keep 		// these variables will be kept from merge.
 
 							* | 	merge to master 		| *
 
-merge 1:1 	countryname school_code 	/// this will connect two datasets
+merge 1:1 	countryname interview__id 	/// this will connect two datasets
 			using "${po0}" 		/// use master dataset
 			, assert(match) 		/// every single obseration should match perfectly
-			keep(`keep')			// keep only these variables
+			keep(match)			// keep only these variables
 
 
 
