@@ -21,7 +21,8 @@ use	 	"${B_sch}", replace
 		label var	`v'_raw "Unimputed `v'"			// label the raw variable
 
 		// generate a by-country mean of each var
-		egen m_`v' = mean(`v'), by country
+		sort 	country
+		by 		country: 	egen m_`v' = mean(`v')
 
 		// replace the real var's value if that obs is missings
 		replace `v' = m`v' 	if `v' == .
