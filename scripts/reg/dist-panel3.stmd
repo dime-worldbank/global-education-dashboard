@@ -41,7 +41,6 @@ Recall that working theory posits bureaucracy indicators as predictors of inputs
 ```s, echo=FALSE
 
 qui use 	`"`md'"' , clear
-preserve
 
 
 qui foreach y of global slnop {
@@ -60,7 +59,7 @@ esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt
  				stats(N F r2 r2_a cfe dfe efe tfe rkn moz, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Removed Mozambique") ) ///
 				modelwidth(15) mlabels(, depvars) wide drop(*country* *g2* _cons)
 
-restore
+qui estimate clear
 
 ```
 
@@ -86,6 +85,8 @@ qui foreach y of local slnop {
 esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
  				stats(N F r2 r2_a cfe dfe efe tfe rkn moz, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Removed Mozambique") ) ///
 				modelwidth(15) mlabels(, depvars) wide drop(*country* *g2* _cons)
+qui estimate clear
+
 
 ```
 <br><br><br>
@@ -118,6 +119,8 @@ qui foreach y of local sl2 {
 esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
  				stats(N F r2 r2_a cfe dfe efe tfe rkn moz, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Removed Mozambique") ) ///
 				modelwidth(15) mlabels(, depvars) wide drop(*country* *g2* _cons)
+qui estimate clear
+
 
 ```
 <br><br><br>
