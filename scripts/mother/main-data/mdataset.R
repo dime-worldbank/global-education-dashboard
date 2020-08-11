@@ -8,6 +8,7 @@ library(sf)
 library(assertthat)
 library(rio)
 library(haven)
+library(sjlabelled)
 
                       # ----------------------------- #
                       # Load+append schools datasets  #----
@@ -58,8 +59,10 @@ mozambique_school <- import(file.path(vault,
 rwanda_school <- import(file.path(vault,
                                "Rwanda/Data/Full_Data/school_indicators_data.RData"),
                      which = "school_dta_short")
-rwanda_school <- left_join(rwanda_school, rwanda_gdp, by = "school_code") # should keep all obs in main
+rwanda_school <- left_join(rwanda_school, rwanda_gdp, by = "school_code") %>% # should keep all obs in main
+                select(-(c("total_enrolled.x", "total_enrolled.y")))
 
+  
 # bind rows
 m.school <- bind_rows("Peru" = peru_school,
                       "Jordan" = jordan_school,
