@@ -74,7 +74,7 @@ qui use 	`"`md'"' , clear
 qui foreach y of local slnop {
 	loc el `y'				// store loop var in local
 	loc rest: list slnop - el // take out the loop var from list
-	eststo bi_`y': reg `y' bi `rest' i.enrolled i.country i.g2 i.enrollment	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
+	eststo bi_`y': reg `y' bi `rest' i.enrolled i.country i.g2	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
 	estadd local cfe "Yes"
 	estadd local dfe "Yes"
 	estadd local efe "No"
