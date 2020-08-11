@@ -194,7 +194,7 @@ gl s3 	= 1		// 0 = keep 203 obs in peru PO dataset; 1 == drop unmatched obs as B
 
 /* script settings settings to 1 if you want to run, default == 0 */
 
-loc clean	= 0		// reconstruct bi vars
+loc clean	= 1		// reconstruct bi vars
 loc agg		= 1 	// generate top p-tile vars for BI
 
 
