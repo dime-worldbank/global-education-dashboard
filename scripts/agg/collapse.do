@@ -9,7 +9,14 @@ use `"${D_po}"', clear
 
 * determine muneric vars
 ds	,	 		has(type numeric)
-loc numeric 	= r(varlist)
+loc numbers 	= r(varlist)
+
+* take away the the geographic vars
+loc g1 		g1 g2
+loc g2 		g2
+loc district 	: list numbers - g2 // for district we want to have g1
+loc region 		: list numbers - g1 // for region we don't want either g2 or g1
+
 
 
 
@@ -22,7 +29,7 @@ loc numeric 	= r(varlist)
 		preserve
 
 			sort		countryname g1
-			collapse 	(mean) `numeric', by(countryname g1)
+			collapse 	(mean) `region', by(countryname g1)
 
 				if (${s2} == 1) {
 				*>> Now Create Averages for BI by region
@@ -46,7 +53,7 @@ loc numeric 	= r(varlist)
 					preserve
 
 						sort		countryname g1 g2
-						collapse 	(mean) `numeric', by(g2)
+						collapse 	(mean) `district', by(countryname g2)
 						drop 		idpo g3
 						*do 		${labscript}
 						save 		"${publicofficial}/Dataset/col_po_g2_alltier.dta", replace
@@ -61,7 +68,7 @@ loc numeric 	= r(varlist)
 	preserve
 
 		sort		countryname g1 g2
-		collapse 	(mean) `numeric', by(countryname g1 g2)
+		collapse 	(mean) `district', by(countryname g1 g2)
 		drop 		idpo g3
 		do 			"${scripts_clone}/mother/utils/labpreserve.do"
 		save 		"${publicofficial}/Dataset/col_po_g2_alltier.dta", replace
@@ -76,7 +83,7 @@ loc numeric 	= r(varlist)
 				keep if 	govt_tier == 3 		// where 3 == district officials
 
 				sort		countryname g1 g2
-				collapse 	(mean) `numeric', by(countryname g1 g2)
+				collapse 	(mean) `district', by(countryname g1 g2)
 				drop 		idpo g3
 				do 			"${scripts_clone}/mother/utils/labpreserve.do"
 				save 		"${publicofficial}/Dataset/col_po_g2_tier3.dta", replace
