@@ -14,9 +14,9 @@ loc numbers 	= r(varlist)
 * take away the the geographic vars
 loc g1 		g1 g2
 loc g2 		g2
-loc district 	: list numbers - g2 // for district we want to have g1
-loc region 		: list numbers - g2 // for region we don't want either g2 or g1
-* these are the same, yes, it's right, trust me.
+loc district 	: list numbers - g1 // for district we want to have g1
+loc region 		: list numbers - g1 // for region we don't want either g2 or g1
+* these are the same, yes, it's right, trust me
 
 
 
