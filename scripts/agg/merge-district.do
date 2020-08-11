@@ -20,7 +20,7 @@ Function: merges the district-level averages to countries
 			/* run schoolcheck.do */
 
 			* Save whole dataset ...
-
+				la data 	"School indicators with all tiers of officials averaged by district; all matches"
 				save 		"${baseline_dt}/Intermediate/merge_district_alltiers_nomatch.dta", replace
 
 			* Then drop non-mereged obs and...
@@ -31,6 +31,7 @@ Function: merges the district-level averages to countries
 				/* run another checkscript (diff cuz this time we loose school obs) */
 
 				* save the dataset as a new version.
+				la data 	"School indicators with all tiers of officials averaged by district"
 				save 		"${baseline_dt}/final/merge_district_alltiers.dta", replace
 
 		restore
@@ -58,7 +59,7 @@ Function: merges the district-level averages to countries
 			/* run schoolcheck.do */
 
 			* Save whole dataset ...
-
+				la data 	"School indicators w/ only district officials averaged by district; all matches"
 				save 		"${baseline_dt}/Intermediate/merge_district_tdist_nonmatch.dta", replace
 
 			* Then drop non-mereged obs and...
@@ -69,6 +70,7 @@ Function: merges the district-level averages to countries
 				/* run another checkscript (diff cuz this time we loose school obs) */
 
 				* save the dataset as a new version.
+				la data 	"School indicators w/ only district officials averaged by district"
 				save 		"${baseline_dt}/final/merge_district_tdist.dta", replace
 
 		restore

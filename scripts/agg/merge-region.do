@@ -22,7 +22,7 @@ Function: merges the region-level averages to countries
 			/* run schoolcheck.do */
 
 			* Save whole dataset ...
-
+				la data 	"School indicators with all tiers of officials averaged by region; all matches"
 				save 		"${baseline_dt}/Intermediate/merge_region_alltiers_nonmatch.dta", replace
 
 			* Then drop non-mereged obs and...
@@ -32,6 +32,7 @@ Function: merges the region-level averages to countries
 				/* run another checkscript (diff cuz this time we loose school obs) */
 
 				* save the dataset as a new version.
+				la data 	"School indicators with all tiers of officials averaged by region"
 				save 		"${baseline_dt}/final/merge_region_alltiers.dta", replace
 
 		restore
