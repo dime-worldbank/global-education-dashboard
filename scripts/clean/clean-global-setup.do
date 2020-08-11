@@ -166,7 +166,7 @@
 								ADM0_NAME ADM1_NAME ADM2_NAME ADM0_CODE ADM1_CODE ADM2_CODE STR2_YEAR ///
 								EXP2_YEAR STATUS DISP_AREA Shape_Leng Shape_Le_1 Shape_Area ///
 								school_province school_district total_enrolled school_name school_address ///
-								 region total_missing total_missing_teach_grd4_assess
+								 region total_missing total_missing_teach_grd4_assess gdp ln_gdp
 
 		gl 			piipo 		interview__id interview__key office_preload survey_time responsible_fance_planning ///
 		 						responsible_hring_teachers responsible_ming_performan responsible_none education ///
@@ -189,7 +189,7 @@
 								 ENUMq1 ENUMq2 ENUMq3 ENUMq4 ENUMq5 ENUMq6 ENUMq7 ENUMq8 ///
 								 school_district_preload school_province_preload region_code district_code ///
 								 district province location lat lon end_time responsible_mnitoring_perf ///
-								 enumerator_number enumerator_code
+								 enumerator_number enumerator_code 
 
 		gl 			 poorder 	`"idpo countryname country g1 g2 ${biall}"'
 
