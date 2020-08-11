@@ -66,7 +66,7 @@ Function: merges the district-level averages to countries
 
 			* Then drop non-mereged obs and...
 				keep if 	merge == 3
-				drop		merge matched
+				drop		merge
 
 			* Verify quality of dataset after the drop.
 				/* run another checkscript (diff cuz this time we loose school obs) */
