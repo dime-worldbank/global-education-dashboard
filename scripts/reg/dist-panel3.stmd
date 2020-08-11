@@ -97,7 +97,7 @@ qui estimate clear
 ```s, echo=FALSE
 
 qui use 	`"`md'"' , clear
-merge 1:1 	idschool	/// match on idschool
+qui merge 1:1 	idschool	/// match on idschool
 			using 	"${sch0}" /// master schools dataset
 			, keepus(gdp) /// keep only gdp
 			keep(match) /// keep only matched vars.
