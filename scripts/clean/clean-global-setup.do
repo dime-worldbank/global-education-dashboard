@@ -169,7 +169,7 @@
 								 region total_missing total_missing_teach_grd4_assess gdp ln_gdp
 
 		gl 			piipo 		interview__id interview__key office_preload survey_time responsible_fance_planning ///
-		 						responsible_hring_teachers responsible_ming_performan responsible_none education ///
+		 						responsible_hring_teachers  responsible_none education ///
 								gender director_hr position sub_professional_service professional_service ///
 								occupational_category consent admin DEM1q1 DEM1q2 DEM1q4__1 DEM1q4__2 DEM1q4__3 ///
 								DEM1q5__1 DEM1q5__2 DEM1q5__3 DEM1q5__4 DEM1q6 DEM1q7 DEM1q8 DEM1q9 DEM1q10 ///
