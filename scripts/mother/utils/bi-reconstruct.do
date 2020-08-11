@@ -96,7 +96,7 @@
 					}
 
 	*	----> generate the overall bureaucracy indicator
-				begen bi1 = rowmean(`bi_els'1)
+				egen bi1 = rowmean(`bi_els'1)
 
 
 
@@ -119,8 +119,8 @@
 	* gen differences from mine vs dataset's
 
 		foreach v of local all_els {
-			gen dif_`v' = `v'1 - `v'0					// create a variable that measures the differences and direction of the variable i generated `v' compared to the one in the dataset `v'0
-			replace `v' = `v'1							// replace this variable with the values from the one i generated
+			gen dif_`v' = `v'1 - `v'0					// create a variable that measures the differences and direction of the variable I generated, `v', compared to the one in the dataset `v'0
+			replace `v' = `v'1							// replace this variable with the values from the one I generated
 			gen dif2_`v' = abs(`v' - `v'1)				// create a new difference variable that verify that the two variables are equal
 			sum dif2_`v'
 			assert r(max) == 0							// check that replacing went well; that these two variables are equal. their differences should	be 0.

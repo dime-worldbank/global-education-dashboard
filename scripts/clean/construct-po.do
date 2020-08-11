@@ -22,6 +22,22 @@ use	 	"${B_po}", replace
 					 	it'd be like that of schools. */
 
 
+
+							* | 	reconstruct bi 		| *
+
+					/* turning s4 to 1 will check and regenerate all of
+					 	the bi information, where 0 will leave the raw
+						data as it and only generate BI */
+
+if (${s4} == 1) {
+	do 	 "${scripts_clone}/mother/utils/bi-reconstruct.do"
+}
+else {
+	egen 	bi = rowmean(national_learning_goals mandates_accountability quality_bureaucracy impartial_decision_making)
+}
+
+
+
 							* | 	enumerator quality 		| *
 
 		/* note that the coding puts missing values in 0 for generated dummy vars, not missing.
