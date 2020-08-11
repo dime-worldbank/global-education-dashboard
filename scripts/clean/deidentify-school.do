@@ -56,6 +56,6 @@ replace enrolled 		= 8 	if total_enrolled >= 500
 
 drop 		${piisch} _merge
 
-
+order 		${sorder}
 
 save 		`"${D_sch}"' , replace

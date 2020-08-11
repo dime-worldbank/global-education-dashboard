@@ -15,15 +15,33 @@ library(sjlabelled)
                       # ----------------------------- #
 vault <- file.path("A:/Countries")
 
+# load each country's GDP data
+peru_gdp <- import(file.path(vault,
+	"Peru/Data/Full_Data/school_indicators_data.RData"),
+	which = "school_GDP"))
+
+jordan_gdp <- import(file.path(vault,
+	"Jordan/Data/Full_Data/school_indicators_data.RData"),
+	which = "school_GDP"))
+
+# note there is no moz GDP yet
+
+rwanda_gdp <- import(file.path(vault,
+	"Rwanda/Data/Full_Data/school_indicators_data.RData"),
+	which = "school_GDP"))
+
 # Peru
 peru_school <- import(file.path(vault,
                      "Peru/Data/Full_Data/school_indicators_data.RData"),
                     which = "school_dta_short")
+peru_school <- left_join(peru_school, peru_gdp, by "school_code") # should keep all obs in main
 
 # Jordan
 jordan_school <- import(file.path(vault,
                                "Jordan/Data/Full_Data/school_indicators_data.RData"),
                      which = "school_dta_short")
+jordan_school <- left_join(jordan_school, jordan_gdp, by "school_code") # should keep all obs in main
+
 
 # Mozambique :: note there is no Rdata file.
 mozambique_school <- import(file.path(vault,
@@ -41,13 +59,19 @@ mozambique_school <- import(file.path(vault,
 rwanda_school <- import(file.path(vault,
                                "Rwanda/Data/Full_Data/school_indicators_data.RData"),
                      which = "school_dta_short")
+rwanda_school <- left_join(rwanda_school, rwanda_gdp, by "school_code") # should keep all obs in main
 
 # bind rows
 m.school <- bind_rows("Peru" = peru_school,
                       "Jordan" = jordan_school,
                       "Rwanda" = rwanda_school,
                       "Mozambique" = mozambique_school,
-                      .id = "countryname")
+                      .id = "countryname") %>%
+					  mutate(
+						  ln_gdp = log(gdp)  # create log GDP 
+					  )
+
+
 
 
 

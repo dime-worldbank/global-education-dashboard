@@ -156,6 +156,7 @@
 								z_intrinsiz_motivation z_content_knowledge z_pedagogical_knowledge ///
 								z_operational_manage z_instructional_leadership z_principal_knowl_score ///
 								z_principal_manage
+		gl 			sorder 		"idschool countryname country g1 g2 ${schoutcome}"
 
 	* for deidentificaiton
 		gl 			piisch	 	school_code school_province_preload school_district_preload ///
@@ -189,6 +190,8 @@
 								 school_district_preload school_province_preload region_code district_code ///
 								 district province location lat lon end_time responsible_mnitoring_perf ///
 								 enumerator_number enumerator_code
+
+		gl 			 poorder 	`"idpo countryname country g1 g2 ${biall}"'
 
 
 
