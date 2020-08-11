@@ -108,11 +108,11 @@
 					}
 			// check that and that all secondary vars are less than 5 and not equal to 0; there should be no secondary indicators missing.
 			foreach secondary of local secondary_els {
-				assert `secondary'1 	<= 5	& `secondary'1 != . ///
+				assert (`secondary'1 	<= 5	& `secondary'1 != .) ///
 						if droptag1 != 1
 					}
 			// check that the overall bi index is less than 5 and not equal to 0; there should be no missings.
-				assert bi1 	<= 5	& bi1 > 0				///
+				assert (bi1 	<= 5	& bi1 > 0)				///
 						if droptag1 != 1
 
 
