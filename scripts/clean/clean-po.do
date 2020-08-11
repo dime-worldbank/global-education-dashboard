@@ -28,7 +28,8 @@ local 	misvars: list varlist - except		// this list of vars are the ones we care
 
 	if (${s3} == 1) {
 	gen 	droptag1 = 0
-	replace droptag1 = 1 	if mandates_accountability == . & national_learning_goals == .
+	replace droptag1 = 1 	if 	targeting == . & monitoring == . & incentives == . ///
+							& coherence == . & transparency == . & accountability == .
 	}
 	/* there are ~ 27 obs that have basically no po data, only demogrpahic info,
 	 	and we can identify them if they are missing on these two variables.
