@@ -14,7 +14,7 @@ Function: runs all the scripts for the cleaning portion.
 if (0) {
 * create a template using iecodebook
 iecodebook template ///
-			 "A:/Countries/Peru/Data/school_indicator_dta_confidential.dta" /// path to Peru
+			 "A:/Countries/Peru/Data/PER_school_survey_data_short.dta" /// path to Peru
 			 "A:/Countries/Jordan/Data/final_indicator_school_data.dta" /// Path to jordan
 			 "A:/Countries/Mozambique/Data/school_inicators_data.dta" /// path to moz
 			 "A:/Countries/Rwanda/Data/final_indicator_school_data.dta" /// path to rwanda
@@ -28,7 +28,7 @@ iecodebook template ///
 * apply to all datasets
 * %% this will not run unless you delete the _appended.xlsx, and replace option wont work
 iecodebook append ///
-			 "A:/Countries/Peru/Data/school_indicator_dta_confidential.dta" /// path to Peru
+			 "A:/Countries/Peru/Data/PER_school_survey_data_short.dta" /// path to Peru
 			 "A:/Countries/Jordan/Data/final_indicator_school_data.dta" /// Path to jordan
 			 "A:/Countries/Mozambique/Data/school_inicators_data.dta" /// path to moz
 			 "A:/Countries/Rwanda/Data/final_indicator_school_data.dta" /// path to rwanda

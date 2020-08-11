@@ -62,7 +62,7 @@ rwanda_school <- import(file.path(vault,
 rwanda_school <- left_join(rwanda_school, rwanda_gdp, by = "school_code") %>% # should keep all obs in main
                 select(-(c("total_enrolled.x", "total_enrolled.y")))
 
-  
+
 # bind rows
 m.school <- bind_rows("Peru" = peru_school,
                       "Jordan" = jordan_school,
@@ -70,7 +70,7 @@ m.school <- bind_rows("Peru" = peru_school,
                       "Mozambique" = mozambique_school,
                       .id = "countryname") %>%
             mutate(.,
-						  ln_gdp = log(GDP)  # create log GDP 
+						  ln_gdp = log(GDP)  # create log GDP
 					  ) %>%
   rename(gdp = GDP)
 
@@ -384,6 +384,11 @@ main_school_data_export <- main_school_data %>%
   rename_at(.vars=varlist_to_change_s, ~str_trunc(.,30,"center", ellipsis="")) %>% # rename long vars
   select(-contains("enumerator_name")) # take out enumerator name variable
 
+peru_school_export <- peru_school %>%
+	rename_at(.vars=varlist_to_change_s, ~str_trunc(.,30,"center", ellipsis="")) %>% # rename long vars
+	select(-contains("enumerator_name")) # take out enumerator name variable
+
+
 # # add varlabels
 # labelled(colnames(main_po_data_export), labels = names(main_po_data_export))
 # var_labels(main_po_data_export)
@@ -406,6 +411,14 @@ write_dta(data = main_school_data_export,
           path = "A:/main/final_main_school_data.dta",
           version = 14
 ) # default, leave factors as value labels, use variable name as var label
+
+# export the peru schools
+write_dta(data = peru_school_export,
+          path = "A:/Countries/Peru/Data/PER_school_survey_data_short.dta",
+          version = 14
+) # default, leave factors as value labels, use variable name as var label
+
+
 
 # # credits: https://stackoverflow.com/questions/6986657/find-duplicated-rows-based-on-2-columns-in-data-frame-in-r
 # https://gis.stackexchange.com/questions/224915/extracting-data-frame-from-simple-features-object-in-r
