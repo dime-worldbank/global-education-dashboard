@@ -187,7 +187,7 @@
 
 gl s1	= 0		// reconstruct bi vars
 gl s2	= 0 	// generate top p-tile vars for BI
-gl s3 	= 1		// 0 = keep 203 obs in peru PO dataset; 1 == drop unmatched obs as Brian does. 
+gl s3 	= 1		// 0 = keep 203 obs in peru PO dataset; 1 == drop unmatched obs as Brian does.
 
 
 
@@ -196,6 +196,10 @@ gl s3 	= 1		// 0 = keep 203 obs in peru PO dataset; 1 == drop unmatched obs as B
 
 	do "${scripts_clone}/clean/main-clean.do"
 
+
+* [Aggregate]
+* Collapse by admin unit, merge. 
+	do "${scripts_clone}/agg/main-agg.do"
 
 
 *iefolder*3*End_RunDofiles******************************************************
