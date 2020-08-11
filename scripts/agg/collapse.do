@@ -60,7 +60,7 @@ loc region 		: list numbers - g1 // for region we don't want either g2 or g1
 
 					restore
 
-		restore
+		
 
 
 
