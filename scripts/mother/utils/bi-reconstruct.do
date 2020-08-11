@@ -108,10 +108,12 @@
 					}
 			// check that and that all secondary vars are less than 5 and not equal to 0; there should be no secondary indicators missing.
 			foreach secondary of local secondary_els {
-				assert `secondary'1 	<= 5	& `secondary'1 != .
+				assert `secondary'1 	<= 5	& `secondary'1 != . ///
+						if droptag1 != 1
 					}
 			// check that the overall bi index is less than 5 and not equal to 0; there should be no missings.
-				assert bi1 	<= 5	& bi1 > 0
+				assert bi1 	<= 5	& bi1 > 0				///
+						if droptag1 != 1
 
 
 
@@ -123,7 +125,9 @@
 			replace `v' = `v'1							// replace this variable with the values from the one I generated
 			gen dif2_`v' = abs(`v' - `v'1)				// create a new difference variable that verify that the two variables are equal
 			sum dif2_`v'
-			assert r(max) == 0							// check that replacing went well; that these two variables are equal. their differences should	be 0.
+			assert r(max) == 0							/// check that replacing went well; that these two variables are equal. their differences should	be 0.
+						if droptag1 != 1
+
 			drop dif_* dif2_* `v'1							// drop the difference vars
 			}
 
