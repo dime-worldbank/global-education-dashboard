@@ -1,0 +1,1045 @@
+# Education Dashboard: Exploration of District-Level Merging and Regression Panel 1
+Author: Tom <br>
+Date: July, 2020
+
+
+
+
+```s, quietly
+use `"${baseline_dt}/final/merge_district_tdist.dta"', clear
+tokenize "${countrynames}"
+set linesize 240
+
+loc md 	`"${baseline_dt}/final/merge_district_tdist.dta"'
+loc mr 	`"${baseline_dt}/Deidentified/D_sch.dta"'
+
+loc sl 	student_knowledge ecd_student_knowledge inputs infrastructure intrinsic_motivation content_knowledge pedagogical_knowledge operational_manage instr_leader principal_knowl_score principal_manage
+loc slz 	c_student_knowledge c_ecd_student_knowledge c_inputs c_infrastructure c_intrinsic_motivation c_content_knowledge c_pedagogical_knowledge c_operational_manage c_instr_leader c_principal_knowl_score c_principal_manage
+
+
+
+```
+
+# Table of Contents
+
+[Current Delights and Dilemmas](#problems) <br>
+[Introduction](#intro) <br>
+[Descriptive Statistics](#stats) <br>
+1. [Correlations](#cor) <br>
+[Panel 0: Observations and Groups](#p0) <br>
+1. [Number of Observations](#nadmin) <br>
+[Panel 1: No Noise Controls; Environmental Controls](#p1) <br>
+1. [Bivariate Regressions: School variable explained by "BI"] (#br1) <br>
+2. [Bivariate Regressions: School variable explained by Secondary Indicators] (#br2) <br>
+3. [Multivariate Regressions: no fixed-effects] (#mr1) <br>
+4. [Multivariate Regressions: adding country and district Fixed Effects] (#mr2) <br>
+5. [Multivariate Regressions: adding environmental controls] (#mr3) <br>
+6. [Multivariate Regressions: incorporating Enumerators' Assessments] (#mr4) <br>
+7. [Multivariate Regressions: adding school indicators as covariates] (#mr5) <br>
+8. [Multivariate Regressions: recoding all categorical variables into z-scores] (#mr6) <br>
+
+
+
+
+
+
+
+# Current Delights and Dilemmas <a name="problems" ></a>
+
+These are some of the most salient points or questions from this analysis document, along with my comments. Links to the sections in which these topics are discussed are also included.: <br>
+
+1. Which tier officials should we include in the regression analysis if linking at the district level? All officials, MinEDU and District, or only District level [officials](#intro)? <br>
+	-For the time being, I’ve only included district-level officials as I’m not sure how to appropriately incorporate other levels of officials. <br><br>
+2. How do we want to best represent categorical variables in regressions? [Z-score Standardization, Raw, or transformation into indicator](#mr6)? <br>
+	-I conducted separate regressions with variables as raw, 1-5 scaled and also standardized. <br><br>
+3. There are a few problems with incorporating controls for enumerator quality: the enumerator's assessment of how well the interview went is collinear with district fixed-effects and thus dropped from the regression. Also, not all offices in a district are visited on the same day -- which prevents a clean average when aggregating by district. [(Discussed Here)](#mr3) <br>
+	-To incorporate enumerator quality somehow, I produced some iterations of regressions with very low-quality districts removed. <br><br>
+4. The four secondary indicators for Bureaucratic Quality appear to be [collinear](#mr2), but someone with better econometrics than me should confirm this. <br>
+	-My theoretical math isn’t this good. <br><br>
+5. Despite all of this, we do see signs that School Inputs have a positive and significant relationship with some measurements of bureaucratic quality when accounting for enumerator/interview quality and country, district fixed effects, and other school indicators. [(Discussed Here)](#mr6) However, this is a very tentative finding, since GDP hasn't yet been factored in and we have a lot of observation attrition. <br>
+	-I have a feeling that adding GDP might change this finding, and that set will come later<br><br>
+
+
+
+
+
+
+
+
+
+# Introduction <a name="intro" ></a>
+
+This document walks through initial stages of conducting exploratory regressions on a school-level dataset, where each school takes the district-average of bureaucrat information.
+
+By default, the data in this investigation uses **only** district-level public officials (see question 1 above). One could also conduct the same analysis by including other combinations of public officials, such as central Ministry of Education officials, but then the question becomes what to do with them, since they are theoretically "above" or "removed" from district level analysis yet nevertheless could have a role in shaping the bureaucratic quality at the local level.
+
+
+
+
+
+
+
+
+
+
+# Descriptive Statistics <a name="stats" ></a>
+This section presents descriptives between the full (non averaged) sample, regional-averaged sample, and district-averaged sample.
+<br> <br>
+Here are some important notes: <br>
+- there are wide fluctuations in observation counts for school-level variables (e.g., 4th Grade Student Knowledge vs Teacher Pedagogical Skill.) Does this seems right and are the Education Team aware of this? <br>
+- school indicator averages change slightly between datasets, but there don't appear to be large descriptive changes. (not tested for significance, here, but do we want to do this to "validate" our "sub-sample" of schools?) <br>
+- this trend largely holds for public officials as well.
+
+## Schools
+Full sample
+```s, echo=FALSE
+use 	"${GLOBE_sch}" , clear
+labsumm `sl'
+
+```
+
+Region-averaged sample
+```s, echo=FALSE
+use 	`"`mr'"' , clear
+labsumm `sl'
+
+```
+
+District-averaged sample
+```s, echo=FALSE
+use 	`"`md'"' , clear
+labsumm `sl'
+
+```
+
+## Public Officials
+Full sample
+```s, echo=FALSE
+use 	"${GLOBE_po}" , clear
+labsumm "${bi}"
+
+```
+
+Region-averaged sample <br>
+Note that each row is a country-region average of bureaucrat survey data
+```s, echo=FALSE
+use 	`"`mr'"' , clear
+preserve
+keep 	${bi} g1 g2 country
+collapse (mean) ${bi} , by( country g1)
+labsumm ${bi}
+restore
+
+```
+
+District-averaged sample <br>
+Note that each row is a country-district average of bureaucrat survey data
+```s, echo=FALSE
+use 	`"`md'"' , clear
+preserve
+keep 	${bi} g1 g2 country
+collapse (mean) ${bi} , by( country g2)
+labsumm ${bi}
+restore
+
+```
+
+
+## Correlations <a name="cor" ></a>
+
+Let's remind ourselves quickly of the correlation coefficients between secondary and primary indicators for bureaucratic quality: <br>
+Whole sample
+
+```s, echo=FALSE
+use 	`"${GLOBE_po}"' , clear
+
+corr 	${bi}
+
+```
+
+
+
+
+
+
+
+
+# Panel 0: Observations and Groups <a name="p0" ></a>
+
+## Number of Districts and School-level observations. <a name="nadmin" ></a>
+Main points: <br>
+- The overlap of between schools and officials is lower at the district level, and reduces the number of usable school-level observations from 882 (region-level link) to 345 schools (district-level link) <br>
+
+### Full samples
+<br>
+In total we have 975 schools.
+```s, echo=FALSE
+use 	`"${GLOBE_sch}"' , clear
+tabstat idschool, by(country) s(n)
+
+```
+<br><br>
+
+And we have 738 total public officials sampled.
+```s, echo=FALSE
+use 	`"${GLOBE_po}"' , clear
+tabstat idpo, by(country) s(n)
+
+```
+<br><br>
+
+However, because these two samples are linked in some way by aggregating across geography, the nature of their overlap determines how many observations can be kept. <br>
+
+In the schools sample, we have the following distribution of unique regions (g1) and districts (g2).
+```s, echo=FALSE
+use 	`"${GLOBE_sch}"' , clear
+di "Unique Regions by Country"
+unique g1, by(country)
+di "Unique Districts by Country"
+unique g2, by(country)
+
+```
+<br><br>
+
+Likewise, here is the distribution in the public officials sample.
+```s, echo=FALSE
+use 	`"${GLOBE_po}"' , clear
+di "Unique Regions by Country"
+unique g1, by(country)
+di "Unique Districts by Country"
+unique g2, by(country)
+
+
+```
+<br><br>
+
+### Region-comparison
+
+<br>
+The number of school observations that are kept when aggregating bureaucrat outcomes by region or district is determined by the number of administrative units in which there is both a school and an official. We'll look at this overlap in two ways: <br>
+1. the number of observations that are kept/matched between school-bureaucrat datasets and <br>
+2. the number of administrative units that are kept/matched between school-bureaucrat datasets
+
+<br><br>
+
+#### Matching Method 1: observation-level overlap
+Here we see that most public officials are in a region (g1) and district (g2) with a school. (This sampling scheme was intentional, I believe.)
+```s, echo=FALSE
+forvalues v = 1/4 {
+tokenize	`"${countries}"'
+	di " ``v'' "
+	use 	"${GLOBE_data}/``v''_po_F_match.dta", clear
+	tabstat match_g1, stat(mean)
+	tabstat match_g2, stat(mean)
+}
+```
+<br>
+However, the inverse is not as true: there are some schools in places with no official sampled and this rate of overlap decreases at the district level.
+```s, echo=FALSE
+tokenize	`"${countries}"'
+forvalues v = 1/4 {
+	di " ``v'' "
+	use 	"${GLOBE_data}/``v''_sch_F_match.dta", clear
+	tabstat match_g1, stat(mean)
+	tabstat match_g2, stat(mean)
+}
+```
+
+<br><br><br>
+
+#### Matching Method 2: administrative unit overlap
+Another way to examine the quality of overlap is to see how many unique regions/districts are present in both datasets. Let's first go back to the school-level dataset that imports region-averaged bureaucrat data (not district-averaged), which was the dataset used to produce most of our analysis in the presentations made before this document. Note that when we link by region, the number of unique region values is not reduced much from the total number of regions in each dataset's full sample.
+
+```s, echo=FALSE
+use 	`"`mr'"' , clear
+unique g1, by(country)
+
+```
+
+This leaves us with 39 unique administrative units across the four countries:
+
+```s, echo=FALSE
+use 	`"`mr'"' , clear
+unique g1 country
+
+```
+
+
+### District-level data
+#### Matching Method 1: observation-level overlap
+See "Region: Matching Method 1" above.
+
+#### Matching Method 2: administrative unit overlap
+However, when we link by district-level aggregation, we lose a larger number of units compared to linking by region yet we still have more administrative units. We have about 15 unique districts per country, with variation.
+
+```s, echo=FALSE
+use 	`"`md'"' , clear
+unique g2, by(country)
+
+```
+
+But we also have 65 total unique administrative units, which is more than the 39 units we get when merging by region.
+
+```s, echo=FALSE
+use 	`"`md'"' , clear
+unique country g2
+
+```
+
+
+
+
+
+# Panel 1: No Noise Control; Environmental Controls <a name="p1" ></a>
+
+## Bivariate Regressions: School variable explained by "BI" <a name="br1" ></a>
+
+Our first panel uses the schools dataset that includes district-averaged scores for public officials. We have 11 school-level variables of interest, so let's run 11 bivariate regressions with the overall Bureaucracy Index as the explanatory variable, without district fixed-effects <br>
+Notable points include: <br>
+- Coefficients for the following are negative and significant: 4th Grade Assessments, 1st Grade Assessments, Operational Management. <br>
+- Coefficients for the following are positive and significant: Teacher Motivation, Teacher Content Knowledge,  Leadership <br>
+- And the following Coefficients are not significant: Inputs, infrastructure, Teacher Pedagogical Knowledge, Principal Knowledge, Principal Management
+
+```s, echo=FALSE
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui foreach y of local sl {
+	eststo bi_`y': reg `y' bi
+	estadd local cfe "No"
+	estadd local dfe "No"
+	estadd local efe "No"
+	estadd local tfe "No"
+}
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(_cons)
+
+```
+
+
+## Bivariate Regressions: School variable explained by Secondary Indicators <a name="br2" ></a>
+
+Let's run the same regressions as above but use each of the four secondary indicators as regressors, keeping in mind that we still aren't using district or country fixed-effects. <br>
+Notable points include: <br>
+- The is heterogeneity of results within the secondary indicators: sign changes(4th Grade Assessments) and significance levels (Inputs) change across secondary indicators. <br>
+- Some indicators are consistently not explained at all by any secondary indicators (Teacher Pedagogical Knowledge), while others (4th Grade Student Knowledge) show predictability not matter the indicator.
+
+<br> <br>
+National Learning Goals
+```s, echo=FALSE
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui foreach y of local sl {
+	eststo bi_`y': reg `y' national_learning_goals
+	estadd local cfe "No"
+	estadd local dfe "No"
+	estadd local efe "No"
+	estadd local tfe "No"
+}
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(_cons)
+
+```
+<br><br>
+Mandates and Accountability
+```s, echo=FALSE
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui foreach y of local sl {
+	eststo bi_`y': reg `y' mandates_accountability
+	estadd local cfe "No"
+	estadd local dfe "No"
+	estadd local efe "No"
+	estadd local tfe "No"
+}
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop( _cons)
+
+```
+
+
+<br><br>
+Quality of Bureaucracy
+```s, echo=FALSE
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui foreach y of local sl {
+	eststo bi_`y': reg `y' quality_bureaucracy
+	estadd local cfe "No"
+	estadd local dfe "No"
+	estadd local efe "No"
+	estadd local tfe "No"
+}
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop( _cons)
+
+```
+
+
+<br><br>
+Impartial Decision-Making
+```s, echo=FALSE
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui foreach y of local sl {
+	eststo bi_`y': reg `y' impartial_decision_making
+	estadd local cfe "No"
+	estadd local dfe "No"
+	estadd local efe "No"
+	estadd local tfe "No"
+}
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop( _cons)
+
+```
+
+
+<br><br><br>
+
+
+
+## Multivariate Regressions: School variable explained by Secondary Indicators, still no Fixed Effects <a name="mr1" ></a>
+
+Here, we'll add the four Secondary Indicators as regressors on each of the 11 outcome variables for schools.
+
+<br><br>
+```s, echo=FALSE
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui foreach y of local sl {
+	eststo bi_`y': reg `y' ${secondary}
+	estadd local cfe "No"
+	estadd local dfe "No"
+	estadd local efe "No"
+	estadd local tfe "No"
+}
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop( _cons)
+
+```
+
+
+<br><br><br>
+
+## Multivariate Regressions: School variable explained by Bureaucratic Quality, adding country and district Fixed Effects <a name="mr2" ></a>
+<br><br>
+Main Points: <br>
+- The addition of country and district-level fixed effects eliminate many patterns of significance and reveal others. <br>
+- 4th Grade Assessments appear well-predicted by the secondary indicators, but the coefficients for some are positive and others negative, which may suggest they are highly correlated in this setting. <br>
+- Infrastructure may follow this same pattern described for 4th Grade Assessments <br>
+- As may be expected, there is a notable R-sq jump when adding country and district fixed effects, which many suggest a lot of the variation in outcomes is explained by within-country or -district characteristics. <br>
+
+### Using Overall Bureaucracy Index as regressor:
+<br>
+
+```s, echo=FALSE
+qui use 	`"`md'"' , clear
+
+/*Stata's limitations prevent a direct way to implement fixed effects for two non-time related variables. One could simply
+code i.country and i.[district var] to include both dimensions as fixed-effects, but the problem is doing so would equate
+de-identified regions across countries. For example, region "101" in country A is not the same as region "101" in country B,
+but the way the regions are randomized/coded, stata will think these are the same under the i.country and i.[district var]
+scenario. The solution I came up with is to concatenate the two variables (since they are both numeric) and, since no region
+has more than 999 districts (the district variable is 3 digits), we can safely proceed by creating a 4-digit country-district
+identifier where the first digit (1-4) refers to the country and the final 3 digits refer to the random district identifier.  */
+
+
+qui estimates clear
+qui foreach y of local sl {
+	eststo bi_`y': reg `y' bi i.country_g2
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+}
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+```
+
+<br><br>
+
+### Using Secondary Indicators as regressors individually
+<br>
+
+<br> <br>
+National Learning Goals
+```s, echo=FALSE
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui foreach y of local sl {
+	eststo bi_`y': reg `y' national_learning_goals i.country_g2
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+}
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+```
+<br><br>
+Mandates and Accountability
+```s, echo=FALSE
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui foreach y of local sl {
+	eststo bi_`y': reg `y' mandates_accountability i.country_g2
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+}
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+```
+
+
+<br><br>
+Quality of Bureaucracy
+```s, echo=FALSE
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui foreach y of local sl {
+	eststo bi_`y': reg `y' quality_bureaucracy i.country_g2
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+}
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+```
+
+
+<br><br>
+Impartial Decision-Making
+```s, echo=FALSE
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui foreach y of local sl {
+	eststo bi_`y': reg `y' impartial_decision_making i.country_g2
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+}
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+```
+
+
+
+
+### Combining all Secondary Indicators as regressors
+
+```s, echo=FALSE
+qui use 	`"`md'"' , clear
+
+** set up country-district variable
+
+/*Stata's limitations prevent a direct way to implement fixed effects for two non-time related variables. One could simply
+code i.country and i.[district var] to include both dimensions as fixed-effects, but the problem is doing so would equate
+de-identified regions across countries. For example, region "101" in country A is not the same as region "101" in country B,
+but the way the regions are randomized/coded, stata will think these are the same under the i.country and i.[district var]
+scenario. The solution I came up with is to concatenate the two variables (since they are both numeric) and, since no region
+has more than 999 districts (the district variable is 3 digits), we can safely proceed by creating a 4-digit country-district
+identifier where the first digit (1-4) refers to the country and the final 3 digits refer to the random district identifier.  */
+
+
+qui estimates clear
+qui foreach y of local sl {
+	eststo bi_`y': reg `y' ${secondary} i.country_g2
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+}
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+```
+<br><br><br>
+
+
+
+## Adding Environmental Controls <a name="mr3" ></a>
+Notes: <br>
+- Controlling for enumerators' assessments is key to revealing trends, but seems to be collinear with districts. <br>
+- Once you can *somewhat* control for enumerator assessments, it seems a few variables are predicted by bureaucracy indicators alone (Instructional Leadership), but in these cases we see the coefficients for four indicators split in opposite directions.
+
+
+
+### Note on Interview quality.
+
+Methodology: the enumerator assessment variables are categorical in the survey, so I converted them to indicator.
+
+As we can see here, most interviews went "very well" overall by the enumerator's assessment, but less than half surveyed had expert knowledge of *both* their own work and the organization according to the enumerator. Also, only about half were willing to provide sensitive and basic information.
+
+```s, echo=FALSE
+qui use 	`"${GLOBE_po}"' , clear
+labsumm		enum*
+
+```
+<br>
+
+## Incorporating Enumerators' Assessments
+However, if we include the enumerator's assessment of the respondent's knowledge, Stata drops this variable because of collinearity with the district Fixed-Effects. This happens for every enumerator quality indicator, which suggests measures for interview quality correlate with institution.
+
+
+```s, echo=FALSE
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui foreach y of local sl {
+	eststo bi_`y': reg `y' ${secondary} i.country_g2 enum_know
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "Yes"
+	estadd local tfe "No"
+}
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+```
+<br><br><br>
+
+
+If we remove the district Fixed Effects, the interview quality variable is maintained.
+```s, echo=FALSE
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui foreach y of local sl {
+	eststo bi_`y': reg `y' ${secondary} enum_know
+	estadd local cfe "No"
+	estadd local dfe "No"
+	estadd local efe "Yes"
+	estadd local tfe "No"
+}
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop( _cons)
+
+```
+<br><br><br>
+
+
+
+
+So what if we restricted our sample to districts that met a certain threshold for enumerator quality? Here's a histogram of *Respondent had knowledge of work and organization*: <br>
+
+```s, echo=FALSE
+set graph on
+hist enum_know, scheme(plotplain) percent
+```
+<br><br><br>
+
+Let's eliminate districts where not even 10 percent of respondents had an acceptable level of knowledge. Here's the regression in this case:
+```s, echo=FALSE
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui foreach y of local sl {
+	eststo bi_`y': reg `y' ${secondary} i.country_g2 	if enum_know > 0.10 // restrict to 10% knowledge level.
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+	estadd local rkn "Yes"
+}
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe rkn, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+```
+<br><br><br>
+
+
+Now let's also take away regions with very low rates of good interviews (< 10%)
+```s, echo=FALSE
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui foreach y of local sl {
+	eststo bi_`y': reg `y' ${secondary} i.country_g2 	if enum_know > 0.10 & enum_eval > 0.10 // restrict by knowledge and enum eval.
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+	estadd local rkn "Yes"
+	estadd local evl "Yes"
+}
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe rkn evl, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Restricted Evaluation Sample") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+```
+<br><br><br>
+
+
+
+
+
+
+## Adding School level indicators as covariates. <a name="mr5" ></a>
+Main Points: <br>
+
+- The most reliable school variables predicted by measures of bureaucratic quality are inputs and infrastructure
+- When we add the 11 school level dimensions as explanatory variables, we see observation attrition since many of these variables are missing from Mozambique
+
+```s, echo=FALSE
+
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui loc pk pedagogical_knowledge	// store pedagogical_knowledge as local
+qui loc sl2: list sl - pk		// remove pedagogical_knowledge from varlist
+
+qui foreach y of local sl2 {
+	loc el `y'				// store loop var in local
+	loc rest: list sl2 - el // take out the loop var from list
+	eststo bi_`y': reg `y' bi `rest' i.country_g2 	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+	estadd local rkn "Yes"
+	estadd local moz "Yes"
+}
+
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe rkn moz, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Removed Mozambique") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+
+```
+<br><br><br>
+
+```s, echo=FALSE
+
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui loc pk pedagogical_knowledge	// store pedagogical_knowledge as local
+qui loc sl2: list sl - pk		// remove pedagogical_knowledge from varlist
+
+qui foreach y of local sl2 {
+	loc el `y'				// store loop var in local
+	loc rest: list sl2 - el // take out the loop var from list
+	eststo bi_`y': reg `y' national_learning_goals `rest' i.country_g2 	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+	estadd local rkn "Yes"
+	estadd local moz "Yes"
+}
+
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe rkn moz, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Removed Mozambique") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+
+```
+<br><br><br>
+
+```s, echo=FALSE
+
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui loc pk pedagogical_knowledge	// store pedagogical_knowledge as local
+qui loc sl2: list sl - pk		// remove pedagogical_knowledge from varlist
+
+qui foreach y of local sl2 {
+	loc el `y'				// store loop var in local
+	loc rest: list sl2 - el // take out the loop var from list
+	eststo bi_`y': reg `y' quality_bureaucracy `rest' i.country_g2 	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+	estadd local rkn "Yes"
+	estadd local moz "Yes"
+}
+
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe rkn moz, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Removed Mozambique") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+
+```
+<br><br><br>
+
+```s, echo=FALSE
+
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui loc pk pedagogical_knowledge	// store pedagogical_knowledge as local
+qui loc sl2: list sl - pk		// remove pedagogical_knowledge from varlist
+
+qui foreach y of local sl2 {
+	loc el `y'				// store loop var in local
+	loc rest: list sl2 - el // take out the loop var from list
+	eststo bi_`y': reg `y' mandates_accountability `rest' i.country_g2 	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+	estadd local rkn "Yes"
+	estadd local moz "Yes"
+}
+
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe rkn moz, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Removed Mozambique") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+
+```
+<br><br><br>
+
+```s, echo=FALSE
+
+qui use 	`"`md'"' , clear
+qui estimates clear
+qui loc pk pedagogical_knowledge	// store pedagogical_knowledge as local
+qui loc sl2: list sl - pk		// remove pedagogical_knowledge from varlist
+
+qui foreach y of local sl2 {
+	loc el `y'				// store loop var in local
+	loc rest: list sl2 - el // take out the loop var from list
+	eststo bi_`y': reg `y' impartial_decision_making `rest' i.country_g2 	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+	estadd local rkn "Yes"
+	estadd local moz "Yes"
+}
+
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe rkn moz, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Removed Mozambique") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+
+```
+<br><br><br><br><br>
+
+
+
+## Rerunning using z-scores for all outcome and explanatory categorical variables <a name="mr6" ></a>
+Main Points: <br>
+- Similar to the above, we see that inputs are the most reliable school outcome predicted by bureaucratic quality.
+
+```s, echo=FALSE
+
+qui use 	`"`md'"' , clear
+preserve
+tempfile mdz
+qui save `mdz'
+
+qui loc slz c_student_knowledge c_ecd_student_knowledge c_inputs c_infrastructure c_intrinsic_motivation c_content_knowledge c_pedagogical_knowledge c_operational_manage c_instr_leader c_principal_knowl_score c_principal_manage
+
+qui estimates clear
+qui loc pk c_pedagogical_knowledge	// store pedagogical_knowledge as local
+qui loc sl2: list slz - pk		// remove pedagogical_knowledge from varlist
+
+qui foreach y of local sl2 {
+	loc el `y'				// store loop var in local
+	loc rest: list sl2 - el // take out the loop var from list
+	eststo bi_`y': reg `y' c_bi `rest' i.country_g2 	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+	estadd local rkn "Yes"
+	estadd local moz "Yes"
+}
+
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe rkn moz, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Removed Mozambique") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+restore
+
+```
+<br><br><br>
+
+```s, echo=FALSE
+
+qui use 	`"`mdz'"' , clear
+qui estimates clear
+qui loc pk c_pedagogical_knowledge	// store pedagogical_knowledge as local
+qui loc sl2: list slz - pk		// remove pedagogical_knowledge from varlist
+
+qui foreach y of local sl2 {
+	loc el `y'				// store loop var in local
+	loc rest: list sl2 - el // take out the loop var from list
+	eststo bi_`y': reg `y' c_national_learning_goals `rest' i.country_g2 	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+	estadd local rkn "Yes"
+	estadd local moz "Yes"
+}
+
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe rkn moz, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Removed Mozambique") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+
+```
+<br><br><br>
+
+```s, echo=FALSE
+
+qui use 	`"`mdz'"' , clear
+qui estimates clear
+qui loc pk c_pedagogical_knowledge	// store pedagogical_knowledge as local
+qui loc sl2: list slz - pk		// remove pedagogical_knowledge from varlist
+
+qui foreach y of local sl2 {
+	loc el `y'				// store loop var in local
+	loc rest: list sl2 - el // take out the loop var from list
+	eststo bi_`y': reg `y' c_quality_bureaucracy `rest' i.country_g2 	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+	estadd local rkn "Yes"
+	estadd local moz "Yes"
+}
+
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe rkn moz, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Removed Mozambique") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+
+```
+<br><br><br>
+
+```s, echo=FALSE
+
+qui use 	`"`mdz'"' , clear
+qui estimates clear
+qui loc pk c_pedagogical_knowledge	// store pedagogical_knowledge as local
+qui loc sl2: list slz - pk		// remove pedagogical_knowledge from varlist
+
+qui foreach y of local sl2 {
+	loc el `y'				// store loop var in local
+	loc rest: list sl2 - el // take out the loop var from list
+	eststo bi_`y': reg `y' c_mandates_accountability `rest' i.country_g2 	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+	estadd local rkn "Yes"
+	estadd local moz "Yes"
+}
+
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe rkn moz, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Removed Mozambique") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+
+```
+<br><br><br>
+
+```s, echo=FALSE
+
+qui use 	`"`mdz'"' , clear
+qui estimates clear
+qui loc pk c_pedagogical_knowledge	// store pedagogical_knowledge as local
+qui loc sl2: list slz - pk		// remove pedagogical_knowledge from varlist
+
+qui foreach y of local sl2 {
+	loc el `y'				// store loop var in local
+	loc rest: list sl2 - el // take out the loop var from list
+	eststo bi_`y': reg `y' c_impartial_decision_making `rest' i.country_g2 	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+	estadd local rkn "Yes"
+	estadd local moz "Yes"
+}
+
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe rkn moz, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Removed Mozambique") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+
+```
+<br><br><br><br><br>
+
+
+
+Let's add in all four secondary indicators now.
+```s, echo=FALSE
+
+qui use 	`"`mdz'"' , clear
+qui estimates clear
+qui loc pk c_pedagogical_knowledge	// store pedagogical_knowledge as local
+qui loc sl2: list slz - pk		// remove pedagogical_knowledge from varlist
+
+qui foreach y of local sl2 {
+	loc el `y'				// store loop var in local
+	loc rest: list sl2 - el // take out the loop var from list
+	eststo bi_`y': reg `y'  c_national_learning_goals c_mandates_accountability c_quality_bureaucracy c_impartial_decision_making ///
+							`rest' i.country_g2 	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+	estadd local rkn "Yes"
+	estadd local moz "Yes"
+}
+
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe rkn moz, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Removed Mozambique") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+
+```
+<br><br><br><br><br>
+
+
+Finally, since Mozambique does have data for inputs, let's include those observations and all other explanatory variables we can.
+```s, echo=FALSE
+
+qui use 	`"`mdz'"' , clear
+qui estimates clear
+qui loc slzshort c_student_knowledge c_inputs c_infrastructure c_content_knowledge  c_pedagogical_knowledge
+qui loc pk c_pedagogical_knowledge	// store pedagogical_knowledge as local
+qui loc sl2: list slzshort - pk		// remove pedagogical_knowledge from varlist
+
+qui foreach y of local sl2 {
+	loc el `y'				// store loop var in local
+	loc rest: list sl2 - el // take out the loop var from list
+	eststo bi_`y': reg `y'  c_national_learning_goals c_mandates_accountability c_quality_bureaucracy c_impartial_decision_making ///
+							`rest' i.country_g2 	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
+	estadd local cfe "Yes"
+	estadd local dfe "Yes"
+	estadd local efe "No"
+	estadd local tfe "No"
+	estadd local rkn "Yes"
+	estadd local moz "No"
+}
+
+esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
+ 				stats(N F r2 r2_a cfe dfe efe tfe rkn moz, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Removed Mozambique") ) ///
+				modelwidth(15) mlabels(, depvars) wide drop(*country* _cons)
+
+
+```
+<br><br><br><br><br>

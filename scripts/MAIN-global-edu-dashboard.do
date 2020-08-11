@@ -197,7 +197,7 @@ gl s4	= 1		// 1 reconstructs BI vars, 0 leaves raw data and only constructs Aggr
 
 loc clean	= 1		// reconstruct bi vars
 loc agg		= 1 	// generate top p-tile vars for BI
-
+loc reg 	= 1 	// run regression panels
 
 * [Cleaning]
 * Import, Clean, Construct, Deidentify
@@ -209,6 +209,12 @@ if (`clean' == 1) {
 * Collapse by admin unit, merge.
 if (`agg' == 1) {
 	do "${scripts_clone}/agg/main-agg.do"
+}
+
+* [exploratory regs ]
+* Collapse by admin unit, merge.
+if (`reg' == 1) {
+	do "${scripts_clone}/reg/main-reg.do"
 }
 
 *iefolder*3*End_RunDofiles******************************************************
