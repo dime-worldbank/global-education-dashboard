@@ -43,16 +43,16 @@ Recall that working theory posits bureaucracy indicators as predictors of inputs
 qui use 	`"`md'"' , clear
 preserve
 
-qui loc slz c_student_knowledge c_ecd_student_knowledge c_inputs c_infrastructure c_intrinsic_motivation c_content_knowledge c_pedagogical_knowledge c_operational_manage c_instr_leader c_principal_knowl_score c_principal_manage
+qui loc slz z_student_knowledge z_ecd_student_knowledge z_inputs z_infrastructure z_intrinsiz_motivation z_content_knowledge z_pedagogical_knowledge z_operational_manage z_instr_leader z_principal_knowl_score z_principal_manage
 
 qui estimates clear
-qui loc pk c_pedagogical_knowledge	// store pedagogical_knowledge as local
+qui loc pk z_pedagogical_knowledge	// store pedagogical_knowledge as local
 qui loc sl2: list slz - pk		// remove pedagogical_knowledge from varlist
 
 qui foreach y of local sl2 {
 	loc el `y'				// store loop var in local
 	loc rest: list sl2 - el // take out the loop var from list
-	eststo bi_`y': reg `y' c_bi `rest' i.country_g2 	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
+	eststo bi_`y': reg `y' z_bi `rest' i.country_g2 	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
 	estadd local cfe "Yes"
 	estadd local dfe "Yes"
 	estadd local efe "No"
@@ -76,16 +76,16 @@ restore
 
 qui use 	`"`md'"' , clear
 
-qui loc slz c_student_knowledge c_ecd_student_knowledge c_inputs c_infrastructure c_intrinsic_motivation c_content_knowledge c_pedagogical_knowledge c_operational_manage c_instr_leader c_principal_knowl_score c_principal_manage
+qui loc slz z_student_knowledge z_ecd_student_knowledge z_inputs z_infrastructure z_intrinsiz_motivation z_content_knowledge z_pedagogical_knowledge z_operational_manage z_instr_leader z_principal_knowl_score z_principal_manage
 
 qui estimates clear
-qui loc pk c_pedagogical_knowledge	// store pedagogical_knowledge as local
+qui loc pk z_pedagogical_knowledge	// store pedagogical_knowledge as local
 qui loc sl2: list slz - pk		// remove pedagogical_knowledge from varlist
 
 qui foreach y of local sl2 {
 	loc el `y'				// store loop var in local
 	loc rest: list sl2 - el // take out the loop var from list
-	eststo bi_`y': reg `y' c_bi `rest' total_enrolled i.country_g2 	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
+	eststo bi_`y': reg `y' z_bi `rest' total_enrolled i.country_g2 	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
 	estadd local cfe "Yes"
 	estadd local dfe "Yes"
 	estadd local efe "No"
@@ -108,16 +108,16 @@ esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt
 
 qui use 	`"`md'"' , clear
 
-qui loc slz c_student_knowledge c_ecd_student_knowledge c_inputs c_infrastructure c_intrinsic_motivation c_content_knowledge c_pedagogical_knowledge c_operational_manage c_instr_leader c_principal_knowl_score c_principal_manage
+qui loc slz z_student_knowledge z_ecd_student_knowledge z_inputs z_infrastructure z_intrinsiz_motivation z_content_knowledge z_pedagogical_knowledge z_operational_manage z_instr_leader z_principal_knowl_score z_principal_manage
 
 qui estimates clear
-qui loc pk c_pedagogical_knowledge	// store pedagogical_knowledge as local
+qui loc pk z_pedagogical_knowledge	// store pedagogical_knowledge as local
 qui loc sl2: list slz - pk		// remove pedagogical_knowledge from varlist
 
 qui foreach y of local sl2 {
 	loc el `y'				// store loop var in local
 	loc rest: list sl2 - el // take out the loop var from list
-	eststo bi_`y': reg `y' c_bi `rest' total_enrolled gdp ///
+	eststo bi_`y': reg `y' z_bi `rest' total_enrolled gdp ///
 	 					i.country_g2 	if enum_know > 0.1 & country != 3 // restrict to 10% knowledge level, remove Mozambique
 	estadd local cfe "Yes"
 	estadd local dfe "Yes"
