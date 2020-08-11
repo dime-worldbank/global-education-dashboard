@@ -160,6 +160,7 @@
 *iefolder*2*End_StandardGlobals*************************************************
 *iefolder will not work properly if the line above is edited
 
+do `"${scripts_clone}/clean/clean-global-setup.do"' // this the the clean-specific and also main
 
 *iefolder*3*RunDofiles**********************************************************
 *iefolder will not work properly if the line above is edited
