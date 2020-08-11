@@ -18,8 +18,8 @@ iecodebook template ///
 			 "A:/Countries/Jordan/Data/final_indicator_school_data.dta" /// Path to jordan
 			 "A:/Countries/Mozambique/Data/school_inicators_data.dta" /// path to moz
 			 "A:/Countries/Rwanda/Data/final_indicator_school_data.dta" /// path to rwanda
-			 using `"${mastData}/codebooks/schools.xlsx"' /// path to codebook
-			, replace surveys($countrynames) generate(country)
+			 using `"${mastData}/codebooks/schools2.xlsx"' /// path to codebook
+			, replace surveys($countrynames) generate(country) match
 }
 
 		/*excel editing happens manually here. */
@@ -32,7 +32,7 @@ iecodebook append ///
 			 "A:/Countries/Jordan/Data/final_indicator_school_data.dta" /// Path to jordan
 			 "A:/Countries/Mozambique/Data/school_inicators_data.dta" /// path to moz
 			 "A:/Countries/Rwanda/Data/final_indicator_school_data.dta" /// path to rwanda
-			 using `"${mastData}/codebooks/schools.xlsx"' /// path to codebook
+			 using `"${mastData}/codebooks/schools2.xlsx"' /// path to codebook
 			, replace surveys($countrynames) generate(country) clear
 
 
