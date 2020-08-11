@@ -19,6 +19,39 @@ merge 1:1 	countryname school_code 	/// this will connect two datasets
 
 
 
+
+
+							* | 	convert school size into categorical		| *
+
+
+
+la def 	enrolled 	1	"25 or fewer" ///
+					2 	"25-50" ///
+					3 	"50-75" ///
+					4 	"75-100" ///
+					5 	"100-150" ///
+					6 	"150-300" ///
+					7	"300-500" ///
+					8	"500+"
+
+gen 	enrolled		= .
+la values enrolled enrolled 			// assign value label
+la var	enrolled 		"Total Student Enrollement" // label variable
+
+replace enrolled 		= 1 	if 							total_enrolled < 25
+replace enrolled 		= 2 	if total_enrolled >= 25 & 	total_enrolled < 50
+replace enrolled 		= 3 	if total_enrolled >= 50 & 	total_enrolled < 75
+replace enrolled 		= 4 	if total_enrolled >= 75 & 	total_enrolled < 100
+replace enrolled 		= 5 	if total_enrolled >= 100 & 	total_enrolled < 150
+replace enrolled 		= 6 	if total_enrolled >= 150 & 	total_enrolled < 300
+replace enrolled 		= 7 	if total_enrolled >= 300 & 	total_enrolled < 500
+replace enrolled 		= 8 	if total_enrolled >= 500
+
+
+
+
+
+
 							* | 	drop pii variables		| *
 
 drop 		${piisch} _merge
