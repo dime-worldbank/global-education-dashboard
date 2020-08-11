@@ -59,7 +59,7 @@ esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt
  				stats(N F r2 r2_a cfe dfe efe tfe rkn moz, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Removed Mozambique") ) ///
 				modelwidth(15) mlabels(, depvars) wide drop(*country* *g2* _cons)
 
-qui estimate clear
+qui estimates clear
 
 ```
 
@@ -85,7 +85,7 @@ qui foreach y of local slnop {
 esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
  				stats(N F r2 r2_a cfe dfe efe tfe rkn moz, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Removed Mozambique") ) ///
 				modelwidth(15) mlabels(, depvars) wide drop(*country* *g2* _cons)
-qui estimate clear
+qui estimates clear
 
 
 ```
@@ -119,7 +119,7 @@ qui foreach y of local sl2 {
 esttab , numbers noconstant cells( b(label("b") fmt(a3) star) se(label("se") fmt(2))  ) label legend ///
  				stats(N F r2 r2_a cfe dfe efe tfe rkn moz, labels("N" "F-Stat" "R-sq" "Adj. R-sq" "Country FE" "District FE" "Enumerator FE" "Date FE" "Restricted Knowledge Sample" "Removed Mozambique") ) ///
 				modelwidth(15) mlabels(, depvars) wide drop(*country* *g2* _cons)
-qui estimate clear
+qui estimates clear
 
 
 ```
