@@ -44,7 +44,7 @@ loc region 		: list numbers - g1 // for region we don't want either g2 or g1
 					}
 				}
 
-			drop 		idpo g2 g3 // we don't need these as they will be meaningless as averages.
+			drop 		idpo  // we don't need these as they will be meaningless as averages.
 			do 			"${scripts_clone}/mother/utils/labpreserve.do"
 			save 		"${publicofficial}/Dataset/col_po_g1_alltier.dta", replace
 					restore
@@ -54,7 +54,7 @@ loc region 		: list numbers - g1 // for region we don't want either g2 or g1
 
 						sort		countryname g1 g2
 						collapse 	(mean) `district', by(countryname g2)
-						drop 		idpo g3
+						drop 		idpo
 						*do 		${labscript}
 						save 		"${publicofficial}/Dataset/col_po_g2_alltier.dta", replace
 
@@ -69,7 +69,7 @@ loc region 		: list numbers - g1 // for region we don't want either g2 or g1
 
 		sort		countryname g1 g2
 		collapse 	(mean) `district', by(countryname g1 g2)
-		drop 		idpo g3
+		drop 		idpo
 		do 			"${scripts_clone}/mother/utils/labpreserve.do"
 		save 		"${publicofficial}/Dataset/col_po_g2_alltier.dta", replace
 
@@ -84,7 +84,7 @@ loc region 		: list numbers - g1 // for region we don't want either g2 or g1
 
 				sort		countryname g1 g2
 				collapse 	(mean) `district', by(countryname g1 g2)
-				drop 		idpo g3
+				drop 		idpo
 				do 			"${scripts_clone}/mother/utils/labpreserve.do"
 				save 		"${publicofficial}/Dataset/col_po_g2_tier3.dta", replace
 
