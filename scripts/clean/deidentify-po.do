@@ -30,6 +30,3 @@ drop 		${piipo} _merge
 
 
 save 		`"${D_po}"' , replace
-
-pause on
-pause
