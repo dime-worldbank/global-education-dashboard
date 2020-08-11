@@ -14,7 +14,7 @@ Function: merges the region-level averages to countries
 		preserve
 
 		* merge on region (g1)
-				merge 		m:1 	countryname g2 	///
+				merge 		m:1 	countryname g1 	///
 									using "${publicofficial}/Dataset/col_po_g1_alltier.dta" ///
 									, gen(merge)
 
