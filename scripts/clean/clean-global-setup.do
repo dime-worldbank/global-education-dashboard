@@ -164,12 +164,26 @@
 								school_emis_preload school_info_correct m1s0q2_name m1s0q2_code m1s0q2_emis ///
 								ADM0_NAME ADM1_NAME ADM2_NAME ADM0_CODE ADM1_CODE ADM2_CODE STR2_YEAR ///
 								EXP2_YEAR STATUS DISP_AREA Shape_Leng Shape_Le_1 Shape_Area
-								
-		gl 			piipo 		interview__id interview__key office_preload survey_time occupational_category ///
-								professional_service sub_professional_service resp_finance_planning director_hr ///
-								education DEM1q2 DEM1q1 DEM1q6 ///
+
+		gl 			piipo 		interview__id interview__key office_preload survey_time responsible_fance_planning ///
+		 						responsible_hring_teachers responsible_ming_performan responsible_none education ///
+								gender director_hr position sub_professional_service professional_service ///
+								occupational_category consent admin DEM1q1 DEM1q2 DEM1q4__1 DEM1q4__2 DEM1q4__3 ///
+								DEM1q5__1 DEM1q5__2 DEM1q5__3 DEM1q5__4 DEM1q6 DEM1q7 DEM1q8 DEM1q9 DEM1q10 ///
+								DEM1q11n DEM1q12n DEM1q13n DEM1q14n DEM1q11 DEM1q15n DEM1q12 DEM1q13 DEM1q14__1 ///
+								DEM1q14__2 DEM1q14__3 DEM1q14__4 DEM1q14__5 DEM1q14__6 DEM1q14__7 DEM1q14__8 ///
+								DEM1q14__9 DEM1q14__10 DEM1q14__97 DEM1q14__900 DEM1q14__998 DEM1q14__12 DEM1q15 ///
 								ADM0_NAME ADM1_NAME ADM2_NAME ADM0_CODE ADM1_CODE ADM2_CODE STR2_YEAR EXP2_YEAR ///
-								STATUS DISP_AREA Shape_Leng Shape_Le_1 Shape_Area
+								STATUS DISP_AREA Shape_Leng Shape_Le_1 Shape_Area ///
+								nlg_length acm_length qb_length idm_length ORG1q1a ORG1q1b ORG1q1c ORG1q1d ORG1q1e ///
+								 ORG1q2a ORG1q2a_other ORG1q2b ORG1q2b_other ORG1q2c ORG1q2c_other ORG1q2d ORG1q2d_other ///
+								 ORG1q2e ORG1q2e_other ORG1q3__1 ORG1q3__2 ORG1q3__3 ORG1q3__4 ORG1q3__5 ORG1q4a ///
+								 ORG1q4b ORG1q4c ORG1q4d ORG1q4e ORG1q5 ORG1q6 ORG2q1 ORG2q2 ORG2q3 ORG2q4 ORG2q5 ///
+								 ORG2q6 ORG2q7 ORG2q8 ORG3q1 ORG3q2 ORG3q3 ORG3q4 ORG4q1__1 ORG4q1__2 ORG4q1__3 ///
+								 ORG4q1__4 ORG4q1__5 ORG4q1__900 ORG4q1__998 ORG4q2__1 ORG4q2__2 ORG4q2__3 ///
+								 ORG4q2__4 ORG4q2__5 ORG4q2__97 ORG4q2__900 ORG4q2__998 ORG4q2_other ORG4q3 ///
+								 DEM1q14b ENUMq1_endtime responsible_mg_performance proportion_reerperformance ///
+								 ENUMq1 ENUMq2 ENUMq3 ENUMq4 ENUMq5 ENUMq6 ENUMq7 ENUMq8
 
 
 
