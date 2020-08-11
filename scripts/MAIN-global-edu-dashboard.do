@@ -187,6 +187,7 @@
 
 gl s1	= 0		// reconstruct bi vars
 gl s2	= 0 	// generate top p-tile vars for BI
+gl s3 	= 1		// 0 = keep 203 obs in peru PO dataset; 1 == drop unmatched obs as Brian does. 
 
 
 
