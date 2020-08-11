@@ -184,7 +184,9 @@
 								 ORG4q2__4 ORG4q2__5 ORG4q2__97 ORG4q2__900 ORG4q2__998 ORG4q2_other ORG4q3 ///
 								 DEM1q14b ENUMq1_endtime responsible_mg_performance proportion_reerperformance ///
 								 ENUMq1 ENUMq2 ENUMq3 ENUMq4 ENUMq5 ENUMq6 ENUMq7 ENUMq8 ///
-								 school_district_preload school_province_preload region_code district_code district province location lat lon
+								 school_district_preload school_province_preload region_code district_code ///
+								 district province location lat lon end_time responsible_mnitoring_perf ///
+								 enumerator_number
 
 
 
