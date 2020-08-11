@@ -8,7 +8,6 @@ library(sf)
 library(assertthat)
 library(rio)
 library(haven)
-library(sjlabelled)
 
                       # ----------------------------- #
                       # Load+append schools datasets  #----
@@ -18,29 +17,29 @@ vault <- file.path("A:/Countries")
 # load each country's GDP data
 peru_gdp <- import(file.path(vault,
 	"Peru/Data/Full_Data/school_indicators_data.RData"),
-	which = "school_GDP"))
+	which = "school_gdp")
 
 jordan_gdp <- import(file.path(vault,
 	"Jordan/Data/Full_Data/school_indicators_data.RData"),
-	which = "school_GDP"))
+	which = "school_gdp")
 
 # note there is no moz GDP yet
 
 rwanda_gdp <- import(file.path(vault,
 	"Rwanda/Data/Full_Data/school_indicators_data.RData"),
-	which = "school_GDP"))
+	which = "school_gdp")
 
 # Peru
 peru_school <- import(file.path(vault,
                      "Peru/Data/Full_Data/school_indicators_data.RData"),
                     which = "school_dta_short")
-peru_school <- left_join(peru_school, peru_gdp, by "school_code") # should keep all obs in main
+peru_school <- left_join(peru_school, peru_gdp, by = "school_code") # should keep all obs in main
 
 # Jordan
 jordan_school <- import(file.path(vault,
                                "Jordan/Data/Full_Data/school_indicators_data.RData"),
                      which = "school_dta_short")
-jordan_school <- left_join(jordan_school, jordan_gdp, by "school_code") # should keep all obs in main
+jordan_school <- left_join(jordan_school, jordan_gdp, by = "school_code") # should keep all obs in main
 
 
 # Mozambique :: note there is no Rdata file.
@@ -59,7 +58,7 @@ mozambique_school <- import(file.path(vault,
 rwanda_school <- import(file.path(vault,
                                "Rwanda/Data/Full_Data/school_indicators_data.RData"),
                      which = "school_dta_short")
-rwanda_school <- left_join(rwanda_school, rwanda_gdp, by "school_code") # should keep all obs in main
+rwanda_school <- left_join(rwanda_school, rwanda_gdp, by = "school_code") # should keep all obs in main
 
 # bind rows
 m.school <- bind_rows("Peru" = peru_school,
@@ -67,9 +66,10 @@ m.school <- bind_rows("Peru" = peru_school,
                       "Rwanda" = rwanda_school,
                       "Mozambique" = mozambique_school,
                       .id = "countryname") %>%
-					  mutate(
-						  ln_gdp = log(gdp)  # create log GDP 
-					  )
+            mutate(.,
+						  ln_gdp = log(GDP)  # create log GDP 
+					  ) %>%
+  rename(gdp = GDP)
 
 
 
@@ -106,7 +106,7 @@ mozambique_po <- read.dta13(file.path(vault,
                             nonint.factors = FALSE)
       # will levels be same as rest by when converting from numeric to factor?
       #mozambique_po$govt_tier <- factor(mozambique_po$govt_tier, levels = tiers) %>%
-                                factor()
+      #                          factor()
 
 
 # Rwanda
@@ -403,11 +403,6 @@ write_dta(data = main_school_data_export,
           path = "A:/main/final_main_school_data.dta",
           version = 14
 ) # default, leave factors as value labels, use variable name as var label
-
-main_school_data %>% st_set_geometry(NULL) %>%
-  write_dta(path = "A:/main/final_main_school_data.dta",
-            version = 14 # v15 causes problems with </sortlist>
-           )
 
 # # credits: https://stackoverflow.com/questions/6986657/find-duplicated-rows-based-on-2-columns-in-data-frame-in-r
 # https://gis.stackexchange.com/questions/224915/extracting-data-frame-from-simple-features-object-in-r
