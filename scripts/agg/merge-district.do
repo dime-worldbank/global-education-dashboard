@@ -49,9 +49,6 @@ Function: merges the district-level averages to countries
 
 		preserve
 
-			* keep only district officials
-				keep if 		govt_tier == 3 	// where 3 == district
-
 			* merge
 				merge 		m:1 	countryname g2 	///
 									using "${publicofficial}/Dataset/col_po_g2_tier3.dta" ///
