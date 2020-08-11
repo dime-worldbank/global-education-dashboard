@@ -15,7 +15,8 @@ loc numbers 	= r(varlist)
 loc g1 		g1 g2
 loc g2 		g2
 loc district 	: list numbers - g2 // for district we want to have g1
-loc region 		: list numbers - g1 // for region we don't want either g2 or g1
+loc region 		: list numbers - g2 // for region we don't want either g2 or g1
+* these are the same, yes, it's right, trust me.
 
 
 
@@ -53,14 +54,14 @@ loc region 		: list numbers - g1 // for region we don't want either g2 or g1
 					preserve
 
 						sort		countryname g1 g2
-						collapse 	(mean) `district', by(countryname g2)
+						collapse 	(mean) `district', by(countryname g1 g2)
 						drop 		idpo
 						*do 		${labscript}
 						save 		"${publicofficial}/Dataset/col_po_g2_alltier.dta", replace
 
 					restore
 
-		
+
 
 
 
