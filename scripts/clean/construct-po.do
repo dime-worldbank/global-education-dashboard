@@ -22,6 +22,19 @@ use	 	"${B_po}", replace
 					 	it'd be like that of schools. */
 
 
+							* | 	enumerator quality 		| *
+
+		/* note that the coding puts missing values in 0 for generated dummy vars, not missing.
+		 	missings are mostly 0, at most 3 total for all 4 countries*/
+
+
+	gen enum_priv = (ENUMq3 == 1) // privacy: interview was totally private
+	gen enum_know = (ENUMq4 == 3) // expert knowledge: Expert knowledge about both their own work and about the organization.
+	gen enum_info = (ENUMq5 == 3) // reveal information: provides both basic and sensitive info
+	gen enum_eval = (ENUMq7 == 4) // overall assessment: very well
+
+
+
 
 							* | 	z-scores 		| *
 

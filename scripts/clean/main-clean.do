@@ -34,3 +34,5 @@ do `"${scripts_clone}/clean/construct-po.do"'
 
 do `"${scripts_clone}/clean/deidentify-school.do"'
 do `"${scripts_clone}/clean/deidentify-po.do"'
+
+clear
