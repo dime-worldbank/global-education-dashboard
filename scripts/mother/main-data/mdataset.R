@@ -3,15 +3,16 @@
 # appends all schools datasets and all public officials dataset (raw), performs basic
 # 	cleaning, and does geoprocessing on gps coordinates to determine admin unit, distances etc
 
+install.packages("pacman")
 
+pacman::p_load(tidyverse,
+       readstata13,
+       sf,
+       assertthat,
+       rio,
+       haven,
+       sjlabelled)
 
-library(tidyverse)
-library(readstata13)
-library(sf)
-library(assertthat)
-library(rio)
-library(haven)
-library(sjlabelled)
 
 					# ----------------------------- #
 					# 			 settings	 		#----
@@ -20,21 +21,24 @@ user <- 1
 # where 1 == Tom
 # 		2 == reviewer
 
-shared <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard/code-review"
+
+# shared data folder
 
 
 
 # user settings
 if (user == 1) {
-root  <- file.path("A:")
+root  <- file.path("A:") #
 vault <- file.path(root, "Countries")
 wbpoly <- file.path(shared, "gis/20160921_GAUL_GeoJSON_TopoJSON")
+shared <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard/code-review"
 }
 
 if (user == 2) {
-root  <- file.path("") # <- insert file path here.
+root  <- file.path("") # <- insert file path here if you want to copy the files locally.
 vault <- file.path(root, "Countries")
-wbpoly <- file.path(shared, "gis/20160921_GAUL_GeoJSON_TopoJSON")
+shared <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard/code-review"
+  # replace with where you put the 'code-review' folder if you decide to run locally.
 }
 
 
@@ -44,6 +48,7 @@ wbpoly <- file.path(shared, "gis/20160921_GAUL_GeoJSON_TopoJSON")
 appendskip <- 1 # 1 if we want to skip creation of real, pii dataset and use the sample dataset instead.
                 # will also output files to shared folder instead.
 imprt 		<- 1 # 1 if the raw geojson file for the worldbank polys should be imported (takes time)
+savepoly  <- 0 # 1 if we want to save the polygon file for later use.
 
 
 
@@ -199,7 +204,7 @@ if (appendskip == 1) {
 	m.school <- read.csv(file.path(shared,
 	                           "sample-data/sample-schools.csv"),
 	                     header = TRUE) %>%
-	  rename("countryname" = "ï..countryname")
+	  rename("countryname" = "countryname")
 	
 }
 
@@ -295,7 +300,7 @@ m.school.gps <- select(m.school,
 
 if (imprt == 1) {
 
-wb.poly <- st_read(file.path(wbpoly, "GeoJSON/g2015_2014_2.geojson")) %>%
+wb.poly <- st_read(file.path(shared, "gis/g2015_2014_2.geojson")) %>%
   filter(ADM0_NAME == "Peru" | ADM0_NAME == "Jordan" | ADM0_NAME == "Mozambique" | ADM0_NAME == "Rwanda") %>%
   distinct(ADM2_CODE, ADM1_CODE, ADM0_CODE, .keep_all = TRUE)  # remove any possible duplicates
 
@@ -356,12 +361,10 @@ wb.poly.m <-
 assert_that(anyDuplicated(wb.poly.m$g2,
                           wb.poly.m$g1,
                           wb.poly.m$g0) == 0)
-
-        # we were pretty sure of this as we used distinct() above
-        # but just to make be sure.
-
+if (savepoly == 1) {
 saveRDS(wb.poly.m,
-         file = file.path(root, "main/wb-poly-m.Rda"))
+        file = file.path(root, "main/wb-poly-m.Rda"))
+}
 
 } # end imprt switch
 
@@ -499,7 +502,6 @@ school_dist<-left_join(main_school_data, # 1. join join by district
          geometry.ro = geometry) %>%
 	select(idschool, region_idoffice, district_idoffice, # order for reading convenience
 		dist_to_ro, dist_to_do,
-		order,
 		everything()
 	)
 
@@ -523,7 +525,7 @@ if (appendskip == 1) { # save output in shared folder if appendskip ==1
 }
 
 
-if (appendskip != 1) { # run only if not running in shared folder
+if (appendskip == 0) { # run only if not running in shared folder
   
 # save as rds/stata
 save(main_po_data, main_school_data,
