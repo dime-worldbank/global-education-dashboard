@@ -1,2 +1,4 @@
-# global-edu-dashboard
-A global Education Dashboard
+# Global Education Dashboard
+The Global Education Dashboard runs two surveys in each country that participates: a public officials survey and a school-level survey. The Public Official (PO) survey interviews civil servants in the ministry of education at various levels (central MinEDU, regional offices, and district offices). The School survey takes averaged measures of school infrastructure, teacher quality, and student test scores at the school level (thus the unit of observation is the individual school). The goal is to tell a story of if/how bureuacratic quality at MinEDU relates to school-level outcomes. We do this by creating averages of indicies of bureaucratic quality from the public officials survey by district and region and merging these averaged scores to schools in the same distrist or region.
+
+The script titled 'mdataset.R' in essence creates master datasets for the schools and public officials through geoprocessing using simple features in R. Because the data at this stage is raw, I've created a sample dataset in csv form that mimics key variables and features of the raw datasets.
