@@ -14,26 +14,31 @@ library(haven)
 library(sjlabelled)
 
 					# ----------------------------- #
-					# 			 settings	 		          #----
+					# 			 settings	 		#----
 					# ----------------------------- #
 user <- 1
 # where 1 == Tom
 # 		2 == reviewer
+
+shared <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard/code-review"
+
 
 
 # user settings
 if (user == 1) {
 root  <- file.path("A:")
 vault <- file.path(root, "Countries")
-wbpoly <-
-  "C:/Users/WB551206/OneDrive - WBG/Documents/WB_data/names+boundaries/20160921_GAUL_GeoJSON_TopoJSON"
+wbpoly <- file.path(shared, "gis/20160921_GAUL_GeoJSON_TopoJSON")
 }
 
 if (user == 2) {
 root  <- file.path("") # <- insert file path here.
 vault <- file.path(root, "Countries")
-wbpoly <- file.path(root, "20160921_GAUL_GeoJSON_TopoJSON") # note that this must be downloaded.
+wbpoly <- file.path(shared, "gis/20160921_GAUL_GeoJSON_TopoJSON")
 }
+
+
+
 
 
 # code settings
@@ -47,7 +52,8 @@ imprt 		<- 0 # 1 if the raw geojson file for the worldbank polys should be impor
                       # Load+append schools datasets  #----
                       # ----------------------------- #
 
-if (appendskip == 0) {
+if (appendskip == 0) { 		# note that the reviewer won't be reviewing this section as it has pii and will be
+							# superceded by importing the fake data below.
 
 # load each country's GDP data
 peru_gdp <- import(file.path(vault,
@@ -167,6 +173,7 @@ m.po <-     bind_rows("Peru"   = peru_po,
                                      "Region Office" = "Regional office (or equivalent)",
                                      "District Office" = "District office (or equivalent)"
                                      ))
+
 } # end appendskip switch
 
 # load fake dataset if appendskip switch == 1
@@ -176,7 +183,7 @@ if (appendskip == 1) {
 }
 
 
-                        # ----------------------------- # %% start here.
+                        # ----------------------------- # 
                         # Generate project ID           #----
                         # ----------------------------- #
 
@@ -214,20 +221,20 @@ m.po$idpo <- runif(length(m.po$interview__id)) %>%
   				rank()
 
 # generate project id for officeid (idoffice)
-of <- select(m.po, office_preload) %>% # create a subselection of offices 
+of <- select(m.po, office_preload) %>% # create a subselection of offices
   group_by(office_preload) %>%
   summarise()
 
 set.seed(417) # create random id
 of$idoffice <- runif(length(of$office_preload)) %>%
-					rank() 
+					rank()
 
 # replace missing values with office id == NA
 of <- mutate(of,
     idoffice = ifelse(is.na(office_preload), NA, idoffice),
     idoffice = ifelse(office_preload == "", NA, idoffice)
   )
-  
+
 
 m.po <- left_join(m.po, of, by = "office_preload") # merge id back to full po dataset
 
@@ -398,8 +405,8 @@ main_school_data <- st_join(school, # points
 	# Since each school is situated within a district and region, we want
 	# to know the 'linear' distance from that school to the office in its district
 	# office and its regional office (ie only for the single district and single region
-	# office for each school.) since we already have joined the geographic ids to the 
-  # schools and public officials, we can just link the two datasets by their ADM2/ADM1 
+	# office for each school.) since we already have joined the geographic ids to the
+  # schools and public officials, we can just link the two datasets by their ADM2/ADM1
   # ids to find out which schools and offices are in the same district/region.
 
 # assert that there is only 1 distinct value of govt tier for each office.
@@ -410,7 +417,7 @@ t <- group_by(main_po_data, idoffice) %>%
   # assert_that(max(t$unique == 1)) # I cant figure out how to make this assertion return
   # a logical value. I want to say that this variable 'uniuqe' is only ever == 1.
 
-# create an office dictionary, where each obs is a unique officeid 
+# create an office dictionary, where each obs is a unique officeid
 offices <- group_by(main_po_data, idoffice) %>%
   summarise(ADM0_CODE = mean(ADM0_CODE),
             ADM1_CODE = mean(ADM1_CODE),
@@ -424,17 +431,17 @@ offices <- group_by(main_po_data, idoffice) %>%
             ADM2_NAME = first(ADM2_NAME),
             lon       = first(lon), # also wrong on only ~4 occasions but still wrong.
             lat       = first(lat)
-            )      # now remove sf object/convert geometry to lat lon vars 
+            )      # now remove sf object/convert geometry to lat lon vars
 
 regionoffices <- filter(offices, govt_tier == "Region Office",
                                 is.na(ADM1_CODE) == FALSE)
-  
+
 districtoffices <- filter(offices, govt_tier == "District Office",
                                     is.na(ADM2_CODE) == FALSE)
 
 
 # Join by District, remove geometry, then region, remove geometry.
-school1<-left_join(main_school_data,
+school_dist<-left_join(main_school_data, # 1. join join by district
             as.data.frame(districtoffices),
             by = "ADM2_CODE",
             suffix = c(".school", ".do")) %>%
@@ -445,7 +452,7 @@ school1<-left_join(main_school_data,
                        by_element = TRUE)/1000 # we know that the pairwise elements are correct, in km
     ) %>%
   rename(district_idoffice = idoffice) %>%  # rename office id to district
-  left_join(                                # begin joining by region.
+  left_join(                                # 2. begin joining by region.
             as.data.frame(regionoffices),
             by = c("ADM1_CODE.school" = "ADM1_CODE"),
             suffix = c(".school", ".ro")) %>%
@@ -455,20 +462,21 @@ school1<-left_join(main_school_data,
                              geometry, # where geometry is the point of region since not duped
                              by_element = TRUE)/1000 # we know that the pairwise elements are correct, in km
   ) %>%
-  rename(region_idoffice = idoffice,
+  rename(region_idoffice = idoffice, # rename variables to be consistent
          g0.ro = g0,
-         g1.ro = g1, 
+         g1.ro = g1,
          g2.ro = g2,
          ADM0_NAME.ro = ADM0_NAME,
          ADM1_NAME.ro = ADM1_NAME,
          ADM2_NAME.ro = ADM2_NAME,
-         lon.ro = lon, 
-         lat.ro = lat, 
-         geometry.ro = geometry)
-
-# %% begin here. but are we done? just order distance vars, change school name, etc. prob should save this as second "main school dataset"?
-  
-  
+         lon.ro = lon,
+         lat.ro = lat,
+         geometry.ro = geometry) %>%
+	select(idschool, region_idoffice, district_idoffice, # order for reading convenience
+		dist_to_ro, dist_to_do,
+		order,
+		everything()
+	)
 
 
 
@@ -487,7 +495,7 @@ save(main_po_data, main_school_data,
      wb.poly.m,
      tiers,
      offices,
-     school1, # change to whatever
+     school_dist, # change to whatever
      file = file.path(root, "main/final_main_data.Rdata"))
 
 #determine lists of vars to change length
