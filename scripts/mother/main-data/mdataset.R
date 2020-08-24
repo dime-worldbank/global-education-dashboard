@@ -1,5 +1,8 @@
 # Mdataset.R
-# appends all schools datasets and all public officials dataset (raw)
+# Author: Tom
+# appends all schools datasets and all public officials dataset (raw), performs basic
+# 	cleaning, and does geoprocessing on gps coordinates to determine admin unit, distances etc
+
 
 
 library(tidyverse)
@@ -10,10 +13,41 @@ library(rio)
 library(haven)
 library(sjlabelled)
 
+					# ----------------------------- #
+					# 			 settings	 		#----
+					# ----------------------------- #
+user <- 1
+# where 1 == Tom
+# 		2 == reviewer
+
+
+# change root folders
+if (user == 1) {
+root  <- file.path("A:")
+vault <- file.path(root, "Countries")
+wbpoly <-
+  "C:/Users/WB551206/OneDrive - WBG/Documents/WB_data/names+boundaries/20160921_GAUL_GeoJSON_TopoJSON"
+}
+
+if (user == 2) {
+root  <- file.path("") # <- insert file path here.
+vault <- file.path(root, "Countries")
+wbpoly <- file.path(root, "20160921_GAUL_GeoJSON_TopoJSON") # note that this must be downloaded.
+}
+
+
+# code settings
+appendskip 	<- 1 # 1 if we want to skip creation of real, pii dataset and use the sample dataset instead.
+imprt 		<- 0 # 1 if the raw geojson file for the worldbank polys should be imported (takes time)
+
+
+
+
                       # ----------------------------- #
                       # Load+append schools datasets  #----
                       # ----------------------------- #
-vault <- file.path("A:/Countries")
+
+if (appendskip == 0) {
 
 # load each country's GDP data
 peru_gdp <- import(file.path(vault,
@@ -133,10 +167,16 @@ m.po <-     bind_rows("Peru"   = peru_po,
                                      "Region Office" = "Regional office (or equivalent)",
                                      "District Office" = "District office (or equivalent)"
                                      ))
+} # end appendskip switch
+
+# load fake dataset if appendskip switch == 1
+if (appendskip == 1) {
+	# load po as m.po
+	# load school as m.school
+}
 
 
-
-                        # ----------------------------- #
+                        # ----------------------------- # %% start here.
                         # Generate project ID           #----
                         # ----------------------------- #
 
@@ -180,9 +220,9 @@ m.po$idoffice <- runif(length(m.po$office_preload)) %>%
 
 # save as main datasets
 saveRDS(m.school,
-        file = "A:/main/m-school.Rda")
+        file = file.path(root, "main/m-school.Rda"))
 saveRDS(m.po,
-        file = "A:/main/m-po.Rda")
+        file = file.path(root, "main/m-po.Rda"))
 
 # gerenate gps only datasets with country id,
 m.po.gps <- select(m.po,
@@ -205,13 +245,9 @@ m.school.gps <- select(m.school,
                                 # ------------------------------------- #
                                 # import WB subnational geojson files   # ----
                                 # ------------------------------------- #
-imprt <- 0
-# this takes a long time and is saved as Rda, if imprt ==0, will import rda
+					# this takes a long time and is saved as Rda, if imprt ==0, will import rda
 
 if (imprt == 1) {
-
-wbpoly <-
-  "C:/Users/WB551206/OneDrive - WBG/Documents/WB_data/names+boundaries/20160921_GAUL_GeoJSON_TopoJSON"
 
 wb.poly <- st_read(file.path(wbpoly, "GeoJSON/g2015_2014_2.geojson")) %>%
   filter(ADM0_NAME == "Peru" | ADM0_NAME == "Jordan" | ADM0_NAME == "Mozambique" | ADM0_NAME == "Rwanda") %>%
@@ -284,22 +320,18 @@ saveRDS(wb.poly.m,
 }
 
 if (imprt == 0) {
-  wb.poly.m <- readRDS("A:/main/wb-poly-m.Rda")
+  wb.poly.m <- readRDS(file.path(root, "main/wb-poly-m.Rda"))
 }
 
                             # ------------------------------------- #
                             #   spatial join with main dataset      # ----
                             # ------------------------------------- #
-
-# use st_join to match mother dataset obs to geographic location based on gps
+					# uses st_join to match mother dataset obs to geographic
+					# location based on gps
 
 # convert po + school dataset to sf objects
-
-    # set geometry/point column first
-
-
 po <- st_as_sf(m.po,
-               coords = c("lon", "lat"),
+               coords = c("lon", "lat"), # set geometry/point column first
                na.fail = FALSE)
 
 school <- st_as_sf(m.school,
@@ -316,12 +348,12 @@ school <- st_as_sf(m.school,
     st_is_longlat(po)
     st_is_longlat(wb.poly.m)
 
-
-# join poly and po datasets
+# set the variable order
 order <- c("ADM0_NAME", "ADM1_NAME", "ADM2_NAME",
            "ADM0_CODE", "ADM1_CODE", "ADM2_CODE",
            "g0", "g1", "g2")
 
+# join poly and po datasets
 main_po_data <- st_join(po, # points
                         wb.poly.m) %>% #polys
                 left_join(m.po.gps, # join back to gps coords for reference
@@ -337,6 +369,23 @@ main_school_data <- st_join(school, # points
                               by = c("school_code", "countryname")
                     ) %>%
                     select(idschool, school_code, order, everything())
+
+
+
+
+
+
+
+							# ------------------------------------- #
+                            #   	Additional Geoprocessing	    # ----
+                            # ------------------------------------- #
+
+# distance of each school to associated district and regional office.
+	# Since each school is situated within a district and region, we want
+	# to know the 'linear' distance from that school to the office in its district
+	# office and its regional office (ie only for the single district and single region
+	# office for each school.)
+
 
 
 
@@ -387,16 +436,6 @@ main_school_data_export <- main_school_data %>%
 peru_school_export <- peru_school %>%
 	rename_at(.vars=varlist_to_change_s, ~str_trunc(.,30,"center", ellipsis="")) %>% # rename long vars
 	select(-contains("enumerator_name")) # take out enumerator name variable
-
-
-# # add varlabels
-# labelled(colnames(main_po_data_export), labels = names(main_po_data_export))
-# var_labels(main_po_data_export)
-# is.labelled(main_po_data_export)
-#
-# varnames<- list(colnames(main_po_data_export))
-# main_po_data_export <- set_label(main_po_data_export, varnames)
-
 
 
 
