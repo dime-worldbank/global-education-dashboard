@@ -465,6 +465,8 @@ school1<-left_join(main_school_data,
          lon.ro = lon, 
          lat.ro = lat, 
          geometry.ro = geometry)
+
+# %% begin here. but are we done? just order distance vars, change school name, etc. prob should save this as second "main school dataset"?
   
   
 
