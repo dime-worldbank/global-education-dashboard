@@ -40,10 +40,11 @@ wbpoly <- file.path(shared, "gis/20160921_GAUL_GeoJSON_TopoJSON")
 
 
 
-
 # code settings
-appendskip <- 0 # 1 if we want to skip creation of real, pii dataset and use the sample dataset instead.
-imprt 		<- 0 # 1 if the raw geojson file for the worldbank polys should be imported (takes time)
+appendskip <- 1 # 1 if we want to skip creation of real, pii dataset and use the sample dataset instead.
+                # will also output files to shared folder instead.
+imprt 		<- 1 # 1 if the raw geojson file for the worldbank polys should be imported (takes time)
+
 
 
 
@@ -128,6 +129,9 @@ m.school <- bind_rows("Peru" = peru_school,
 tiers <- c("Ministry of Education (or equivalent)",
            "Regional office (or equivalent)",
            "District office (or equivalent)")
+newtiers <- c("MinEDU Central",
+              "Region Office",
+              "District Office")
 
 # Peru
 peru_po <- import(file.path(vault,
@@ -178,8 +182,25 @@ m.po <-     bind_rows("Peru"   = peru_po,
 
 # load fake dataset if appendskip switch == 1
 if (appendskip == 1) {
-	# load po as m.po
-	# load school as m.school
+	m.po <- read.csv(file.path(shared,
+	                           "sample-data/sample-po.csv"),
+	                 header = TRUE
+	                 )
+ 
+	# convert factors 
+	newtiers <- c("MinEDU Central",
+	              "Region Office",
+	              "District Office")
+	m.po$govt_tier <- factor(m.po$govt_tier, 
+	                         levels = c(1, 2, 3),
+	                         labels = newtiers, 
+	                         ordered = TRUE)
+	
+	m.school <- read.csv(file.path(shared,
+	                           "sample-data/sample-schools.csv"),
+	                     header = TRUE) %>%
+	  rename("countryname" = "ï..countryname")
+	
 }
 
 
@@ -239,11 +260,15 @@ of <- mutate(of,
 m.po <- left_join(m.po, of, by = "office_preload") # merge id back to full po dataset
 
 
-# save as main datasets
+# save as main datasets (only if we are running the real data.)
+if (appendskip != 1) {
+  
 saveRDS(m.school,
         file = file.path(root, "main/m-school.Rda"))
 saveRDS(m.po,
         file = file.path(root, "main/m-po.Rda"))
+}
+
 
 # gerenate gps only datasets with country id,
 m.po.gps <- select(m.po,
@@ -338,7 +363,7 @@ assert_that(anyDuplicated(wb.poly.m$g2,
 saveRDS(wb.poly.m,
          file = file.path(root, "main/wb-poly-m.Rda"))
 
-}
+} # end imprt switch
 
 if (imprt == 0) {
   wb.poly.m <- readRDS(file.path(root, "main/wb-poly-m.Rda"))
@@ -488,14 +513,25 @@ school_dist<-left_join(main_school_data, # 1. join join by district
                               # ------------------------------------- #
 
 
+if (appendskip == 1) { # save output in shared folder if appendskip ==1
+  save(main_po_data, main_school_data,
+       m.po, m.school,
+       wb.poly.m,
+       newtiers,
+       offices,
+       file = file.path(shared, "out/final_main_data.Rdata"))
+}
 
+
+if (appendskip != 1) { # run only if not running in shared folder
+  
 # save as rds/stata
 save(main_po_data, main_school_data,
      m.po, m.school,
      wb.poly.m,
      tiers,
+     newtiers,
      offices,
-     school_dist, # change to whatever
      file = file.path(root, "main/final_main_data.Rdata"))
 
 #determine lists of vars to change length
@@ -548,7 +584,7 @@ write_dta(data = peru_school_export,
           version = 14
 ) # default, leave factors as value labels, use variable name as var label
 
-
+} # end appendskip switch
 
 # # credits: https://stackoverflow.com/questions/6986657/find-duplicated-rows-based-on-2-columns-in-data-frame-in-r
 # https://gis.stackexchange.com/questions/224915/extracting-data-frame-from-simple-features-object-in-r
