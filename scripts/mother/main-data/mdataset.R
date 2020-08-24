@@ -521,6 +521,7 @@ if (appendskip == 1) { # save output in shared folder if appendskip ==1
        wb.poly.m,
        newtiers,
        offices,
+       school_dist,
        file = file.path(shared, "out/final_main_data.Rdata"))
 }
 
@@ -534,6 +535,7 @@ save(main_po_data, main_school_data,
      tiers,
      newtiers,
      offices,
+     school_dist,
      file = file.path(root, "main/final_main_data.Rdata"))
 
 #determine lists of vars to change length
