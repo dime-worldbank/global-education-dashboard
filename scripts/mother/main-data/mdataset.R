@@ -14,14 +14,14 @@ library(haven)
 library(sjlabelled)
 
 					# ----------------------------- #
-					# 			 settings	 		#----
+					# 			 settings	 		          #----
 					# ----------------------------- #
 user <- 1
 # where 1 == Tom
 # 		2 == reviewer
 
 
-# change root folders
+# user settings
 if (user == 1) {
 root  <- file.path("A:")
 vault <- file.path(root, "Countries")
@@ -37,7 +37,7 @@ wbpoly <- file.path(root, "20160921_GAUL_GeoJSON_TopoJSON") # note that this mus
 
 
 # code settings
-appendskip 	<- 1 # 1 if we want to skip creation of real, pii dataset and use the sample dataset instead.
+appendskip <- 0 # 1 if we want to skip creation of real, pii dataset and use the sample dataset instead.
 imprt 		<- 0 # 1 if the raw geojson file for the worldbank polys should be imported (takes time)
 
 
@@ -214,9 +214,23 @@ m.po$idpo <- runif(length(m.po$interview__id)) %>%
   				rank()
 
 # generate project id for officeid (idoffice)
-set.seed(417)
-m.po$idoffice <- runif(length(m.po$office_preload)) %>%
-					rank()
+of <- select(m.po, office_preload) %>% # create a subselection of offices 
+  group_by(office_preload) %>%
+  summarise()
+
+set.seed(417) # create random id
+of$idoffice <- runif(length(of$office_preload)) %>%
+					rank() 
+
+# replace missing values with office id == NA
+of <- mutate(of,
+    idoffice = ifelse(is.na(office_preload), NA, idoffice),
+    idoffice = ifelse(office_preload == "", NA, idoffice)
+  )
+  
+
+m.po <- left_join(m.po, of, by = "office_preload") # merge id back to full po dataset
+
 
 # save as main datasets
 saveRDS(m.school,
@@ -315,7 +329,7 @@ assert_that(anyDuplicated(wb.poly.m$g2,
         # but just to make be sure.
 
 saveRDS(wb.poly.m,
-         file = "A:/main/wb-poly-m.Rda")
+         file = file.path(root, "main/wb-poly-m.Rda"))
 
 }
 
@@ -359,7 +373,7 @@ main_po_data <- st_join(po, # points
                 left_join(m.po.gps, # join back to gps coords for reference
                           by = c("interview__id", "countryname")
                           ) %>%
-                select(idpo, interview__id, order, everything())
+                select(idpo, interview__id, idoffice, order, everything())
 
 
 # join poly and school datasets
@@ -376,18 +390,83 @@ main_school_data <- st_join(school, # points
 
 
 
-							# ------------------------------------- #
-                            #   	Additional Geoprocessing	    # ----
+						              	# ------------------------------------- #
+                            #   	Additional Geoprocessing	        # ----
                             # ------------------------------------- #
 
 # distance of each school to associated district and regional office.
 	# Since each school is situated within a district and region, we want
 	# to know the 'linear' distance from that school to the office in its district
 	# office and its regional office (ie only for the single district and single region
-	# office for each school.)
+	# office for each school.) since we already have joined the geographic ids to the 
+  # schools and public officials, we can just link the two datasets by their ADM2/ADM1 
+  # ids to find out which schools and offices are in the same district/region.
+
+# assert that there is only 1 distinct value of govt tier for each office.
+t <- group_by(main_po_data, idoffice) %>%
+  summarize(
+    unique = n_distinct(govt_tier)
+  )
+  # assert_that(max(t$unique == 1)) # I cant figure out how to make this assertion return
+  # a logical value. I want to say that this variable 'uniuqe' is only ever == 1.
+
+# create an office dictionary, where each obs is a unique officeid 
+offices <- group_by(main_po_data, idoffice) %>%
+  summarise(ADM0_CODE = mean(ADM0_CODE),
+            ADM1_CODE = mean(ADM1_CODE),
+            ADM2_CODE = mean(ADM2_CODE),
+            govt_tier = first(govt_tier), # this is a big assumption and is wrong on ~4 occasions.
+            g0        = mean(g0),
+            g1        = mean(g1),
+            g2        = mean(g2),
+            ADM0_NAME = first(ADM0_NAME),
+            ADM1_NAME = first(ADM1_NAME),
+            ADM2_NAME = first(ADM2_NAME),
+            lon       = first(lon), # also wrong on only ~4 occasions but still wrong.
+            lat       = first(lat)
+            )      # now remove sf object/convert geometry to lat lon vars 
+
+regionoffices <- filter(offices, govt_tier == "Region Office",
+                                is.na(ADM1_CODE) == FALSE)
+  
+districtoffices <- filter(offices, govt_tier == "District Office",
+                                    is.na(ADM2_CODE) == FALSE)
 
 
-
+# Join by District, remove geometry, then region, remove geometry.
+school1<-left_join(main_school_data,
+            as.data.frame(districtoffices),
+            by = "ADM2_CODE",
+            suffix = c(".school", ".do")) %>%
+  select(idschool, idoffice, everything()) %>%
+  mutate(
+    dist_to_do = st_distance(geometry.school,
+                       geometry.do,
+                       by_element = TRUE)/1000 # we know that the pairwise elements are correct, in km
+    ) %>%
+  rename(district_idoffice = idoffice) %>%  # rename office id to district
+  left_join(                                # begin joining by region.
+            as.data.frame(regionoffices),
+            by = c("ADM1_CODE.school" = "ADM1_CODE"),
+            suffix = c(".school", ".ro")) %>%
+  select(idschool, idoffice, everything()) %>%
+  mutate(
+    dist_to_ro = st_distance(geometry.school,
+                             geometry, # where geometry is the point of region since not duped
+                             by_element = TRUE)/1000 # we know that the pairwise elements are correct, in km
+  ) %>%
+  rename(region_idoffice = idoffice,
+         g0.ro = g0,
+         g1.ro = g1, 
+         g2.ro = g2,
+         ADM0_NAME.ro = ADM0_NAME,
+         ADM1_NAME.ro = ADM1_NAME,
+         ADM2_NAME.ro = ADM2_NAME,
+         lon.ro = lon, 
+         lat.ro = lat, 
+         geometry.ro = geometry)
+  
+  
 
 
 
@@ -405,7 +484,9 @@ save(main_po_data, main_school_data,
      m.po, m.school,
      wb.poly.m,
      tiers,
-     file = "A:/main/final_main_data.Rdata")
+     offices,
+     school1, # change to whatever
+     file = file.path(root, "main/final_main_data.Rdata"))
 
 #determine lists of vars to change length
 varlist_p <- as.data.frame(colnames(main_po_data))
@@ -461,4 +542,4 @@ write_dta(data = peru_school_export,
 
 # # credits: https://stackoverflow.com/questions/6986657/find-duplicated-rows-based-on-2-columns-in-data-frame-in-r
 # https://gis.stackexchange.com/questions/224915/extracting-data-frame-from-simple-features-object-in-r
-#
+# https://dominicroye.github.io/en/2019/calculating-the-distance-to-the-sea-in-r/
