@@ -1,9 +1,16 @@
-# Mdataset.R
+imprtjson# Mdataset.R
 # Author: Tom
 # appends all schools datasets and all public officials dataset (raw), performs basic
 # 	cleaning, and does geoprocessing on gps coordinates to determine admin unit, distances etc
 
-#install.packages("pacman")
+
+					# ----------------------------- #
+					# 			 startup	 		#----
+					# ----------------------------- #
+
+if (!is.element("pacman", installed.packages())) {
+    install.packages("pacman", dep= T)
+  }
 
 pacman::p_load(tidyverse,
        readstata13,
@@ -20,7 +27,7 @@ pacman::p_load(tidyverse,
 
 user <- 1
 # where 1 == Tom
-# 		2 == reviewer
+# 		2 == Robert
 
 
 # shared data folder
@@ -45,11 +52,17 @@ shared <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashb
 
 
 
-# code settings (for review, first two should be set to 1)
+# code settings (for review, default values are: appendskip=1 	imprtjson=1		savepoly=2)
+				# to skip import of the raw json file, run: appendskip=1 	imprtjson=2		savepoly=2
+
 appendskip <- 1 # 1 if we want to skip creation of real, pii dataset and use the sample dataset instead.
                 # will also output files to shared folder instead.
-imprt 		<- 1 # 1 if the raw geojson file for the worldbank polys should be imported (takes time)
-savepoly  <- 0 # 1 if we want to save the polygon file for later use.
+imprtjson <- 1 # 1 = import the raw geojson file for the worldbank polys (takes ~10 min)
+				# 0 = import the saved file on tom's local folder to skip the import
+				# 2 = import the saved file on the shared folder to skip this.
+savepoly  <- 2 # 1 = save the polygon file to Tom's wb folder for later use.
+				# 2 = save the file to the shared folder, should be run with imprtjson == 2 if you
+						# want to import the file that you save in the shared folder.
 
 
 
@@ -59,8 +72,8 @@ savepoly  <- 0 # 1 if we want to save the polygon file for later use.
                       # Load+append schools datasets  #----
                       # ----------------------------- #
 
-if (appendskip == 0) { 		# note that the reviewer won't be reviewing this section as it has pii and will be
-							# superceded by importing the fake data below.
+if (appendskip != 1) { 		# note that the reviewer won't be reviewing this section as it has pii and will be
+							# superceded by importing the fake data below in line ~197.
 
 # load each country's GDP data
 peru_gdp <- import(file.path(vault,
@@ -186,31 +199,40 @@ m.po <-     bind_rows("Peru"   = peru_po,
 
 } # end appendskip switch
 
+
+
+
+
 # load fake dataset if appendskip switch == 1
 if (appendskip == 1) {
+
+	# load public official dataset
 	m.po <- read.csv(file.path(shared,
 	                           "sample-data/sample-po.csv"),
 	                 header = TRUE
 	                 )
- 
-	# convert factors 
+
+	# convert factors
 	newtiers <- c("MinEDU Central",
 	              "Region Office",
 	              "District Office")
-	m.po$govt_tier <- factor(m.po$govt_tier, 
+	m.po$govt_tier <- factor(m.po$govt_tier,
 	                         levels = c(1, 2, 3),
-	                         labels = newtiers, 
+	                         labels = newtiers,
 	                         ordered = TRUE)
-	
+
+
+
+	# load school dataset
 	m.school <- read.csv(file.path(shared,
 	                           "sample-data/sample-schools.csv"),
 	                     header = TRUE) %>%
 	  rename("countryname" = "countryname")
-	
+
 }
 
 
-                        # ----------------------------- # 
+                        # ----------------------------- #
                         # Generate project ID           #----
                         # ----------------------------- #
 
@@ -248,6 +270,12 @@ m.po$idpo <- runif(length(m.po$interview__id)) %>%
   				rank()
 
 # generate project id for officeid (idoffice)
+# I don't really know how to do this well in R, I want to create a random id
+# for each office (office_preload) but there are multiple observations with
+# the same office id, so I did this by collapsing the office IDs so that each
+# row is a unique id, randomized, then merged back to the main dataset, but I'm
+# sure there's a better way to do this.
+
 of <- select(m.po, office_preload) %>% # create a subselection of offices
   group_by(office_preload) %>%
   summarise()
@@ -266,9 +294,9 @@ of <- mutate(of,
 m.po <- left_join(m.po, of, by = "office_preload") # merge id back to full po dataset
 
 
-# save as main datasets (only if we are running the real data.)
+# save as main datasets (only if we are running the real data. Reviewer's code will not run this)
 if (appendskip != 1) {
-  
+
 saveRDS(m.school,
         file = file.path(root, "main/m-school.Rda"))
 saveRDS(m.po,
@@ -297,9 +325,14 @@ m.school.gps <- select(m.school,
                                 # ------------------------------------- #
                                 # import WB subnational geojson files   # ----
                                 # ------------------------------------- #
-					# this takes a long time and is saved as Rda, if imprt ==0, will import rda
+					# this takes a long time and is saved as Rda, if imprtjson ==0, will import rda.
+					# however, I'm having the reviewer import the raw geojson file because this code
+					# is an important step. (sorry!)
+					# however, i've made a switch you adjust in the introduction up top where, after you run
+					# or check the code once, you can save an rda file and reimport it to save time when
+					# running the code again.
 
-if (imprt == 1) {
+if (imprtjson == 1) {
 
 wb.poly <- st_read(file.path(shared, "gis/g2015_2014_2.geojson")) %>%
   filter(ADM0_NAME == "Peru" | ADM0_NAME == "Jordan" | ADM0_NAME == "Mozambique" | ADM0_NAME == "Rwanda") %>%
@@ -366,11 +399,19 @@ if (savepoly == 1) {
 saveRDS(wb.poly.m,
         file = file.path(root, "main/wb-poly-m.Rda"))
 }
+if (savepoly == 2) {
+saveRDS(wb.poly.m,
+        file = file.path(shared, "out/wb-poly-m.Rda"))
+}
 
-} # end imprt switch
 
-if (imprt == 0) {
+} # end imprtjson switch
+
+if (imprtjson == 0) {
   wb.poly.m <- readRDS(file.path(root, "main/wb-poly-m.Rda"))
+}
+if (imprtjson == 2) {
+  wb.poly.m <- readRDS(file.path(shared, "out/wb-poly-m.Rda"))
 }
 
                             # ------------------------------------- #
@@ -426,7 +467,7 @@ main_school_data <- st_join(school, # points
 
 
 
-						              	# ------------------------------------- #
+						    # ------------------------------------- #
                             #   	Additional Geoprocessing	        # ----
                             # ------------------------------------- #
 
@@ -527,8 +568,8 @@ if (appendskip == 1) { # save output in shared folder if appendskip ==1
 }
 
 
-if (appendskip == 0) { # run only if not running in shared folder
-  
+if (appendskip != 1) { # run only if not running in shared folder
+
 # save as rds/stata
 save(main_po_data, main_school_data,
      m.po, m.school,
