@@ -3,7 +3,7 @@
 # appends all schools datasets and all public officials dataset (raw), performs basic
 # 	cleaning, and does geoprocessing on gps coordinates to determine admin unit, distances etc
 
-install.packages("pacman")
+#install.packages("pacman")
 
 pacman::p_load(tidyverse,
        readstata13,
@@ -17,6 +17,7 @@ pacman::p_load(tidyverse,
 					# ----------------------------- #
 					# 			 settings	 		#----
 					# ----------------------------- #
+
 user <- 1
 # where 1 == Tom
 # 		2 == reviewer
@@ -30,8 +31,8 @@ user <- 1
 if (user == 1) {
 root  <- file.path("A:") #
 vault <- file.path(root, "Countries")
-wbpoly <- file.path(shared, "gis/20160921_GAUL_GeoJSON_TopoJSON")
 shared <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard/code-review"
+wbpoly <- file.path(shared, "gis/20160921_GAUL_GeoJSON_TopoJSON")
 }
 
 if (user == 2) {
@@ -44,7 +45,7 @@ shared <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashb
 
 
 
-# code settings
+# code settings (for review, first two should be set to 1)
 appendskip <- 1 # 1 if we want to skip creation of real, pii dataset and use the sample dataset instead.
                 # will also output files to shared folder instead.
 imprt 		<- 1 # 1 if the raw geojson file for the worldbank polys should be imported (takes time)
