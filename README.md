@@ -17,7 +17,7 @@ Since I new to working in R this review for me is just as much about coding effi
 
 
  ## Running the code
--While the project itself has many scripts, for this review we only need to run one script called "mdataset.R", which is in scripts/mother/main-data/mdataset.R
--I've shared/will share a folder on my WBOD that contains the data, which includes a massive geojson file which is only available/should be used on the WB intranet
--the code should be runable as-is, since it runs entirely off the shared folder once you clone the repo, but if you decide to copy locally just change line 46.
+-While the project itself has many scripts, for this review we only need to run one script called "mdataset.R", which is in scripts/mother/main-data/mdataset.R <br>
+-I've shared/will share a folder on my WBOD that contains the data, which includes a massive geojson file which is only available/should be used on the WB intranet <br>
+-the code should be runable as-is, since it runs entirely off the shared folder once you clone the repo, but if you decide to copy locally just change line 46. <br>
 -The code takes about 10 minutes to run as R has to work through the geojson file.
