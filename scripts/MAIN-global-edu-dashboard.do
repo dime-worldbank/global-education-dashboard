@@ -190,13 +190,14 @@ gl s1	= 0		// reconstruct bi vars
 gl s2	= 0 	// generate top p-tile vars for BI
 gl s3 	= 1		// 0 = keep 203 obs in peru PO dataset; 1 == drop unmatched obs as Brian does.
 gl s4	= 1		// 1 reconstructs BI vars, 0 leaves raw data and only constructs Aggregate indicator
-
+gl s5	= 0 	// 1 generate raw dates, which becomes PII, whereas 0 only constructs day of week vars. 
 
 
 /* script settings settings to 1 if you want to run, default == 0 */
 
 loc clean	= 0		// reconstruct bi vars
 loc agg		= 1 	// conduct collapsing and merging
+loc misc 	= 1 	// misc data processing, prior merging is necessary.
 loc reg 	= 0 	// run regression panels
 
 * [Cleaning]
@@ -210,6 +211,13 @@ if (`clean' == 1) {
 if (`agg' == 1) {
 	do "${scripts_clone}/agg/main-agg.do"
 }
+
+* [Misc. Data Processing]
+* Collapse by admin unit, merge.
+if (`misc' == 1) {
+	do "${scripts_clone}/agg/main-misc.do"
+}
+
 
 * [exploratory regs ]
 * Collapse by admin unit, merge.

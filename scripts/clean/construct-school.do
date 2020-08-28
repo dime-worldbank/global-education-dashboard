@@ -33,6 +33,37 @@ use	 	"${B_sch}", replace
 
 
 
+
+							* | 	Day of Week		| *
+
+					/* 	Runs a mini-script that takes the raw input and
+					 	generates day of week vars, not actual date vars
+						which are PII. This can be changed on the main
+						script under switch s5. */
+
+
+do 			"${scripts_clone}/mother/utils/survey_time.do"
+
+
+
+
+
+
+						* | 	schools per district, region		| *
+
+					/* 	this section generates variables of the number of
+						schools per region and district */
+
+* number of schools per district
+egen nsch_dist = count(idschool), by(country g2)
+
+
+* number of schools per region
+egen nsch_region = count(idschool), by(country g1)
+
+
+
+
 							* | 	z-scores 		| *
 
 					/* here we will use a stata package instead of manual,

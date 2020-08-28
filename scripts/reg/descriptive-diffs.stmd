@@ -1,0 +1,920 @@
+# Education Dashboard: Basic Descriptive Differences
+Author: Tom <br>
+Date: August, 2020 <br>
+
+
+
+
+```s, quietly
+loc mdq `"${GLOBE_data}/merged/gl-m-g2xd-quart.dta"'	// merged at district lvl, only tier3, w. quartiles
+loc dav `"${GLOBE_data}/merged/gl-m-dist-av.dta"'	// merged at district lvl, only tier3, w. quartiles
+use `mdq', clear
+tokenize "${countrynames}"
+set linesize 100
+
+loc sl 	student_knowledge ecd_student_knowledge inputs infrastructure intrinsic_motivation content_knowledge pedagogical_knowledge operational_manage instr_leader principal_knowl_score principal_manage
+loc slz 	c_student_knowledge c_ecd_student_knowledge c_inputs c_infrastructure c_intrinsic_motivation c_content_knowledge c_pedagogical_knowledge c_operational_manage c_instr_leader c_principal_knowl_score c_principal_manage
+
+
+
+```
+
+# Table of Contents
+
+[Introduction](#intro) <br>
+[Descriptive Comparison](#dc) <br>
+[Scatterplots](#scatters) <br>
+[1. Bureaucracy Index](#scattersbi) <br>
+[2. National Learning Goals](#scattersnlg) <br>
+[3. Mandates and Accountability](#scattersma) <br>
+[4. Quality of Bureaucracy](#scattersqb) <br>
+[5. Impartial Decision-Making](#scattersidm) <br>
+[Explanation of Negative Relationships](#theory) <br>
+[1. Coding](#coding) <br>
+[2. Methodology](#method) <br>
+[3. Observation Attrition](#attrition) <br>
+
+
+
+
+
+
+
+
+
+
+# Introduction <a name="intro" ></a>
+We previously saw that basic multivariable regression models generated results that suggested that measures for bureaucratic quality experienced a negative relationship with school outcomes. This document explores and queries this finding further.<br>
+Just like last time, we'll be using the school-level dataset with averaged civil servant data by district. <br>
+Here is a set of descritives of outcome indidcators for our "using" dataset.
+```s, echo=FALSE
+use 	`"`mdq'"' , clear
+labsumm `sl'
+
+```
+<br><br><br>
+
+# Descriptive Comparison <a name="dc" ></a>
+Here we compare the outcomes of schools in a bottom-quartile-performing Bureaucracy Indicator district with those in the top quartile. <br>
+
+## Overall Bureaucracy Index: bi
+
+bi: Lowest Quartile
+```s, echo=FALSE
+use 	`"`mdq'"' , clear
+labsumm 	`sl' 		if l_bi == 1
+
+```
+
+bi: Higest Quartile
+```s, echo=FALSE
+use 	`"`mdq'"' , clear
+labsumm 	`sl' 		if t_bi == 1
+
+```
+<br> <br>
+
+
+## National Learning Goals
+
+NLG: Lowest Quartile
+```s, echo=FALSE
+use 	`"`mdq'"' , clear
+labsumm 	`sl' 		if l_national_learning_goals == 1
+
+```
+
+NLG: Higest Quartile
+```s, echo=FALSE
+use 	`"`mdq'"' , clear
+labsumm 	`sl' 		if t_national_learning_goals == 1
+
+```
+<br> <br>
+
+
+
+## Quality of Bureaucracy
+
+QB: Lowest Quartile
+```s, echo=FALSE
+use 	`"`mdq'"' , clear
+labsumm 	`sl' 		if l_quality_bureaucracy == 1
+
+```
+
+QB: Higest Quartile
+```s, echo=FALSE
+use 	`"`mdq'"' , clear
+labsumm 	`sl' 		if t_quality_bureaucracy == 1
+
+```
+<br> <br>
+
+
+## Mandates and Accountability
+
+MA: Lowest Quartile
+```s, echo=FALSE
+use 	`"`mdq'"' , clear
+labsumm 	`sl' 		if l_mandates_accountability == 1
+
+```
+
+MA: Higest Quartile
+```s, echo=FALSE
+use 	`"`mdq'"' , clear
+labsumm 	`sl' 		if t_mandates_accountability == 1
+
+```
+<br> <br>
+
+
+
+
+## Impartial Decision-Making
+
+IDM: Lowest Quartile
+```s, echo=FALSE
+use 	`"`mdq'"' , clear
+labsumm 	`sl' 		if l_impartial_decision_making == 1
+
+```
+
+IDM: Higest Quartile
+```s, echo=FALSE
+use 	`"`mdq'"' , clear
+labsumm 	`sl' 		if t_impartial_decision_making == 1
+
+```
+<br> <br>
+
+
+# Scatterplots <a name="scatters" ></a>
+
+The same bivariate relationships above are shown graphically below. School outcomes are always displayed on the y axis; (averaged) bureaucratic scores on the x axis. Also, school-observations with an averaged district bureaucrat score in the bottom quartile of all district-averaged scores are colored in red; those with scores in the top quartile are colored green.
+
+## Bureaucracy Index <a name="scattersbi" ></a>
+
+```s, echo=FALSE
+ twoway lfitci student_knowledge bi || ///
+  scatter student_knowledge bi if (l_bi==0 & t_bi==0), mcolor(gs7) m(o) || ///
+  scatter student_knowledge bi if l_bi == 1, mcolor(red) m(o) || ///
+  scatter student_knowledge bi if t_bi == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(bi vs student_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci ecd_student_knowledge bi || ///
+  scatter ecd_student_knowledge bi if (l_bi==0 & t_bi==0), mcolor(gs7) m(o) || ///
+  scatter ecd_student_knowledge bi if l_bi == 1, mcolor(red) m(o) || ///
+  scatter ecd_student_knowledge bi if t_bi == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(bi vs ecd_student_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci inputs bi || ///
+  scatter inputs bi if (l_bi==0 & t_bi==0), mcolor(gs7) m(o) || ///
+  scatter inputs bi if l_bi == 1, mcolor(red) m(o) || ///
+  scatter inputs bi if t_bi == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(bi vs inputs)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci infrastructure bi || ///
+  scatter infrastructure bi if (l_bi==0 & t_bi==0), mcolor(gs7) m(o) || ///
+  scatter infrastructure bi if l_bi == 1, mcolor(red) m(o) || ///
+  scatter infrastructure bi if t_bi == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(bi vs infrastructure)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci intrinsic_motivation bi || ///
+  scatter intrinsic_motivation bi if (l_bi==0 & t_bi==0), mcolor(gs7) m(o) || ///
+  scatter intrinsic_motivation bi if l_bi == 1, mcolor(red) m(o) || ///
+  scatter intrinsic_motivation bi if t_bi == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(bi vs intrinsic_motivation)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci content_knowledge bi || ///
+  scatter content_knowledge bi if (l_bi==0 & t_bi==0), mcolor(gs7) m(o) || ///
+  scatter content_knowledge bi if l_bi == 1, mcolor(red) m(o) || ///
+  scatter content_knowledge bi if t_bi == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(bi vs content_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci pedagogical_knowledge bi || ///
+  scatter pedagogical_knowledge bi if (l_bi==0 & t_bi==0), mcolor(gs7) m(o) || ///
+  scatter pedagogical_knowledge bi if l_bi == 1, mcolor(red) m(o) || ///
+  scatter pedagogical_knowledge bi if t_bi == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(bi vs pedagogical_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci operational_manage bi || ///
+  scatter operational_manage bi if (l_bi==0 & t_bi==0), mcolor(gs7) m(o) || ///
+  scatter operational_manage bi if l_bi == 1, mcolor(red) m(o) || ///
+  scatter operational_manage bi if t_bi == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(bi vs operational_manage)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci instr_leader bi || ///
+  scatter instr_leader bi if (l_bi==0 & t_bi==0), mcolor(gs7) m(o) || ///
+  scatter instr_leader bi if l_bi == 1, mcolor(red) m(o) || ///
+  scatter instr_leader bi if t_bi == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(bi vs instr_leader)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci principal_knowl_score bi || ///
+  scatter principal_knowl_score bi if (l_bi==0 & t_bi==0), mcolor(gs7) m(o) || ///
+  scatter principal_knowl_score bi if l_bi == 1, mcolor(red) m(o) || ///
+  scatter principal_knowl_score bi if t_bi == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(bi vs principal_knowl_score)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci principal_manage bi || ///
+  scatter principal_manage bi if (l_bi==0 & t_bi==0), mcolor(gs7) m(o) || ///
+  scatter principal_manage bi if l_bi == 1, mcolor(red) m(o) || ///
+  scatter principal_manage bi if t_bi == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(bi vs principal_manage)
+
+
+```
+
+<br> <br>
+
+
+
+## National Learning Goals <a name="scattersnlg" ></a>
+
+```s, echo=FALSE
+ twoway lfitci student_knowledge national_learning_goals || ///
+  scatter student_knowledge national_learning_goals if (l_national_learning_goals==0 & t_national_learning_goals==0), mcolor(gs7) m(o) || ///
+  scatter student_knowledge national_learning_goals if l_national_learning_goals == 1, mcolor(red) m(o) || ///
+  scatter student_knowledge national_learning_goals if t_national_learning_goals == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(national_learning_goals vs student_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci ecd_student_knowledge national_learning_goals || ///
+  scatter ecd_student_knowledge national_learning_goals if (l_national_learning_goals==0 & t_national_learning_goals==0), mcolor(gs7) m(o) || ///
+  scatter ecd_student_knowledge national_learning_goals if l_national_learning_goals == 1, mcolor(red) m(o) || ///
+  scatter ecd_student_knowledge national_learning_goals if t_national_learning_goals == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(national_learning_goals vs ecd_student_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci inputs national_learning_goals || ///
+  scatter inputs national_learning_goals if (l_national_learning_goals==0 & t_national_learning_goals==0), mcolor(gs7) m(o) || ///
+  scatter inputs national_learning_goals if l_national_learning_goals == 1, mcolor(red) m(o) || ///
+  scatter inputs national_learning_goals if t_national_learning_goals == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(national_learning_goals vs inputs)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci infrastructure national_learning_goals || ///
+  scatter infrastructure national_learning_goals if (l_national_learning_goals==0 & t_national_learning_goals==0), mcolor(gs7) m(o) || ///
+  scatter infrastructure national_learning_goals if l_national_learning_goals == 1, mcolor(red) m(o) || ///
+  scatter infrastructure national_learning_goals if t_national_learning_goals == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(national_learning_goals vs infrastructure)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci intrinsic_motivation national_learning_goals || ///
+  scatter intrinsic_motivation national_learning_goals if (l_national_learning_goals==0 & t_national_learning_goals==0), mcolor(gs7) m(o) || ///
+  scatter intrinsic_motivation national_learning_goals if l_national_learning_goals == 1, mcolor(red) m(o) || ///
+  scatter intrinsic_motivation national_learning_goals if t_national_learning_goals == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(national_learning_goals vs intrinsic_motivation)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci content_knowledge national_learning_goals || ///
+  scatter content_knowledge national_learning_goals if (l_national_learning_goals==0 & t_national_learning_goals==0), mcolor(gs7) m(o) || ///
+  scatter content_knowledge national_learning_goals if l_national_learning_goals == 1, mcolor(red) m(o) || ///
+  scatter content_knowledge national_learning_goals if t_national_learning_goals == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(national_learning_goals vs content_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci pedagogical_knowledge national_learning_goals || ///
+  scatter pedagogical_knowledge national_learning_goals if (l_national_learning_goals==0 & t_national_learning_goals==0), mcolor(gs7) m(o) || ///
+  scatter pedagogical_knowledge national_learning_goals if l_national_learning_goals == 1, mcolor(red) m(o) || ///
+  scatter pedagogical_knowledge national_learning_goals if t_national_learning_goals == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(national_learning_goals vs pedagogical_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci operational_manage national_learning_goals || ///
+  scatter operational_manage national_learning_goals if (l_national_learning_goals==0 & t_national_learning_goals==0), mcolor(gs7) m(o) || ///
+  scatter operational_manage national_learning_goals if l_national_learning_goals == 1, mcolor(red) m(o) || ///
+  scatter operational_manage national_learning_goals if t_national_learning_goals == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(national_learning_goals vs operational_manage)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci instr_leader national_learning_goals || ///
+  scatter instr_leader national_learning_goals if (l_national_learning_goals==0 & t_national_learning_goals==0), mcolor(gs7) m(o) || ///
+  scatter instr_leader national_learning_goals if l_national_learning_goals == 1, mcolor(red) m(o) || ///
+  scatter instr_leader national_learning_goals if t_national_learning_goals == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(national_learning_goals vs instr_leader)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci principal_knowl_score national_learning_goals || ///
+  scatter principal_knowl_score national_learning_goals if (l_national_learning_goals==0 & t_national_learning_goals==0), mcolor(gs7) m(o) || ///
+  scatter principal_knowl_score national_learning_goals if l_national_learning_goals == 1, mcolor(red) m(o) || ///
+  scatter principal_knowl_score national_learning_goals if t_national_learning_goals == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(national_learning_goals vs principal_knowl_score)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci principal_manage national_learning_goals || ///
+  scatter principal_manage national_learning_goals if (l_national_learning_goals==0 & t_national_learning_goals==0), mcolor(gs7) m(o) || ///
+  scatter principal_manage national_learning_goals if l_national_learning_goals == 1, mcolor(red) m(o) || ///
+  scatter principal_manage national_learning_goals if t_national_learning_goals == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(national_learning_goals vs principal_manage)
+
+
+```
+
+
+
+
+
+
+
+## Mandates and Accountability<a name="scattersma" ></a>
+
+```s, echo=FALSE
+ twoway lfitci student_knowledge mandates_accountability || ///
+  scatter student_knowledge mandates_accountability if (l_mandates_accountability==0 & t_mandates_accountability==0), mcolor(gs7) m(o) || ///
+  scatter student_knowledge mandates_accountability if l_mandates_accountability == 1, mcolor(red) m(o) || ///
+  scatter student_knowledge mandates_accountability if t_mandates_accountability == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(mandates_accountability vs student_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci ecd_student_knowledge mandates_accountability || ///
+  scatter ecd_student_knowledge mandates_accountability if (l_mandates_accountability==0 & t_mandates_accountability==0), mcolor(gs7) m(o) || ///
+  scatter ecd_student_knowledge mandates_accountability if l_mandates_accountability == 1, mcolor(red) m(o) || ///
+  scatter ecd_student_knowledge mandates_accountability if t_mandates_accountability == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(mandates_accountability vs ecd_student_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci inputs mandates_accountability || ///
+  scatter inputs mandates_accountability if (l_mandates_accountability==0 & t_mandates_accountability==0), mcolor(gs7) m(o) || ///
+  scatter inputs mandates_accountability if l_mandates_accountability == 1, mcolor(red) m(o) || ///
+  scatter inputs mandates_accountability if t_mandates_accountability == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(mandates_accountability vs inputs)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci infrastructure mandates_accountability || ///
+  scatter infrastructure mandates_accountability if (l_mandates_accountability==0 & t_mandates_accountability==0), mcolor(gs7) m(o) || ///
+  scatter infrastructure mandates_accountability if l_mandates_accountability == 1, mcolor(red) m(o) || ///
+  scatter infrastructure mandates_accountability if t_mandates_accountability == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(mandates_accountability vs infrastructure)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci intrinsic_motivation mandates_accountability || ///
+  scatter intrinsic_motivation mandates_accountability if (l_mandates_accountability==0 & t_mandates_accountability==0), mcolor(gs7) m(o) || ///
+  scatter intrinsic_motivation mandates_accountability if l_mandates_accountability == 1, mcolor(red) m(o) || ///
+  scatter intrinsic_motivation mandates_accountability if t_mandates_accountability == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(mandates_accountability vs intrinsic_motivation)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci content_knowledge mandates_accountability || ///
+  scatter content_knowledge mandates_accountability if (l_mandates_accountability==0 & t_mandates_accountability==0), mcolor(gs7) m(o) || ///
+  scatter content_knowledge mandates_accountability if l_mandates_accountability == 1, mcolor(red) m(o) || ///
+  scatter content_knowledge mandates_accountability if t_mandates_accountability == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(mandates_accountability vs content_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci pedagogical_knowledge mandates_accountability || ///
+  scatter pedagogical_knowledge mandates_accountability if (l_mandates_accountability==0 & t_mandates_accountability==0), mcolor(gs7) m(o) || ///
+  scatter pedagogical_knowledge mandates_accountability if l_mandates_accountability == 1, mcolor(red) m(o) || ///
+  scatter pedagogical_knowledge mandates_accountability if t_mandates_accountability == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(mandates_accountability vs pedagogical_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci operational_manage mandates_accountability || ///
+  scatter operational_manage mandates_accountability if (l_mandates_accountability==0 & t_mandates_accountability==0), mcolor(gs7) m(o) || ///
+  scatter operational_manage mandates_accountability if l_mandates_accountability == 1, mcolor(red) m(o) || ///
+  scatter operational_manage mandates_accountability if t_mandates_accountability == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(mandates_accountability vs operational_manage)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci instr_leader mandates_accountability || ///
+  scatter instr_leader mandates_accountability if (l_mandates_accountability==0 & t_mandates_accountability==0), mcolor(gs7) m(o) || ///
+  scatter instr_leader mandates_accountability if l_mandates_accountability == 1, mcolor(red) m(o) || ///
+  scatter instr_leader mandates_accountability if t_mandates_accountability == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(mandates_accountability vs instr_leader)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci principal_knowl_score mandates_accountability || ///
+  scatter principal_knowl_score mandates_accountability if (l_mandates_accountability==0 & t_mandates_accountability==0), mcolor(gs7) m(o) || ///
+  scatter principal_knowl_score mandates_accountability if l_mandates_accountability == 1, mcolor(red) m(o) || ///
+  scatter principal_knowl_score mandates_accountability if t_mandates_accountability == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(mandates_accountability vs principal_knowl_score)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci principal_manage mandates_accountability || ///
+  scatter principal_manage mandates_accountability if (l_mandates_accountability==0 & t_mandates_accountability==0), mcolor(gs7) m(o) || ///
+  scatter principal_manage mandates_accountability if l_mandates_accountability == 1, mcolor(red) m(o) || ///
+  scatter principal_manage mandates_accountability if t_mandates_accountability == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(mandates_accountability vs principal_manage)
+
+
+```
+
+
+
+
+
+
+
+
+## Quality of Bureaucracy <a name="scattersqb" ></a>
+
+```s, echo=FALSE
+ twoway lfitci student_knowledge quality_bureaucracy || ///
+  scatter student_knowledge quality_bureaucracy if (l_quality_bureaucracy==0 & t_quality_bureaucracy==0), mcolor(gs7) m(o) || ///
+  scatter student_knowledge quality_bureaucracy if l_quality_bureaucracy == 1, mcolor(red) m(o) || ///
+  scatter student_knowledge quality_bureaucracy if t_quality_bureaucracy == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(quality_bureaucracy vs student_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci ecd_student_knowledge quality_bureaucracy || ///
+  scatter ecd_student_knowledge quality_bureaucracy if (l_quality_bureaucracy==0 & t_quality_bureaucracy==0), mcolor(gs7) m(o) || ///
+  scatter ecd_student_knowledge quality_bureaucracy if l_quality_bureaucracy == 1, mcolor(red) m(o) || ///
+  scatter ecd_student_knowledge quality_bureaucracy if t_quality_bureaucracy == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(quality_bureaucracy vs ecd_student_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci inputs quality_bureaucracy || ///
+  scatter inputs quality_bureaucracy if (l_quality_bureaucracy==0 & t_quality_bureaucracy==0), mcolor(gs7) m(o) || ///
+  scatter inputs quality_bureaucracy if l_quality_bureaucracy == 1, mcolor(red) m(o) || ///
+  scatter inputs quality_bureaucracy if t_quality_bureaucracy == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(quality_bureaucracy vs inputs)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci infrastructure quality_bureaucracy || ///
+  scatter infrastructure quality_bureaucracy if (l_quality_bureaucracy==0 & t_quality_bureaucracy==0), mcolor(gs7) m(o) || ///
+  scatter infrastructure quality_bureaucracy if l_quality_bureaucracy == 1, mcolor(red) m(o) || ///
+  scatter infrastructure quality_bureaucracy if t_quality_bureaucracy == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(quality_bureaucracy vs infrastructure)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci intrinsic_motivation quality_bureaucracy || ///
+  scatter intrinsic_motivation quality_bureaucracy if (l_quality_bureaucracy==0 & t_quality_bureaucracy==0), mcolor(gs7) m(o) || ///
+  scatter intrinsic_motivation quality_bureaucracy if l_quality_bureaucracy == 1, mcolor(red) m(o) || ///
+  scatter intrinsic_motivation quality_bureaucracy if t_quality_bureaucracy == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(quality_bureaucracy vs intrinsic_motivation)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci content_knowledge quality_bureaucracy || ///
+  scatter content_knowledge quality_bureaucracy if (l_quality_bureaucracy==0 & t_quality_bureaucracy==0), mcolor(gs7) m(o) || ///
+  scatter content_knowledge quality_bureaucracy if l_quality_bureaucracy == 1, mcolor(red) m(o) || ///
+  scatter content_knowledge quality_bureaucracy if t_quality_bureaucracy == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(quality_bureaucracy vs content_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci pedagogical_knowledge quality_bureaucracy || ///
+  scatter pedagogical_knowledge quality_bureaucracy if (l_quality_bureaucracy==0 & t_quality_bureaucracy==0), mcolor(gs7) m(o) || ///
+  scatter pedagogical_knowledge quality_bureaucracy if l_quality_bureaucracy == 1, mcolor(red) m(o) || ///
+  scatter pedagogical_knowledge quality_bureaucracy if t_quality_bureaucracy == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(quality_bureaucracy vs pedagogical_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci operational_manage quality_bureaucracy || ///
+  scatter operational_manage quality_bureaucracy if (l_quality_bureaucracy==0 & t_quality_bureaucracy==0), mcolor(gs7) m(o) || ///
+  scatter operational_manage quality_bureaucracy if l_quality_bureaucracy == 1, mcolor(red) m(o) || ///
+  scatter operational_manage quality_bureaucracy if t_quality_bureaucracy == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(quality_bureaucracy vs operational_manage)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci instr_leader quality_bureaucracy || ///
+  scatter instr_leader quality_bureaucracy if (l_quality_bureaucracy==0 & t_quality_bureaucracy==0), mcolor(gs7) m(o) || ///
+  scatter instr_leader quality_bureaucracy if l_quality_bureaucracy == 1, mcolor(red) m(o) || ///
+  scatter instr_leader quality_bureaucracy if t_quality_bureaucracy == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(quality_bureaucracy vs instr_leader)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci principal_knowl_score quality_bureaucracy || ///
+  scatter principal_knowl_score quality_bureaucracy if (l_quality_bureaucracy==0 & t_quality_bureaucracy==0), mcolor(gs7) m(o) || ///
+  scatter principal_knowl_score quality_bureaucracy if l_quality_bureaucracy == 1, mcolor(red) m(o) || ///
+  scatter principal_knowl_score quality_bureaucracy if t_quality_bureaucracy == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(quality_bureaucracy vs principal_knowl_score)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci principal_manage quality_bureaucracy || ///
+  scatter principal_manage quality_bureaucracy if (l_quality_bureaucracy==0 & t_quality_bureaucracy==0), mcolor(gs7) m(o) || ///
+  scatter principal_manage quality_bureaucracy if l_quality_bureaucracy == 1, mcolor(red) m(o) || ///
+  scatter principal_manage quality_bureaucracy if t_quality_bureaucracy == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(quality_bureaucracy vs principal_manage)
+
+
+```
+
+
+
+
+
+## Impartial Decision Making <a name="scattersidm" ></a>
+
+```s, echo=FALSE
+ twoway lfitci student_knowledge impartial_decision_making || ///
+  scatter student_knowledge impartial_decision_making if (l_impartial_decision_making==0 & t_impartial_decision_making==0), mcolor(gs7) m(o) || ///
+  scatter student_knowledge impartial_decision_making if l_impartial_decision_making == 1, mcolor(red) m(o) || ///
+  scatter student_knowledge impartial_decision_making if t_impartial_decision_making == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(impartial_decision_making vs student_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci ecd_student_knowledge impartial_decision_making || ///
+  scatter ecd_student_knowledge impartial_decision_making if (l_impartial_decision_making==0 & t_impartial_decision_making==0), mcolor(gs7) m(o) || ///
+  scatter ecd_student_knowledge impartial_decision_making if l_impartial_decision_making == 1, mcolor(red) m(o) || ///
+  scatter ecd_student_knowledge impartial_decision_making if t_impartial_decision_making == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(impartial_decision_making vs ecd_student_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci inputs impartial_decision_making || ///
+  scatter inputs impartial_decision_making if (l_impartial_decision_making==0 & t_impartial_decision_making==0), mcolor(gs7) m(o) || ///
+  scatter inputs impartial_decision_making if l_impartial_decision_making == 1, mcolor(red) m(o) || ///
+  scatter inputs impartial_decision_making if t_impartial_decision_making == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(impartial_decision_making vs inputs)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci infrastructure impartial_decision_making || ///
+  scatter infrastructure impartial_decision_making if (l_impartial_decision_making==0 & t_impartial_decision_making==0), mcolor(gs7) m(o) || ///
+  scatter infrastructure impartial_decision_making if l_impartial_decision_making == 1, mcolor(red) m(o) || ///
+  scatter infrastructure impartial_decision_making if t_impartial_decision_making == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(impartial_decision_making vs infrastructure)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci intrinsic_motivation impartial_decision_making || ///
+  scatter intrinsic_motivation impartial_decision_making if (l_impartial_decision_making==0 & t_impartial_decision_making==0), mcolor(gs7) m(o) || ///
+  scatter intrinsic_motivation impartial_decision_making if l_impartial_decision_making == 1, mcolor(red) m(o) || ///
+  scatter intrinsic_motivation impartial_decision_making if t_impartial_decision_making == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(impartial_decision_making vs intrinsic_motivation)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci content_knowledge impartial_decision_making || ///
+  scatter content_knowledge impartial_decision_making if (l_impartial_decision_making==0 & t_impartial_decision_making==0), mcolor(gs7) m(o) || ///
+  scatter content_knowledge impartial_decision_making if l_impartial_decision_making == 1, mcolor(red) m(o) || ///
+  scatter content_knowledge impartial_decision_making if t_impartial_decision_making == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(impartial_decision_making vs content_knowledge)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci pedagogical_knowledge impartial_decision_making || ///
+  scatter pedagogical_knowledge impartial_decision_making if (l_impartial_decision_making==0 & t_impartial_decision_making==0), mcolor(gs7) m(o) || ///
+  scatter pedagogical_knowledge impartial_decision_making if l_impartial_decision_making == 1, mcolor(red) m(o) || ///
+  scatter pedagogical_knowledge impartial_decision_making if t_impartial_decision_making == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(impartial_decision_making vs pedagogical_knowledge)
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci operational_manage impartial_decision_making || ///
+  scatter operational_manage impartial_decision_making if (l_impartial_decision_making==0 & t_impartial_decision_making==0), mcolor(gs7) m(o) || ///
+  scatter operational_manage impartial_decision_making if l_impartial_decision_making == 1, mcolor(red) m(o) || ///
+  scatter operational_manage impartial_decision_making if t_impartial_decision_making == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(impartial_decision_making vs operational_manage)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci instr_leader impartial_decision_making || ///
+  scatter instr_leader impartial_decision_making if (l_impartial_decision_making==0 & t_impartial_decision_making==0), mcolor(gs7) m(o) || ///
+  scatter instr_leader impartial_decision_making if l_impartial_decision_making == 1, mcolor(red) m(o) || ///
+  scatter instr_leader impartial_decision_making if t_impartial_decision_making == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(impartial_decision_making vs instr_leader)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci principal_knowl_score impartial_decision_making || ///
+  scatter principal_knowl_score impartial_decision_making if (l_impartial_decision_making==0 & t_impartial_decision_making==0), mcolor(gs7) m(o) || ///
+  scatter principal_knowl_score impartial_decision_making if l_impartial_decision_making == 1, mcolor(red) m(o) || ///
+  scatter principal_knowl_score impartial_decision_making if t_impartial_decision_making == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(impartial_decision_making vs principal_knowl_score)
+
+
+```
+
+
+```s, echo=FALSE
+ twoway lfitci principal_manage impartial_decision_making || ///
+  scatter principal_manage impartial_decision_making if (l_impartial_decision_making==0 & t_impartial_decision_making==0), mcolor(gs7) m(o) || ///
+  scatter principal_manage impartial_decision_making if l_impartial_decision_making == 1, mcolor(red) m(o) || ///
+  scatter principal_manage impartial_decision_making if t_impartial_decision_making == 1, mcolor(green) m(o) || ///
+  , scheme(plotplain) legend(off) ti(impartial_decision_making vs principal_manage)
+
+
+```
+
+
+
+
+
+
+
+
+# Findings and Explanation <a name="theory" ></a>
+
+1. Few scatterplots show a positive relationship between bureaucratic indicators and school outcomes. <br>
+2. However there are a few notable exceptions:
+	- the relationship between the overall Bureaucracy Index and infrastructure, teacher intrinsic motivation, and teacher content knowledge is positive
+	- there is variation among secondary indicators, with Mandates and Accountability showing the most number of positive relaitonships.
+
+## Explanation/Interpretation for Negative Relationships <a name="theory" ></a>
+While all is not lost, we still need to address the fact that many scatterplots show negative relationships that we don't expect. <br>
+
+### Explanation 1: coding errors. <a name="coding" ></a>
+This could all be due to my coding errors, so I've signed up for a code review to check this out.
+
+
+### Explanation 2: Methodology <a name="method" ></a>
+
+It could be that the data are coded correctly but are 'warped'. Since each observation is at the school level, we map into school observation the district average of public official schools in that district. Because there are varying numbers of schools in each district -- and, more importantly, there are many schools without a public official in their district -- this essentially creates a weighting scheme that is proportional to the number of schools in the public officials' districts. If the school has no bureaucrats in its district, their scores are literally thrown out. If the school **does** have a bureaucrat in its district and is the **only** school, the bureaucrat's scores are counted once. However, if the school has many neighboring schools in the same district, then the same bureaucrat average gets counted multiple times. To further complicate matters, some countries have larger school-per-district counts than others. Our anaylysis scheme currently over-emphasizes officials' scores in districts that have many schools. <br><br>
+
+If this hunch is true, then we should see heterogeneity in school outcomes across districts with varying numbers of schools per district. <br><br>
+
+However:  <br>
+- We don't see convincing patterns of Bureucracy Indicators across schools per district <br>
+- And we don't see convincing patterns of school outcomes across schools per district, with the exception maybe of Student Knowledge <br>
+
+
+```s, echo=FALSE
+use `"`dav'"' , clear
+
+ twoway lfitci bi nsch_dist || ///
+   scatter bi nsch_dist, mcolor(gs7) m(o) scheme(plotplain) legend(off)    || ///
+  ,  by(country, total row(2) holes(5) legend(off) ti(Bureaucracy Index (y) vs Mean No. Schools per District (x)))
+```
+```s, echo=FALSE
+ twoway lfitci national_learning_goals nsch_dist  || ///
+   scatter national_learning_goals nsch_dist, mcolor(gs7) m(o) scheme(plotplain) legend(off)    || ///
+  ,  by(country, total row(2) holes(5) legend(off) ti(Natinoal Learning Goals (y) vs Mean No. Schools per District (x)))
+```
+```s, echo=FALSE
+ twoway lfitci mandates_accountability nsch_dist  || ///
+   scatter mandates_accountability nsch_dist, mcolor(gs7) m(o) scheme(plotplain) legend(off)    || ///
+  ,  by(country, total row(2) holes(5) legend(off) ti(Mandates and Accountability (y) vs Mean No. Schools per District (x)))
+```
+```s, echo=FALSE
+ twoway lfitci quality_bureaucracy nsch_dist  || ///
+   scatter quality_bureaucracy nsch_dist , mcolor(gs7) m(o) scheme(plotplain) legend(off)    || ///
+  ,  by(country, total row(2) holes(5) legend(off) ti(Quality of Bureaucracy (y) vs Mean No. Schools per District (x)))
+```
+```s, echo=FALSE
+ twoway lfitci impartial_decision_making nsch_dist  || ///
+   scatter impartial_decision_making nsch_dist  , mcolor(gs7) m(o) scheme(plotplain) legend(off)    || ///
+  ,  by(country, total row(2) holes(5) legend(off) ti(Impartial Decision-Making (y) vs Mean No. Schools per District (x)))
+```
+<br><br><br><br>
+
+
+
+And let's look at the the relationship of average school outcomes by the number of schools in the district
+
+```s, echo=FALSE
+use `"`mdq'"' , clear
+
+ twoway lfitci student_knowledge nsch_dist  || ///
+   scatter student_knowledge nsch_dist, mcolor(gs7) m(o) scheme(plotplain) legend(off)    || ///
+  ,  by(country, total row(2) holes(5) legend(off) ti(Student Knowledge (y) vs Mean No. Schools per District (x)))
+```
+```s, echo=FALSE
+ twoway lfitci ecd_student_knowledge nsch_dist || ///
+   scatter ecd_student_knowledge nsch_dist , mcolor(gs7) m(o) scheme(plotplain) legend(off)    || ///
+  ,  by(country, total row(2) holes(5) legend(off) ti(1st Grade Student Knowledge (y) vs Mean No. Schools per District (x)))
+```
+```s, echo=FALSE
+ twoway lfitci inputs nsch_dist  || ///
+   scatter inputs nsch_dist  , mcolor(gs7) m(o) scheme(plotplain) legend(off)    || ///
+  ,  by(country, total row(2) holes(5) legend(off) ti(Inputs (y) vs Mean No. Schools per District (x)))
+```
+```s, echo=FALSE
+ twoway lfitci infrastructure nsch_dist  || ///
+   scatter infrastructure nsch_dist  , mcolor(gs7) m(o) scheme(plotplain) legend(off)    || ///
+  ,  by(country, total row(2) holes(5) legend(off) ti(Infrastructure (y) vs Mean No. Schools per District (x)))
+```
+```s, echo=FALSE
+ twoway lfitci intrinsic_motivation nsch_dist  || ///
+   scatter intrinsic_motivation nsch_dist  , mcolor(gs7) m(o) scheme(plotplain) legend(off)    || ///
+  ,  by(country, total row(2) holes(5) legend(off) ti(Teacher Motivation (y) vs Mean No. Schools per District (x)))
+```
+```s, echo=FALSE
+ twoway lfitci content_knowledge nsch_dist || ///
+   scatter content_knowledge nsch_dist  , mcolor(gs7) m(o) scheme(plotplain) legend(off)    || ///
+  ,  by(country, total row(2) holes(5) legend(off) ti(Teacher Content Knowledge (y) vs Mean No. Schools per District (x)))
+```
+```s, echo=FALSE
+ twoway lfitci pedagogical_knowledge nsch_dist  || ///
+   scatter pedagogical_knowledge nsch_dist , mcolor(gs7) m(o) scheme(plotplain) legend(off)    || ///
+  ,  by(country, total row(2) holes(5) legend(off) ti(Teacher Pedagogical Knowledge (y) vs Mean No. Schools per District (x)))
+```
+```s, echo=FALSE
+ twoway lfitci operational_manage nsch_dist  || ///
+   scatter operational_manage nsch_dist, mcolor(gs7) m(o) scheme(plotplain) legend(off)    || ///
+  ,  by(country, total row(2) holes(5) legend(off) ti(Operational Management (y) vs Mean No. Schools per District (x)))
+```
+```s, echo=FALSE
+ twoway lfitci instr_leader nsch_dist || ///
+   scatter instr_leader nsch_dist   , mcolor(gs7) m(o) scheme(plotplain) legend(off)    || ///
+  ,  by(country, total row(2) holes(5) legend(off) ti(Instructional Leadership (y) vs Mean No. Schools per District (x)))
+```
+```s, echo=FALSE
+ twoway lfitci principal_knowl_score nsch_dist  || ///
+   scatter principal_knowl_score nsch_dist , mcolor(gs7) m(o) scheme(plotplain) legend(off)    || ///
+  ,  by(country, total row(2) holes(5) legend(off) ti(Principal Knowledge Score (y) vs Mean No. Schools per District (x)))
+```
+```s, echo=FALSE
+ twoway lfitci principal_manage nsch_dist || ///
+   scatter principal_manage nsch_dist  , mcolor(gs7) m(o) scheme(plotplain) legend(off)    || ///
+  ,  by(country, total row(2) holes(5) legend(off) ti(Principal Management (y) vs Mean No. Schools per District (x)))
+```
+
+
+#### Explanation 3: Observation Attrition <a name="attrition" ></a>
+It could also be that the negative relationship between bureaucratic indicators and school outcomes is due to a non-random selection of observations due to observation losses from district-level matching. In order for this to be true, we'd have to show that the selection of schools used in the district-level matched sample is non-random.
+
+<br><br><br>
+
+(see "school-district-merge.xlsx")
+
+<br><br><br>
+
+The excel balance table does show the sample attrition is non-random. We see that Student Knowledge, 1st Grade Test Scores, and Teacher Motivation are significantly lower in the subsample that is merged to public official data; inputs, infrastructure, and Teacher Content Knowledge are significantly higher in the merged subsample. However, there is no significant difference in the following school outcomes between the two samples: Teacher Pedagogical Skill, Operational Management, Instructional Leadership, Principal Knowledge of School, Principal Management Skills. While only about half of school indicators see significant differences between the samples, the set of variables that *are* different seemed to be roughly connected in theme: test scores are lower in our smaple with public official data, and measures of infrastructure quality are generally higer. Thus, we know that the subsample of schools matched to public officials at the district level is not mathematically representative of all schools sampled. However, this still doesn't answer the question as to why, *even within the subsample of observations in the dataset matched to public officials data we still see negative relationships between school outcomes and bureaucracy indicators*.

@@ -52,6 +52,24 @@ else {
 
 
 
+
+
+							* | 	Day of Week		| *
+
+					/* 	Runs a mini-script that takes the raw input and
+					 	generates day of week vars, not actual date vars
+						which are PII. This can be changed on the main
+						script under switch s5. */
+
+
+do 			"${scripts_clone}/mother/utils/survey_time.do"
+
+
+
+
+
+
+
 							* | 	z-scores 		| *
 
 					/* here we will use a stata package instead of manual,
