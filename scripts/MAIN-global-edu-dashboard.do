@@ -196,8 +196,8 @@ gl s4	= 1		// 1 reconstructs BI vars, 0 leaves raw data and only constructs Aggr
 /* script settings settings to 1 if you want to run, default == 0 */
 
 loc clean	= 0		// reconstruct bi vars
-loc agg		= 0 	// generate top p-tile vars for BI
-loc reg 	= 1 	// run regression panels
+loc agg		= 1 	// conduct collapsing and merging
+loc reg 	= 0 	// run regression panels
 
 * [Cleaning]
 * Import, Clean, Construct, Deidentify
