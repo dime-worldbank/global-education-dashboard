@@ -45,24 +45,14 @@ loc region 		: list numbers - g1 // for region we don't want either g2 or g1
 					}
 				}
 
-			drop 		idpo  // we don't need these as they will be meaningless as averages.
+			drop 		idpo  			// we don't need these as they will be meaningless as averages.
+			drop if 	g2 == . 		// we don't want to compress all missing values of g2
+
+
 			do 			"${scripts_clone}/mother/utils/labpreserve.do"
 			la data 	"All tiers of public official indicators averaged at the region"
 			save 		"${publicofficial}/Dataset/col_po_g1_alltier.dta", replace
 					restore
-
-				/*2A. By District: is this not literally the same thing as below?
-					preserve
-
-						sort		countryname g1 g2
-						collapse 	(mean) `district', by(countryname g1 g2)
-						drop 		idpo
-						*do 		${labscript}
-						la data 	"All tiers of public official indicators averaged at the region"
-						save 		"${publicofficial}/Dataset/col_po_g2_alltier.dta", replace
-
-					restore
-				*/
 
 
 
@@ -73,8 +63,12 @@ loc region 		: list numbers - g1 // for region we don't want either g2 or g1
 
 		sort		countryname g1 g2
 		collapse 	(mean) `district', by(countryname g1 g2)
-		drop 		idpo
+
+		drop 		idpo			// this doesn't make sense when averaged
+		drop if 	g2 == . 		// we don't want to compress all missing values of g2
+
 		do 			"${scripts_clone}/mother/utils/labpreserve.do"
+
 		la data 	"All tiers of public official indicators averaged at the district"
 		save 		"${publicofficial}/Dataset/col_po_g2_alltier.dta", replace
 
@@ -89,8 +83,12 @@ loc region 		: list numbers - g1 // for region we don't want either g2 or g1
 
 				sort		countryname g1 g2
 				collapse 	(mean) `district', by(countryname g1 g2)
-				drop 		idpo
+
+				drop 		idpo			// this doesn't make sense when averaged
+				drop if 	g2 == . 		// we don't want to compress all missing values of g2
+
 				do 			"${scripts_clone}/mother/utils/labpreserve.do"
+
 				la data 	"District-office of public official indicators averaged at the district"
 				save 		"${publicofficial}/Dataset/col_po_g2_tier3.dta", replace
 
