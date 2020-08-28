@@ -46,7 +46,7 @@ loc region 		: list numbers - g1 // for region we don't want either g2 or g1
 				}
 
 			drop 		idpo  			// we don't need these as they will be meaningless as averages.
-			drop if 	g2 == . 		// we don't want to compress all missing values of g2
+			drop if 	g1 == . 		// we don't want to compress all missing values of g2
 
 
 			do 			"${scripts_clone}/mother/utils/labpreserve.do"
