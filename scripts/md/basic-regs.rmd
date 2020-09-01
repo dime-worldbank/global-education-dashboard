@@ -1,0 +1,164 @@
+---
+title: "Basic Regressions"
+author: "Tom"
+date: "September 1, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+
+# packages 
+library(tidyverse)
+library(readstata13)
+library(stargazer)
+
+#load data 
+md <- read.dta13(file = "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard/baseline/DataSets/final/merge_district_tdist.dta",
+                 convert.factors = TRUE)
+```
+
+# Basic Regressions
+
+Here are bivariate OLS regressions with country-level fixed effects only. 
+
+Note that Pedagogical Knowledge is only included in Mozambique and is therefore excluded here.
+
+## Using Burureaucracy Index as Explanatory Variable
+
+Note that the comparison/excluded country is Peru unless otherwise noted.
+
+```{r models,  include=FALSE}
+# run + store all regressions regressions as objects
+
+# explanatory = bi 
+lm.bi.1 <- lm(data = md, 
+   student_knowledge ~ bi + as.factor(countryname))
+lm.bi.2 <- lm(data = md, 
+   ecd_student_knowledge ~ bi + as.factor(countryname))
+lm.bi.3 <- lm(data = md, 
+   inputs ~ bi + as.factor(countryname))
+lm.bi.4 <- lm(data = md, 
+   infrastructure ~ bi + as.factor(countryname))
+lm.bi.5 <- lm(data = md, 
+   intrinsic_motivation ~ bi + as.factor(countryname))
+lm.bi.6 <- lm(data = md, 
+   content_knowledge ~ bi + as.factor(countryname))
+lm.bi.8 <- lm(data = md, 
+   operational_manage ~ bi + as.factor(countryname))
+lm.bi.9 <- lm(data = md, 
+   instr_leader ~ bi + as.factor(countryname))
+lm.bi.10 <- lm(data = md, 
+   principal_knowl_score ~ bi + as.factor(countryname))
+lm.bi.11 <- lm(data = md, 
+   principal_manage ~ bi + as.factor(countryname))
+
+# explanatory = nlg 
+lm.nlg.1 <- lm(data = md, 
+   student_knowledge ~ national_learning_goals + as.factor(countryname))
+lm.nlg.2 <- lm(data = md, 
+   ecd_student_knowledge ~ national_learning_goals + as.factor(countryname))
+lm.nlg.3 <- lm(data = md, 
+   inputs ~ national_learning_goals + as.factor(countryname))
+lm.nlg.4 <- lm(data = md, 
+   infrastructure ~ national_learning_goals + as.factor(countryname))
+lm.nlg.5 <- lm(data = md, 
+   intrinsic_motivation ~ national_learning_goals + as.factor(countryname))
+lm.nlg.6 <- lm(data = md, 
+   content_knowledge ~ national_learning_goals + as.factor(countryname))
+lm.nlg.8 <- lm(data = md, 
+   operational_manage ~ national_learning_goals + as.factor(countryname))
+lm.nlg.9 <- lm(data = md, 
+   instr_leader ~ national_learning_goals + as.factor(countryname))
+lm.nlg.10 <- lm(data = md, 
+   principal_knowl_score ~ national_learning_goals + as.factor(countryname))
+lm.nlg.11 <- lm(data = md, 
+   principal_manage ~ national_learning_goals + as.factor(countryname))
+
+# explanatory = ma
+lm.ma.1 <- lm(data = md, 
+   student_knowledge ~ mandates_accountability + as.factor(countryname))
+lm.ma.2 <- lm(data = md, 
+   ecd_student_knowledge ~ mandates_accountability + as.factor(countryname))
+lm.ma.3 <- lm(data = md, 
+   inputs ~ mandates_accountability + as.factor(countryname))
+lm.ma.4 <- lm(data = md, 
+   infrastructure ~ mandates_accountability + as.factor(countryname))
+lm.ma.5 <- lm(data = md, 
+   intrinsic_motivation ~ mandates_accountability + as.factor(countryname))
+lm.ma.6 <- lm(data = md, 
+   content_knowledge ~ mandates_accountability + as.factor(countryname))
+lm.ma.8 <- lm(data = md, 
+   operational_manage ~ mandates_accountability + as.factor(countryname))
+lm.ma.9 <- lm(data = md, 
+   instr_leader ~ mandates_accountability + as.factor(countryname))
+lm.ma.10 <- lm(data = md, 
+   principal_knowl_score ~ mandates_accountability + as.factor(countryname))
+lm.ma.11 <- lm(data = md, 
+   principal_manage ~ mandates_accountability + as.factor(countryname))
+
+
+# explanatory = qb
+lm.qb.1 <- lm(data = md, 
+   student_knowledge ~ quality_bureaucracy + as.factor(countryname))
+lm.qb.2 <- lm(data = md, 
+   ecd_student_knowledge ~ quality_bureaucracy + as.factor(countryname))
+lm.qb.3 <- lm(data = md, 
+   inputs ~ quality_bureaucracy + as.factor(countryname))
+lm.qb.4 <- lm(data = md, 
+   infrastructure ~ quality_bureaucracy + as.factor(countryname))
+lm.qb.5 <- lm(data = md, 
+   intrinsic_motivation ~ quality_bureaucracy + as.factor(countryname))
+lm.qb.6 <- lm(data = md, 
+   content_knowledge ~ quality_bureaucracy + as.factor(countryname))
+lm.qb.8 <- lm(data = md, 
+   operational_manage ~ quality_bureaucracy + as.factor(countryname))
+lm.qb.9 <- lm(data = md, 
+   instr_leader ~ quality_bureaucracy + as.factor(countryname))
+lm.qb.10 <- lm(data = md, 
+   principal_knowl_score ~ quality_bureaucracy + as.factor(countryname))
+lm.qb.11 <- lm(data = md, 
+   principal_manage ~ quality_bureaucracy + as.factor(countryname))
+
+# explanatory = idm
+lm.idm.1 <- lm(data = md, 
+   student_knowledge ~ impartial_decision_making + as.factor(countryname))
+lm.idm.2 <- lm(data = md, 
+   ecd_student_knowledge ~ impartial_decision_making + as.factor(countryname))
+lm.idm.3 <- lm(data = md, 
+   inputs ~ impartial_decision_making + as.factor(countryname))
+lm.idm.4 <- lm(data = md, 
+   infrastructure ~ impartial_decision_making + as.factor(countryname))
+lm.idm.5 <- lm(data = md, 
+   intrinsic_motivation ~ impartial_decision_making + as.factor(countryname))
+lm.idm.6 <- lm(data = md, 
+   content_knowledge ~ impartial_decision_making + as.factor(countryname))
+lm.idm.8 <- lm(data = md, 
+   operational_manage ~ impartial_decision_making + as.factor(countryname))
+lm.idm.9 <- lm(data = md, 
+   instr_leader ~ impartial_decision_making + as.factor(countryname))
+lm.idm.10 <- lm(data = md, 
+   principal_knowl_score ~ impartial_decision_making + as.factor(countryname))
+lm.idm.11 <- lm(data = md, 
+   principal_manage ~ impartial_decision_making + as.factor(countryname))
+
+```
+
+
+```{r bi}
+# table 1
+stargazer(lm.bi.1, lm.bi.2, lm.bi.3, lm.bi.4, lm.bi.5,
+          title = "Bureaucracy Index", type = "text")
+# table 2
+stargazer(lm.bi.6, lm.bi.8, lm.bi.9, lm.bi.10,lm.bi.11,
+          title = "Bureaucracy Index", type = "text")
+# plot
+ggplot(md, aes(student_knowledge, bi)) +
+  geom_jitter() +
+  geom_smooth(method = lm) +
+  facet_wrap(~ countryname)
+  
+
+```
+
