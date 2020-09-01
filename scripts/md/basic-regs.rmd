@@ -2,32 +2,59 @@
 title: "Basic Regressions"
 author: "Tom"
 date: "September 1, 2020"
+runtime: shiny
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+
+#options(width = 300)
 
 # packages 
 library(tidyverse)
 library(readstata13)
-library(stargazer)
+library(sjPlot)
+library(shiny)
+
+# object with outcome variables 
+yvars <- c("student_knowledge",
+           "ecd_student_knowledge",
+           "inputs",
+           "infrastructure",
+           "intrinsic_motivation",
+            "content_knowledge",
+           "operational_manage",
+           "instr_leader",
+           "principal_knowl_score",
+           "principal_manage",
+           "bi",
+           "national_learning_goals",
+           "mandates_accountability",
+           "quality_bureaucracy",
+           "impartial_decision_making")
 
 #load data 
 md <- read.dta13(file = "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard/baseline/DataSets/final/merge_district_tdist.dta",
-                 convert.factors = TRUE)
+                 convert.factors = TRUE) %>%
+  select(idschool, countryname, country, g1, g2, yvars)
+
+
 ```
 
-# Basic Regressions
+# Introduction
 
-Here are bivariate OLS regressions with country-level fixed effects only. 
+This document presents bivariate OLS regressions with country-level fixed effects only, and the country coefficients are hidden. Note that Pedagogical Knowledge as a school outcomes is excluded from analysis here because it is only captured in the Mozambique survey. Furthermore, the dataset used is slightly different than those in the past, as this dataset uses the World Bank Polygons to determine the location of observations. This results in a loss of about 40 school observations. I'm currently looking into what may be causing this. 
 
-Note that Pedagogical Knowledge is only included in Mozambique and is therefore excluded here.
-
-## Using Burureaucracy Index as Explanatory Variable
-
-Note that the comparison/excluded country is Peru unless otherwise noted.
+## Main findings 
+1. With the data we have,we see that the overall Bureaucracy Index it not a good predictor of any school outcomes, except for maybe school infrastructure. <br>
+2. Signifant relationships among the secondary indicators are sparse, but what few there are are promising: <br>
+  - National Learning Goals predict 2 variables related to instruction. <br>
+  - Mandates and Accountability has a mild relationship with Student Knowledge <br>
+  - Quality of Bureaucracy predicts infrastructure <br>
+  - Impartial Decision-Making predicts 3 school-level indicators
 
 ```{r models,  include=FALSE}
 # run + store all regressions regressions as objects
@@ -145,20 +172,203 @@ lm.idm.11 <- lm(data = md,
 
 ```
 
+## Regression Tables
 
 ```{r bi}
 # table 1
-stargazer(lm.bi.1, lm.bi.2, lm.bi.3, lm.bi.4, lm.bi.5,
-          title = "Bureaucracy Index", type = "text")
-# table 2
-stargazer(lm.bi.6, lm.bi.8, lm.bi.9, lm.bi.10,lm.bi.11,
-          title = "Bureaucracy Index", type = "text")
-# plot
-ggplot(md, aes(student_knowledge, bi)) +
-  geom_jitter() +
-  geom_smooth(method = lm) +
-  facet_wrap(~ countryname)
-  
+tab_model(lm.bi.1, lm.bi.2, lm.bi.3, lm.bi.4, lm.bi.5, lm.bi.6, lm.bi.8, lm.bi.9, lm.bi.10,lm.bi.11,
+          pred.labels = c("Bureaucracy Index"),
+          title = "Bureaucracy Index",
+          show.ci = FALSE,
+          show.se = TRUE,
+          collapse.se = TRUE,
+          linebreak = TRUE,
+          show.intercept = FALSE,
+          p.style = "stars",
+          terms = c("bi"))
 
 ```
 
+```{r nlg}
+# table 1
+tab_model(lm.nlg.1, lm.nlg.2, lm.nlg.3, lm.nlg.4, lm.nlg.5, lm.nlg.6, lm.nlg.8, lm.nlg.9, lm.nlg.10,lm.nlg.11,
+          pred.labels = c("National Learning Goals"),
+          title = "National Learning Goals",
+          show.ci = FALSE,
+          show.se = TRUE,
+          collapse.se = TRUE,
+          linebreak = TRUE,
+          show.intercept = FALSE,
+          p.style = "stars",
+          terms = c("national_learning_goals"))
+
+```
+
+```{r ma}
+# table 1
+tab_model(lm.ma.1, lm.ma.2, lm.ma.3, lm.ma.4, lm.ma.5, lm.ma.6, lm.ma.8, lm.ma.9, lm.ma.10,lm.ma.11,
+          pred.labels = c("Mandates + Acct'y"),
+          title = "Mandates and Accountability",
+          show.ci = FALSE,
+          show.se = TRUE,
+          collapse.se = TRUE,
+          linebreak = TRUE,
+          show.intercept = FALSE,
+          p.style = "stars",
+          terms = c("mandates_accountability"))
+
+```
+
+
+```{r qb}
+# table 1
+tab_model(lm.qb.1, lm.qb.2, lm.qb.3, lm.qb.4, lm.qb.5, lm.qb.6, lm.qb.8, lm.qb.9, lm.qb.10,lm.qb.11,
+          pred.labels = c("Qual. of Bureaucracy"),
+          title = "Quality of Bureaucracy",
+          show.ci = FALSE,
+          show.se = TRUE,
+          collapse.se = TRUE,
+          linebreak = TRUE,
+          show.intercept = FALSE,
+          p.style = "stars",
+          terms = c("quality_bureaucracy"))
+
+```
+
+
+```{r idm}
+# table 1
+tab_model(lm.idm.1, lm.idm.2, lm.idm.3, lm.idm.4, lm.idm.5, lm.idm.6, lm.idm.8, lm.idm.9, lm.idm.10,lm.idm.11,
+          pred.labels = c("Impar. Dec'n-Making"),
+          title = "Impartial Decision-Making",
+          show.ci = FALSE,
+          show.se = TRUE,
+          collapse.se = TRUE,
+          linebreak = TRUE,
+          show.intercept = FALSE,
+          p.style = "stars",
+          terms = c("impartial_decision_making"))
+
+```
+
+
+### Interactive By-Country Visualizations
+Select up to two pairs of explanatory variables (Bureaucracy Indicators) and Outcomes Variables (School Outcomes) to visualize the scatterplots and best-fit lines by country.
+
+####Variable Selector
+Plot 1
+```{r}
+
+
+# inputs 1
+selectInput("yvar1", #inputid
+            "Outcome Variable 1", #label
+           choices = c("Student Knowledge" = "student_knowledge",
+           "1st Grade Student Knowledge" = "ecd_student_knowledge",
+           "Inputs" = "inputs",
+           "Infrastructure" = "infrastructure",
+           "Teacher Motivation" = "intrinsic_motivation",
+           "Teacher Content Knowledge" = "content_knowledge",
+           "Operational Management" = "operational_manage",
+           "Instructional Leadership" = "instr_leadership",
+           "Principal Knolwedge Score" = "principal_knowl_score",
+           "Principal Management" = "principal_manage"),
+           multiple = FALSE,
+           selected = "infrastructure"
+)
+           
+selectInput("xvar1", #inputid
+            "Explanatory Variable 1", #label
+           choices = c("Bureaucracy Index" = "bi",
+                       "National Learning Goals" = "national_learning_goals",
+                       "Mandates and Accountability" = "mandates_accountability",
+                       "Quality of Bureaucracy" = "quality_bureaucracy",
+                       "Impartial Decision-Making" = "impartial_decision_making"),
+           multiple = FALSE,
+           selected = "bi"
+)
+```
+
+
+
+Plot 2
+```{r}
+# inputs 2
+selectInput("yvar2", #inputid
+            "Outcome Variable 2", #label
+           choices = c("Student Knowledge" = "student_knowledge",
+           "1st Grade Student Knowledge" = "ecd_student_knowledge",
+           "Inputs" = "inputs",
+           "Infrastructure" = "infrastructure",
+           "Teacher Motivation" = "intrinsic_motivation",
+           "Teacher Content Knowledge" = "content_knowledge",
+           "Operational Management" = "operational_manage",
+           "Instructional Leadership" = "instr_leadership",
+           "Principal Knolwedge Score" = "principal_knowl_score",
+           "Principal Management" = "principal_manage"),
+           multiple = FALSE,
+           selected = "content_knowledge"
+)
+           
+selectInput("xvar2", #inputid
+            "Explanatory Variable 2", #label
+           choices = c("Bureaucracy Index" = "bi",
+                       "National Learning Goals" = "national_learning_goals",
+                       "Mandates and Accountability" = "mandates_accountability",
+                       "Quality of Bureaucracy" = "quality_bureaucracy",
+                       "Impartial Decision-Making" = "impartial_decision_making"),
+           multiple = FALSE,
+           selected = "national_learning_goals"
+)
+
+
+
+```
+
+
+Plot 1
+```{r, fig.align='center', fig.show='hold'}
+
+# plot 1
+renderPlot({
+  # make the plot 
+ ggplot(md, aes_string(input$xvar1, input$yvar1)) +
+    geom_jitter() +
+    geom_smooth(method = lm) +
+    facet_wrap(~ countryname)
+  
+},
+# plot options
+  width  = 500,
+  height = 400,
+  res = 100
+)
+
+
+```
+
+Plot 2
+
+```{r}
+
+
+
+# plot 2         
+renderPlot({
+  # make the plot 
+ ggplot(md, aes_string(input$xvar2, input$yvar2)) +
+    geom_jitter() +
+    geom_smooth(method = lm) +
+    facet_wrap(~ countryname)
+  
+},
+# plot options
+  width  = 500,
+  height = 400,
+  res = 100
+)
+
+
+
+```
+ 
