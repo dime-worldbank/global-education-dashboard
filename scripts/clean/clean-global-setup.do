@@ -52,8 +52,8 @@
    *  country file shortcuts
    * ******************************************************************** *
 		* master dataset
-		gl 			sch0 					"A:/main/final_main_school_data.dta"
-		gl 			po0 					"A:/main/final_main_po_data.dta"
+		gl 			sch0 					"B:/main/final_main_school_data.dta"
+		gl 			po0 					"B:/main/final_main_po_data.dta"
 
 		 *-_-_ Main Datasets _-_-*
 		 * Raw Stata
