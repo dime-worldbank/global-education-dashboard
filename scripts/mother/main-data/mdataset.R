@@ -1,4 +1,4 @@
-imprtjson# Mdataset.R
+# Mdataset.R
 # Author: Tom
 # appends all schools datasets and all public officials dataset (raw), performs basic
 # 	cleaning, and does geoprocessing on gps coordinates to determine admin unit, distances etc
@@ -36,7 +36,8 @@ user <- 1
 
 # user settings
 if (user == 1) {
-root  <- file.path("A:") #
+root  <- file.path("A:") # raw data
+repo.encrypt <- file.path("B:")
 vault <- file.path(root, "Countries")
 shared <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard/code-review"
 wbpoly <- file.path(shared, "gis/20160921_GAUL_GeoJSON_TopoJSON")
@@ -578,21 +579,26 @@ save(main_po_data, main_school_data,
      newtiers,
      offices,
      school_dist,
-     file = file.path(root, "main/final_main_data.Rdata"))
+     file = file.path(repo.encrypt, "main/final_main_data.Rdata"))
 
 #determine lists of vars to change length
+  
+  # tag all varsnames longer than 26 characters
 varlist_p <- as.data.frame(colnames(main_po_data))
 to.change_p <- varlist_p %>%
   filter(str_length(colnames(main_po_data)) > 26 )
 
-varlist_to_change_p<-as.character(to.change_p$`colnames(main_po_data)`)
+  # this list is the public officials list of varnames to change
+  varlist_to_change_p<-as.character(to.change_p$`colnames(main_po_data)`)
 
-
+  
+  #tag varsnames longer than 30 characters
 varlist_s <- as.data.frame(colnames(main_school_data))
 to.change_s <- varlist_s %>%
   filter(str_length(colnames(main_school_data)) > 30 )
-
-varlist_to_change_s<-as.character(to.change_s$`colnames(main_school_data)`)
+  
+# this is the list of schools varnames to change
+  varlist_to_change_s<-as.character(to.change_s$`colnames(main_school_data)`)
 
 
 # change the dataset accordingly
@@ -614,13 +620,13 @@ peru_school_export <- peru_school %>%
 
 # export as dta
 write_dta(data = main_po_data_export,
-          path = "A:/main/final_main_po_data.dta",
+          path = file.path(repo.encrypt, "main/final_main_po_data.dta"),
           version = 14
      ) # default, leave factors as value labels, use variable name as var label
 
 
 write_dta(data = main_school_data_export,
-          path = "A:/main/final_main_school_data.dta",
+          path = file.path(repo.encrypt, "main/final_main_school_data.dta"),
           version = 14
 ) # default, leave factors as value labels, use variable name as var label
 
