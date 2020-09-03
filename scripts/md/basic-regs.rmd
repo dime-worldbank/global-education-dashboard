@@ -2,8 +2,8 @@
 title: "Basic Regressions"
 author: "Tom"
 date: "September 1, 2020"
-runtime: shiny
 output: html_document
+runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
@@ -46,7 +46,7 @@ md <- read.dta13(file = "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/gl
 
 # Introduction
 
-This document presents bivariate OLS regressions with country-level fixed effects only, and the country coefficients are hidden. Note that Pedagogical Knowledge as a school outcomes is excluded from analysis here because it is only captured in the Mozambique survey. Furthermore, the dataset used is slightly different than those in the past, as this dataset uses the World Bank Polygons to determine the location of observations. This results in a loss of about 40 school observations. I'm currently looking into what may be causing this. 
+This document presents bivariate OLS regressions with country-level fixed effects only, and the country coefficients are hidden. Note that Pedagogical Knowledge as a school outcome is excluded from analysis here because it is only captured in the Mozambique survey. Furthermore, the dataset used is slightly different than those used in the past, as this dataset uses the World Bank Polygons to determine the location -- and therefore, the attrition -- of observations. This results in a loss of about 40 school observations. I'm currently looking into what may be causing this, but my guess is that it may have to do with discrepencies in the shapes of regions in the two polygon datasets. 
 
 ## Main findings 
 1. With the data we have,we see that the overall Bureaucracy Index it not a good predictor of any school outcomes, except for maybe school infrastructure. <br>
