@@ -56,12 +56,10 @@ shared <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashb
 # code settings (for review, default values are: appendskip=1 	imprtjson=1		savepoly=2)
 				# to skip import of the raw json file, run: appendskip=1 	imprtjson=2		savepoly=2
 
-appendskip <- 1 # 1 if we want to skip creation of real, pii dataset and use the sample dataset instead.
-                # will also output files to shared folder instead.
-imprtjson <- 1 # 1 = import the raw geojson file for the worldbank polys (takes ~10 min)
+imprtjson <- 0 # 1 = import the raw geojson file for the worldbank polys (takes ~10 min)
 				# 0 = import the saved file on tom's local folder to skip the import
 				# 2 = import the saved file on the shared folder to skip this.
-savepoly  <- 2 # 1 = save the polygon file to Tom's wb folder for later use.
+savepoly  <- 1 # 1 = save the polygon file to Tom's wb folder for later use.
 				# 2 = save the file to the shared folder, should be run with imprtjson == 2 if you
 						# want to import the file that you save in the shared folder.
 
@@ -468,7 +466,7 @@ main_school_data <- st_join(school, # points
 
 
 
-						    # ------------------------------------- #
+						                # ------------------------------------- #
                             #   	Additional Geoprocessing	        # ----
                             # ------------------------------------- #
 
@@ -513,16 +511,16 @@ districtoffices <- filter(offices, govt_tier == "District Office",
 
 # Join by District, remove geometry, then region, remove geometry.
 school_dist<-left_join(main_school_data, # 1. join join by district
-            as.data.frame(districtoffices),
-            by = "ADM2_CODE",
-            suffix = c(".school", ".do")) %>%
+                      as.data.frame(districtoffices),
+                      by = "ADM2_CODE",
+                      suffix = c(".school", ".do")) %>%
   select(idschool, idoffice, everything()) %>%
   mutate(
     dist_to_do = st_distance(geometry.school,
                        geometry.do,
                        by_element = TRUE)/1000 # we know that the pairwise elements are correct, in km
     ) %>%
-  rename(district_idoffice = idoffice) %>%  # rename office id to district
+  rename(school_dist, district_idoffice = idoffice) %>%  # rename office id to district
   left_join(                                # 2. begin joining by region.
             as.data.frame(regionoffices),
             by = c("ADM1_CODE.school" = "ADM1_CODE"),
@@ -533,7 +531,7 @@ school_dist<-left_join(main_school_data, # 1. join join by district
                              geometry, # where geometry is the point of region since not duped
                              by_element = TRUE)/1000 # we know that the pairwise elements are correct, in km
   ) %>%
-  rename(region_idoffice = idoffice, # rename variables to be consistent
+  rename(., region_idoffice = idoffice, # rename variables to be consistent
          g0.ro = g0,
          g1.ro = g1,
          g2.ro = g2,
@@ -557,19 +555,6 @@ school_dist<-left_join(main_school_data, # 1. join join by district
                               #               export                  # ----
                               # ------------------------------------- #
 
-
-if (appendskip == 1) { # save output in shared folder if appendskip ==1
-  save(main_po_data, main_school_data,
-       m.po, m.school,
-       wb.poly.m,
-       newtiers,
-       offices,
-       school_dist,
-       file = file.path(shared, "out/final_main_data.Rdata"))
-}
-
-
-if (appendskip != 1) { # run only if not running in shared folder
 
 # save as rds/stata
 save(main_po_data, main_school_data,
@@ -636,7 +621,6 @@ write_dta(data = peru_school_export,
           version = 14
 ) # default, leave factors as value labels, use variable name as var label
 
-} # end appendskip switch
 
 # # credits: https://stackoverflow.com/questions/6986657/find-duplicated-rows-based-on-2-columns-in-data-frame-in-r
 # https://gis.stackexchange.com/questions/224915/extracting-data-frame-from-simple-features-object-in-r
