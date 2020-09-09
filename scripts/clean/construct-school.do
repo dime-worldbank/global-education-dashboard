@@ -49,19 +49,6 @@ do 			"${scripts_clone}/mother/utils/survey_time.do"
 
 
 
-						* | 	schools per district, region		| *
-
-					/* 	this section generates variables of the number of
-						schools per region and district */
-
-* number of schools per district
-egen nsch_dist = count(idschool), by(country g2)
-
-
-* number of schools per region
-egen nsch_region = count(idschool), by(country g1)
-
-
 
 
 							* | 	z-scores 		| *

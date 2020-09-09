@@ -51,6 +51,22 @@ replace enrolled 		= 8 	if total_enrolled >= 500
 
 
 
+						* | 	schools per district, region		| *
+
+					/* 	this section generates variables of the number of
+						schools per region and district, normally would be
+						in 'construct.do' but g2 is needed, can only be done
+						after deidentification. */
+
+* number of schools per district
+egen nsch_dist = count(idschool), by(country g2)
+
+
+* number of schools per region
+egen nsch_region = count(idschool), by(country g1)
+
+
+
 
 							* | 	drop pii variables		| *
 
