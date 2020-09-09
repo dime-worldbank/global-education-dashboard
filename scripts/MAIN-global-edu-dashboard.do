@@ -160,7 +160,6 @@
 *iefolder*2*End_StandardGlobals*************************************************
 *iefolder will not work properly if the line above is edited
 
-do `"${scripts_clone}/clean/clean-global-setup.do"' // this the the clean-specific and also main
 
 *iefolder*3*RunDofiles**********************************************************
 *iefolder will not work properly if the line above is edited
@@ -199,6 +198,13 @@ loc clean	= 1		// reconstruct bi vars
 loc agg		= 1 	// conduct collapsing and merging
 loc misc 	= 1 	// misc data processing, prior merging is necessary.
 loc reg 	= 0 	// run regression panels
+
+
+* [Global Setup]:
+* really the Cleaning global setup, used as main global setup 
+do `"${scripts_clone}/clean/clean-global-setup.do"' // this the the clean-specific and also main
+
+
 
 * [Cleaning]
 * Import, Clean, Construct, Deidentify
