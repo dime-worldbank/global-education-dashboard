@@ -52,7 +52,16 @@
    *  country file shortcuts
    * ******************************************************************** *
 		* master dataset
+		/* 	Note that the school master will change based on which verion of editing the
+			school obs with missing data we want. 0 == no manual editing; 1 == manual
+			correction but no changes made to missing obs with ambiguous matches.*/
+		if (${s6} == 0) {
 		gl 			sch0 					"B:/main/final_main_school_data.dta"
+		}
+		if (${s6} == 1) {
+		gl 			sch0 					"B:/main/final_main_school_data_op1.dta"
+		}
+
 		gl 			po0 					"B:/main/final_main_po_data.dta"
 
 		 *-_-_ Main Datasets _-_-*
@@ -189,7 +198,7 @@
 								 ENUMq1 ENUMq2 ENUMq3 ENUMq4 ENUMq5 ENUMq6 ENUMq7 ENUMq8 ///
 								 school_district_preload school_province_preload region_code district_code ///
 								 district province location lat lon end_time responsible_mnitoring_perf ///
-								 enumerator_number enumerator_code 
+								 enumerator_number enumerator_code
 
 		gl 			 poorder 	`"idpo countryname country g1 g2 ${biall}"'
 

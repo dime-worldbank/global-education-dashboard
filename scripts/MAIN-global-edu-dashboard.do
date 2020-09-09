@@ -190,8 +190,8 @@ gl s1	= 0		// reconstruct bi vars
 gl s2	= 0 	// generate top p-tile vars for BI
 gl s3 	= 1		// 0 = keep 203 obs in peru PO dataset; 1 == drop unmatched obs as Brian does.
 gl s4	= 1		// 1 reconstructs BI vars, 0 leaves raw data and only constructs Aggregate indicator
-gl s5	= 0 	// 1 generate raw dates, which becomes PII, whereas 0 only constructs day of week vars. 
-
+gl s5	= 0 	// 1 generate raw dates, which becomes PII, whereas 0 only constructs day of week vars.
+gl s6 	= 1		// determines which school dataset to merge w during deidenitfy, 0=normal 1=mild correction
 
 /* script settings settings to 1 if you want to run, default == 0 */
 
