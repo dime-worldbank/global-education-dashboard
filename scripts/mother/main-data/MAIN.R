@@ -4,7 +4,7 @@
 
 
 # ----------------------------- #
-# 			 startup	 		#----
+# 			 startup	 		          ----
 # ----------------------------- #
 
 if (!is.element("pacman", installed.packages())) {
@@ -21,7 +21,7 @@ pacman::p_load(tidyverse,
 
 
 # ----------------------------- #
-# 			 settings	 		#----
+# 			 settings	 		          ----
 # ----------------------------- #
 
 user <- 1
@@ -69,13 +69,13 @@ matchop <- 1  # 1 if we want to exclude all schools in question.
 
 # run script settings, set to 1 to run
 s1 <- 0 # mdataset
-s2 <- 0 # adds missing gps cords (or some)
+s2 <- 1 # adds missing gps cords (or some)
 
 
 
 
 # ----------------------------- #
-# 			 Run Code 	 		#----
+# 			 Run Code 	 		         ----
 # ----------------------------- #
 
 # Run Mdataset.R
@@ -85,5 +85,5 @@ if (s1 == 1) {
 
 # Recover missing GPS obs
 if (s2 == 1) {
-  source(file.path(script, "main-data/recover.R"))
+  source(file.path(scripts, "main-data/recover.R"))
 }

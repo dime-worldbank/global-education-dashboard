@@ -129,7 +129,7 @@ preload.dups <-
 
 
 
-# 5. use the key to merge missing gps info back onto main datasets.
+# use the key to merge missing gps info back onto main datasets ----
 
   # here we have run into an issue where, for school observations with missing gps coordinates, the only geographic 
   # information we have is the preloaded variables. But, for some of these 'missing-gps' observations, the preloaded 
@@ -161,9 +161,91 @@ if (matchop == 1) {
   # 5.1 merge the key back onto the main dataset 
     # %% here we have to figure out how to replace the missing values instead of creating a new row.
     # question is, using method 1, how many schools do we get back?
-  main_school_data_op1 <- left_join(main_school_data,
+  main_school_data_op1a <- left_join(main_school_data,
                                     s.key.op1,
-                                    key = c("countryname", "school_district_preload"))
+                                    by    = c("countryname", "school_district_preload"),
+                                    suffix = c('.x', '.y')) # for missings in x, we want to overwrite with y
+  
+  
+  ## 5.1.1 replace missings in .x if there's a non-missing in y
+    # since we can't 'update' the geovars, we have two copies: a .x (from main dataset) and 
+    # .y (from) the key we just made. for most obs, .x is correct and will be kepts, but 
+    # now we have to now replace .x with .y is .x is missing and theres something in .y
+  main_school_data_op1<- mutate( main_school_data_op1a,
+                                  ADM0_NAME = if_else(is.na(ADM0_NAME.x) & !is.na(ADM0_NAME.y), ADM0_NAME.y, ADM0_NAME.x),
+                                  ADM1_NAME = if_else(is.na(ADM1_NAME.x) & !is.na(ADM1_NAME.y), ADM1_NAME.y, ADM1_NAME.x),
+                                  ADM2_NAME = if_else(is.na(ADM2_NAME.x) & !is.na(ADM2_NAME.y), ADM2_NAME.y, ADM2_NAME.x),
+                                  ADM0_CODE = if_else(is.na(ADM0_CODE.x) & !is.na(ADM0_CODE.y), ADM0_CODE.y, ADM0_CODE.x),
+                                  ADM1_CODE = if_else(is.na(ADM1_CODE.x) & !is.na(ADM1_CODE.y), ADM1_CODE.y, ADM1_CODE.x),
+                                  ADM2_CODE = if_else(is.na(ADM2_CODE.x) & !is.na(ADM2_CODE.y), ADM2_CODE.y, ADM2_CODE.x),
+                                  g0        = if_else(is.na(g0.x)        & !is.na(g0.y)       , g0.y       , g0.x),
+                                  g1        = if_else(is.na(g1.x)        & !is.na(g1.y)       , g1.y       , g1.x),
+                                  g2        = if_else(is.na(g2.x)        & !is.na(g2.y)       , g2.y       , g2.x)
+                                ) %>%
+    select(-ADM0_NAME.x, -ADM0_NAME.y, 
+           -ADM1_NAME.x, -ADM1_NAME.y,
+           -ADM2_NAME.x, -ADM2_NAME.y,
+           -ADM0_CODE.x, -ADM0_CODE.y,
+           -ADM1_CODE.x, -ADM1_CODE.y,
+           -ADM2_CODE.x, -ADM2_CODE.y,
+           -g0.x,        -g0.y,
+           -g1.x,        -g1.y,
+           -g2.x,        -g2.y)
 
   
+  # compare missing value rates
+  #sum(is.na(main_school_data_op1$ADM2_NAME.x)) # n miss=180
+  sum(is.na(main_school_data_op1$ADM2_NAME)) ##  n miss=148; gains 32 schools! 
 }
+
+
+
+
+
+
+
+
+                            # ----------------------------- #
+                            # 			     file export	 		 ----
+                            # ----------------------------- #
+
+      # Here we will do 2 things: add the newly generated school datasets to the main R
+      # environemtn and, also, export the main school dataset as another .dta version.
+
+
+# save important contents
+save(main_po_data, main_school_data,
+     m.po, m.school,
+     wb.poly.m,
+     po.l, school.l, # new: 'light' datasets
+     preload.dups, s.key, s.key.op1, s.missing, s.there, # new: 
+     main_school_data_op1, # new school dataset
+     tiers,
+     newtiers,
+     offices,
+     school_dist,
+     file = file.path(repo.encrypt, "main/final_main_data.Rdata"))
+
+
+# export main school dataset as another version 
+
+    #tag varsnames longer than 30 characters
+    varlist_s <- as.data.frame(colnames(main_school_data_op1))
+    to.change_s <- varlist_s %>%
+      filter(str_length(colnames(main_school_data_op1)) > 30 )
+    
+    # this is the list of schools varnames to change
+    varlist_to_change_s<-as.character(to.change_s$`colnames(main_school_data_op1)`)
+    
+    # chang the dataset accordinly 
+    main_school_data_op1_export <- main_school_data_op1 %>%
+      st_set_geometry(., NULL) %>% # take out geometry
+      rename_at(.vars=varlist_to_change_s, ~str_trunc(.,30,"center", ellipsis="")) %>% # rename long vars
+      select(-contains("enumerator_name")) # take out enumerator name variable
+    
+    # finally, export as dta
+    write_dta(data = main_school_data_op1_export,
+              path = file.path(repo.encrypt, "main/final_main_school_data_op1.dta"),
+              version = 14
+            )
+    
