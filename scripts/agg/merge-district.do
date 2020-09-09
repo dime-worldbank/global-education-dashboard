@@ -15,6 +15,10 @@ Function: merges the district-level averages to countries
 			merge 			m:1 	countryname g2 	///
 									using "${publicofficial}/Dataset/col_po_g2_alltier.dta" ///
 									, gen(merge)
+									
+			* save as tempfile, will need later 
+			tempfile 	mergeg2
+			save 		`mergeg2'
 
 			* 1.  verify quality of the merge BEFORE dropping
 			/* run schoolcheck.do */
@@ -23,7 +27,7 @@ Function: merges the district-level averages to countries
 
 			* 2.  Generate top/bottom quartile tags
 			* generate a variable that lists the number of schools in each district
-			preserve
+			
 
 			* tag schools in areas that are in the lower quartile of 5 bureaucracy indicators
 			collapse (mean) ${bi} nsch_dist, by(country g2)
@@ -42,7 +46,7 @@ Function: merges the district-level averages to countries
 			* save snippet as realfile to merge back on to md dataset
 			save 		"${baseline_dt}/Intermediate/m-bi-nschools-by-district-alltier", replace
 
-			restore		// this brings back dataset we just created in merging.
+			use 		`mergeg2', clear		// this brings back dataset we just created in merging.
 
 			* use merged dataset, mege with merged-bi-nschools-by-district.dta
 			merge m:1 	country g2 ///
@@ -88,6 +92,10 @@ Function: merges the district-level averages to countries
 				merge 		m:1 	countryname g2 	///
 									using "${publicofficial}/Dataset/col_po_g2_tier3.dta" ///
 									, gen(merge)
+									
+			* save as tempfile, will need later 
+			tempfile 	mergeg2b // "a" is above, careful not to mess with overwriting tempfiles, etc
+			save 		`mergeg2b'
 
 			* 1.  verify quality of the merge BEFORE dropping
 			/* run schoolcheck.do */
@@ -96,7 +104,7 @@ Function: merges the district-level averages to countries
 
 			* 2.  Generate top/bottom quartile tags
 			* generate a variable that lists the number of schools in each district
-			preserve
+			
 
 			* tag schools in areas that are in the lower quartile of 5 bureaucracy indicators
 			collapse (mean) ${bi} nsch_dist, by(country g2)
@@ -115,11 +123,11 @@ Function: merges the district-level averages to countries
 			* save snippet as realfile to merge back on to md dataset
 			save 		"${baseline_dt}/Intermediate/m-bi-nschools-by-district-tier3.dta", replace
 
-			restore		// this brings back dataset we just created in merging.
+			use 		`mergeg2b', clear		// this brings back dataset we just created in merging.
 
 			* use merged dataset, mege with merged-bi-nschools-by-district.dta
 			merge m:1 	country g2 ///
-						using "${baseline_dt}/Intermediate/m-bi-nschools-by-district-tier3.dta.dta" ///
+						using "${baseline_dt}/Intermediate/m-bi-nschools-by-district-tier3.dta" ///
 						, assert(match) /// everything should match perfectly
 						keepusing(t_bi t_national_learning_goals t_mandates_accountability t_quality_bureaucracy t_impartial_decision_making l_bi l_national_learning_goals l_mandates_accountability l_quality_bureaucracy l_impartial_decision_making)
 

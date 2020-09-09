@@ -15,4 +15,5 @@ loc p1 	0	// environmental controls
 * 1. Run Survey Match check:
 *		add variables to main school dataset that tell us what obs will be dropped for various datasets
 
-do 	"${scripts_clone}/misc/match-check-schools.do"
+* THIS IS OBSOLETE, done in R
+* do 	"${scripts_clone}/misc/match-check-schools.do" 

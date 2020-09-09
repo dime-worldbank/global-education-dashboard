@@ -1,6 +1,14 @@
 * match-check-schools.do
 * util that uses the district and region- merged dataset to map info on to main schools dataset to tell what observations will be kept/dropped
 
+/*
+
+
+NOTE 9 SEPT, 2020: 	this file is basically obscolete as these variables are created in the main datasets in R. will not be 
+					run starting now.
+
+*/
+
 
 							*| create a tempfile from D_sch 	|*
 						/*	this tempfile is a copy of the de-identified school

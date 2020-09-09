@@ -17,6 +17,10 @@ Function: merges the region-level averages to countries
 				merge 		m:1 	countryname g1 	///
 									using "${publicofficial}/Dataset/col_po_g1_alltier.dta" ///
 									, gen(merge)
+									
+			* save the merged file as tempfile, will need later
+			tempfile 	mergeg1
+			save 		`mergeg1'
 
 			* 1.  verify quality of the merge BEFORE dropping
 			/* run schoolcheck.do */
@@ -25,7 +29,7 @@ Function: merges the region-level averages to countries
 
 			* 2.  Generate top/bottom quartile tags
 			* generate a variable that lists the number of schools in each district
-			preserve
+			
 
 			* tag schools in areas that are in the lower quartile of 5 bureaucracy indicators
 			collapse (mean) ${bi} nsch_dist, by(country g1)
@@ -44,7 +48,7 @@ Function: merges the region-level averages to countries
 			* save snippet as realfile to merge back on to md dataset
 			save 		"${baseline_dt}/Intermediate/m-bi-nschools-by-region-alltier.dta", replace
 
-			restore		// this brings back dataset we just created in merging.
+			use 		`mergeg1', clear	// this brings back dataset we just created in merging.
 
 			* use merged dataset, mege with merged-bi-nschools-by-district.dta
 			merge m:1 	country g1 ///
@@ -59,7 +63,7 @@ Function: merges the region-level averages to countries
 				save 		"${baseline_dt}/Intermediate/merge_region_alltiers_nonmatch.dta", replace
 
 			* Then drop non-mereged obs and...
-				keep if 	merge == 3
+				keep if 	_merge == 3
 
 			* Verify quality of dataset after the drop.
 				/* run another checkscript (diff cuz this time we loose school obs) */

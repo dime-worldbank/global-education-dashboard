@@ -221,7 +221,7 @@ if (`agg' == 1) {
 * [Misc. Data Processing]
 * Collapse by admin unit, merge.
 if (`misc' == 1) {
-	do "${scripts_clone}/agg/main-misc.do"
+	do "${scripts_clone}/misc/main-misc.do"
 }
 
 
