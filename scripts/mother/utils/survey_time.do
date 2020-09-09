@@ -32,12 +32,12 @@ format 			datetime %tc
 drop 				survey_time2 datetime date
 
 
-* Generate Raw Dates 
+* Generate Raw Dates
 /* 	This section generates actual dates that the survey was conducted. If you
 	generate this it becomes PII, so there's a switch, s5, that is set by default
 	to NOT generate these date variables by default. */
 
-if (`s5' == 1) {
+if (${s5} == 1) {
 	// generate year, mo, day etc
 	gen				year = year(date)
 	gen 			month : month = month(date)
