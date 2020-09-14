@@ -10,7 +10,9 @@
   # export settings
   export     <- 1     # set to 1 to export, any other number will not export
   csv.export <- 0     # set to 1 to export csv to manually match, will overwrite
-              
+   
+  
+             
               # ----------------------------- #
               # 			     load data	 		      ----
               # ----------------------------- #
