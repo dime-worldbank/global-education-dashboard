@@ -18,6 +18,7 @@ library(tidyverse)
 library(readstata13)
 library(sjPlot)
 library(shiny)
+library(miceadds)
 
 # object with outcome variables 
 yvars <- c("student_knowledge",
@@ -44,9 +45,13 @@ md <- read.dta13(file = "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/gl
 
 ```
 
-# Introduction
+# Changes From Last Time
 
-This document presents bivariate OLS regressions with country-level fixed effects only, and the country coefficients are hidden. Note that Pedagogical Knowledge as a school outcome is excluded from analysis here because it is only captured in the Mozambique survey. Furthermore, the dataset used is slightly different than those used in the past, as this dataset uses the World Bank Polygons to determine the location -- and therefore, the attrition -- of observations. This results in a loss of about 40 school observations. I'm currently looking into what may be causing this, but my guess is that it may have to do with discrepencies in the shapes of regions in the two polygon datasets. 
+I succeeded in adding a whopping 14 schools by recovering missing GPS data. This 14 number is conservative, but could increase by a few schools depending on how liberal we want to be in our geo-guessing.
+
+# Model Specifications
+- Country Fixed Effects (where each country is an indicator; Peru is the excluded/compared country)
+- Standard Errors are clustered on District
 
 ## Main findings 
 1. With the data we have,we see that the overall Bureaucracy Index it not a good predictor of any school outcomes, except for maybe school infrastructure. <br>
@@ -60,115 +65,115 @@ This document presents bivariate OLS regressions with country-level fixed effect
 # run + store all regressions regressions as objects
 
 # explanatory = bi 
-lm.bi.1 <- lm(data = md, 
-   student_knowledge ~ bi + as.factor(countryname))
-lm.bi.2 <- lm(data = md, 
-   ecd_student_knowledge ~ bi + as.factor(countryname))
-lm.bi.3 <- lm(data = md, 
-   inputs ~ bi + as.factor(countryname))
-lm.bi.4 <- lm(data = md, 
-   infrastructure ~ bi + as.factor(countryname))
-lm.bi.5 <- lm(data = md, 
-   intrinsic_motivation ~ bi + as.factor(countryname))
-lm.bi.6 <- lm(data = md, 
-   content_knowledge ~ bi + as.factor(countryname))
-lm.bi.8 <- lm(data = md, 
-   operational_manage ~ bi + as.factor(countryname))
-lm.bi.9 <- lm(data = md, 
-   instr_leader ~ bi + as.factor(countryname))
-lm.bi.10 <- lm(data = md, 
-   principal_knowl_score ~ bi + as.factor(countryname))
-lm.bi.11 <- lm(data = md, 
-   principal_manage ~ bi + as.factor(countryname))
+lm.bi.1 <- lm.cluster(data = md, 
+   student_knowledge ~ bi + as.factor(countryname), cluster = md$g2)
+lm.bi.2 <- lm.cluster(data = md, 
+   ecd_student_knowledge ~ bi + as.factor(countryname), cluster = "g2")
+lm.bi.3 <- lm.cluster(data = md, 
+   inputs ~ bi + as.factor(countryname), cluster = "g2")
+lm.bi.4 <- lm.cluster(data = md, 
+   infrastructure ~ bi + as.factor(countryname), cluster = "g2")
+lm.bi.5 <- lm.cluster(data = md, 
+   intrinsic_motivation ~ bi + as.factor(countryname), cluster = "g2")
+lm.bi.6 <- lm.cluster(data = md, 
+   content_knowledge ~ bi + as.factor(countryname), cluster = "g2")
+lm.bi.8 <- lm.cluster(data = md, 
+   operational_manage ~ bi + as.factor(countryname), cluster = "g2")
+lm.bi.9 <- lm.cluster(data = md, 
+   instr_leader ~ bi + as.factor(countryname), cluster = "g2")
+lm.bi.10 <- lm.cluster(data = md, 
+   principal_knowl_score ~ bi + as.factor(countryname), cluster = "g2")
+lm.bi.11 <- lm.cluster(data = md, 
+   principal_manage ~ bi + as.factor(countryname), cluster = "g2")
 
 # explanatory = nlg 
-lm.nlg.1 <- lm(data = md, 
-   student_knowledge ~ national_learning_goals + as.factor(countryname))
-lm.nlg.2 <- lm(data = md, 
-   ecd_student_knowledge ~ national_learning_goals + as.factor(countryname))
-lm.nlg.3 <- lm(data = md, 
-   inputs ~ national_learning_goals + as.factor(countryname))
-lm.nlg.4 <- lm(data = md, 
-   infrastructure ~ national_learning_goals + as.factor(countryname))
-lm.nlg.5 <- lm(data = md, 
-   intrinsic_motivation ~ national_learning_goals + as.factor(countryname))
-lm.nlg.6 <- lm(data = md, 
-   content_knowledge ~ national_learning_goals + as.factor(countryname))
-lm.nlg.8 <- lm(data = md, 
-   operational_manage ~ national_learning_goals + as.factor(countryname))
-lm.nlg.9 <- lm(data = md, 
-   instr_leader ~ national_learning_goals + as.factor(countryname))
-lm.nlg.10 <- lm(data = md, 
-   principal_knowl_score ~ national_learning_goals + as.factor(countryname))
-lm.nlg.11 <- lm(data = md, 
-   principal_manage ~ national_learning_goals + as.factor(countryname))
+lm.nlg.1 <- lm.cluster(data = md, 
+   student_knowledge ~ national_learning_goals + as.factor(countryname), cluster = "g2")
+lm.nlg.2 <- lm.cluster(data = md, 
+   ecd_student_knowledge ~ national_learning_goals + as.factor(countryname), cluster = "g2")
+lm.nlg.3 <- lm.cluster(data = md, 
+   inputs ~ national_learning_goals + as.factor(countryname), cluster = "g2")
+lm.nlg.4 <- lm.cluster(data = md, 
+   infrastructure ~ national_learning_goals + as.factor(countryname), cluster = "g2")
+lm.nlg.5 <- lm.cluster(data = md, 
+   intrinsic_motivation ~ national_learning_goals + as.factor(countryname), cluster = "g2")
+lm.nlg.6 <- lm.cluster(data = md, 
+   content_knowledge ~ national_learning_goals + as.factor(countryname), cluster = "g2")
+lm.nlg.8 <- lm.cluster(data = md, 
+   operational_manage ~ national_learning_goals + as.factor(countryname), cluster = "g2")
+lm.nlg.9 <- lm.cluster(data = md, 
+   instr_leader ~ national_learning_goals + as.factor(countryname), cluster = "g2")
+lm.nlg.10 <- lm.cluster(data = md, 
+   principal_knowl_score ~ national_learning_goals + as.factor(countryname), cluster = "g2")
+lm.nlg.11 <- lm.cluster(data = md, 
+   principal_manage ~ national_learning_goals + as.factor(countryname), cluster = "g2")
 
 # explanatory = ma
-lm.ma.1 <- lm(data = md, 
-   student_knowledge ~ mandates_accountability + as.factor(countryname))
-lm.ma.2 <- lm(data = md, 
-   ecd_student_knowledge ~ mandates_accountability + as.factor(countryname))
-lm.ma.3 <- lm(data = md, 
-   inputs ~ mandates_accountability + as.factor(countryname))
-lm.ma.4 <- lm(data = md, 
-   infrastructure ~ mandates_accountability + as.factor(countryname))
-lm.ma.5 <- lm(data = md, 
-   intrinsic_motivation ~ mandates_accountability + as.factor(countryname))
-lm.ma.6 <- lm(data = md, 
-   content_knowledge ~ mandates_accountability + as.factor(countryname))
-lm.ma.8 <- lm(data = md, 
-   operational_manage ~ mandates_accountability + as.factor(countryname))
-lm.ma.9 <- lm(data = md, 
-   instr_leader ~ mandates_accountability + as.factor(countryname))
-lm.ma.10 <- lm(data = md, 
-   principal_knowl_score ~ mandates_accountability + as.factor(countryname))
-lm.ma.11 <- lm(data = md, 
-   principal_manage ~ mandates_accountability + as.factor(countryname))
+lm.ma.1 <- lm.cluster(data = md, 
+   student_knowledge ~ mandates_accountability + as.factor(countryname), cluster = "g2")
+lm.ma.2 <- lm.cluster(data = md, 
+   ecd_student_knowledge ~ mandates_accountability + as.factor(countryname), cluster = "g2")
+lm.ma.3 <- lm.cluster(data = md, 
+   inputs ~ mandates_accountability + as.factor(countryname), cluster = "g2")
+lm.ma.4 <- lm.cluster(data = md, 
+   infrastructure ~ mandates_accountability + as.factor(countryname), cluster = "g2")
+lm.ma.5 <- lm.cluster(data = md, 
+   intrinsic_motivation ~ mandates_accountability + as.factor(countryname), cluster = "g2")
+lm.ma.6 <- lm.cluster(data = md, 
+   content_knowledge ~ mandates_accountability + as.factor(countryname), cluster = "g2")
+lm.ma.8 <- lm.cluster(data = md, 
+   operational_manage ~ mandates_accountability + as.factor(countryname), cluster = "g2")
+lm.ma.9 <- lm.cluster(data = md, 
+   instr_leader ~ mandates_accountability + as.factor(countryname), cluster = "g2")
+lm.ma.10 <- lm.cluster(data = md, 
+   principal_knowl_score ~ mandates_accountability + as.factor(countryname), cluster = "g2")
+lm.ma.11 <- lm.cluster(data = md, 
+   principal_manage ~ mandates_accountability + as.factor(countryname), cluster = "g2")
 
 
 # explanatory = qb
-lm.qb.1 <- lm(data = md, 
-   student_knowledge ~ quality_bureaucracy + as.factor(countryname))
-lm.qb.2 <- lm(data = md, 
-   ecd_student_knowledge ~ quality_bureaucracy + as.factor(countryname))
-lm.qb.3 <- lm(data = md, 
-   inputs ~ quality_bureaucracy + as.factor(countryname))
-lm.qb.4 <- lm(data = md, 
-   infrastructure ~ quality_bureaucracy + as.factor(countryname))
-lm.qb.5 <- lm(data = md, 
-   intrinsic_motivation ~ quality_bureaucracy + as.factor(countryname))
-lm.qb.6 <- lm(data = md, 
-   content_knowledge ~ quality_bureaucracy + as.factor(countryname))
-lm.qb.8 <- lm(data = md, 
-   operational_manage ~ quality_bureaucracy + as.factor(countryname))
-lm.qb.9 <- lm(data = md, 
-   instr_leader ~ quality_bureaucracy + as.factor(countryname))
-lm.qb.10 <- lm(data = md, 
-   principal_knowl_score ~ quality_bureaucracy + as.factor(countryname))
-lm.qb.11 <- lm(data = md, 
-   principal_manage ~ quality_bureaucracy + as.factor(countryname))
+lm.qb.1 <- lm.cluster(data = md, 
+   student_knowledge ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
+lm.qb.2 <- lm.cluster(data = md, 
+   ecd_student_knowledge ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
+lm.qb.3 <- lm.cluster(data = md, 
+   inputs ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
+lm.qb.4 <- lm.cluster(data = md, 
+   infrastructure ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
+lm.qb.5 <- lm.cluster(data = md, 
+   intrinsic_motivation ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
+lm.qb.6 <- lm.cluster(data = md, 
+   content_knowledge ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
+lm.qb.8 <- lm.cluster(data = md, 
+   operational_manage ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
+lm.qb.9 <- lm.cluster(data = md, 
+   instr_leader ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
+lm.qb.10 <- lm.cluster(data = md, 
+   principal_knowl_score ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
+lm.qb.11 <- lm.cluster(data = md, 
+   principal_manage ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
 
 # explanatory = idm
-lm.idm.1 <- lm(data = md, 
-   student_knowledge ~ impartial_decision_making + as.factor(countryname))
-lm.idm.2 <- lm(data = md, 
-   ecd_student_knowledge ~ impartial_decision_making + as.factor(countryname))
-lm.idm.3 <- lm(data = md, 
-   inputs ~ impartial_decision_making + as.factor(countryname))
-lm.idm.4 <- lm(data = md, 
-   infrastructure ~ impartial_decision_making + as.factor(countryname))
-lm.idm.5 <- lm(data = md, 
-   intrinsic_motivation ~ impartial_decision_making + as.factor(countryname))
-lm.idm.6 <- lm(data = md, 
-   content_knowledge ~ impartial_decision_making + as.factor(countryname))
-lm.idm.8 <- lm(data = md, 
-   operational_manage ~ impartial_decision_making + as.factor(countryname))
-lm.idm.9 <- lm(data = md, 
-   instr_leader ~ impartial_decision_making + as.factor(countryname))
-lm.idm.10 <- lm(data = md, 
-   principal_knowl_score ~ impartial_decision_making + as.factor(countryname))
-lm.idm.11 <- lm(data = md, 
-   principal_manage ~ impartial_decision_making + as.factor(countryname))
+lm.idm.1 <- lm.cluster(data = md, 
+   student_knowledge ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
+lm.idm.2 <- lm.cluster(data = md, 
+   ecd_student_knowledge ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
+lm.idm.3 <- lm.cluster(data = md, 
+   inputs ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
+lm.idm.4 <- lm.cluster(data = md, 
+   infrastructure ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
+lm.idm.5 <- lm.cluster(data = md, 
+   intrinsic_motivation ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
+lm.idm.6 <- lm.cluster(data = md, 
+   content_knowledge ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
+lm.idm.8 <- lm.cluster(data = md, 
+   operational_manage ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
+lm.idm.9 <- lm.cluster(data = md, 
+   instr_leader ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
+lm.idm.10 <- lm.cluster(data = md, 
+   principal_knowl_score ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
+lm.idm.11 <- lm.cluster(data = md, 
+   principal_manage ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
 
 ```
 
@@ -176,7 +181,8 @@ lm.idm.11 <- lm(data = md,
 
 ```{r bi}
 # table 1
-tab_model(lm.bi.1, lm.bi.2, lm.bi.3, lm.bi.4, lm.bi.5, lm.bi.6, lm.bi.8, lm.bi.9, lm.bi.10,lm.bi.11,
+tab_model(lm.bi.1$lm_res, lm.bi.2$lm_res, lm.bi.3$lm_res, lm.bi.4$lm_res, lm.bi.5$lm_res, lm.bi.6$lm_res,
+          lm.bi.8$lm_res, lm.bi.9$lm_res, lm.bi.10$lm_res,lm.bi.11$lm_res,
           pred.labels = c("Bureaucracy Index"),
           title = "Bureaucracy Index",
           show.ci = FALSE,
@@ -191,7 +197,8 @@ tab_model(lm.bi.1, lm.bi.2, lm.bi.3, lm.bi.4, lm.bi.5, lm.bi.6, lm.bi.8, lm.bi.9
 
 ```{r nlg}
 # table 1
-tab_model(lm.nlg.1, lm.nlg.2, lm.nlg.3, lm.nlg.4, lm.nlg.5, lm.nlg.6, lm.nlg.8, lm.nlg.9, lm.nlg.10,lm.nlg.11,
+tab_model(lm.nlg.1$lm_res, lm.nlg.2$lm_res, lm.nlg.3$lm_res, lm.nlg.4$lm_res, lm.nlg.5$lm_res, lm.nlg.6$lm_res,
+          lm.nlg.8$lm_res, lm.nlg.9$lm_res, lm.nlg.10$lm_res,lm.nlg.11$lm_res,
           pred.labels = c("National Learning Goals"),
           title = "National Learning Goals",
           show.ci = FALSE,
@@ -206,7 +213,8 @@ tab_model(lm.nlg.1, lm.nlg.2, lm.nlg.3, lm.nlg.4, lm.nlg.5, lm.nlg.6, lm.nlg.8, 
 
 ```{r ma}
 # table 1
-tab_model(lm.ma.1, lm.ma.2, lm.ma.3, lm.ma.4, lm.ma.5, lm.ma.6, lm.ma.8, lm.ma.9, lm.ma.10,lm.ma.11,
+tab_model(lm.ma.1$lm_res, lm.ma.2$lm_res, lm.ma.3$lm_res, lm.ma.4$lm_res, lm.ma.5$lm_res, lm.ma.6$lm_res,
+          lm.ma.8$lm_res, lm.ma.9$lm_res, lm.ma.10$lm_res,lm.ma.11$lm_res,
           pred.labels = c("Mandates + Acct'y"),
           title = "Mandates and Accountability",
           show.ci = FALSE,
@@ -222,7 +230,8 @@ tab_model(lm.ma.1, lm.ma.2, lm.ma.3, lm.ma.4, lm.ma.5, lm.ma.6, lm.ma.8, lm.ma.9
 
 ```{r qb}
 # table 1
-tab_model(lm.qb.1, lm.qb.2, lm.qb.3, lm.qb.4, lm.qb.5, lm.qb.6, lm.qb.8, lm.qb.9, lm.qb.10,lm.qb.11,
+tab_model(lm.qb.1$lm_res, lm.qb.2$lm_res, lm.qb.3$lm_res, lm.qb.4$lm_res, lm.qb.5$lm_res, lm.qb.6$lm_res,
+          lm.qb.8$lm_res, lm.qb.9$lm_res, lm.qb.10$lm_res,lm.qb.11$lm_res,
           pred.labels = c("Qual. of Bureaucracy"),
           title = "Quality of Bureaucracy",
           show.ci = FALSE,
@@ -238,7 +247,8 @@ tab_model(lm.qb.1, lm.qb.2, lm.qb.3, lm.qb.4, lm.qb.5, lm.qb.6, lm.qb.8, lm.qb.9
 
 ```{r idm}
 # table 1
-tab_model(lm.idm.1, lm.idm.2, lm.idm.3, lm.idm.4, lm.idm.5, lm.idm.6, lm.idm.8, lm.idm.9, lm.idm.10,lm.idm.11,
+tab_model(lm.idm.1$lm_res, lm.idm.2$lm_res, lm.idm.3$lm_res, lm.idm.4$lm_res, lm.idm.5$lm_res, lm.idm.6$lm_res,
+          lm.idm.8$lm_res, lm.idm.9$lm_res, lm.idm.10$lm_res,lm.idm.11$lm_res,
           pred.labels = c("Impar. Dec'n-Making"),
           title = "Impartial Decision-Making",
           show.ci = FALSE,
@@ -249,6 +259,13 @@ tab_model(lm.idm.1, lm.idm.2, lm.idm.3, lm.idm.4, lm.idm.5, lm.idm.6, lm.idm.8, 
           p.style = "stars",
           terms = c("impartial_decision_making"))
 
+```
+
+
+```{r}
+summary(lm.bi.1)
+summary(lm.bi.2)
+summary(lm.bi.3)
 ```
 
 

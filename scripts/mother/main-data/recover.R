@@ -4,7 +4,7 @@
   # data present
 
 
-              
+  library(readr)            
               
               # ----------------------------- #
               # 			     load data	 		      ----
@@ -99,7 +99,7 @@ s.there   <- filter(school.l, is.na(ADM2_NAME) == FALSE)
   # also exist in the main dataset, with gps coordinates. we will join by countryname and school_district_preload 
   # since the assumption is that there cannot be two same-named districts in the same country. Joining also by region 
   # will likely undermatch, as not all string variables are actually preloaded, there many be same-placed districts 
-  # that don't match because of mis-spellings.
+  # that don't match because of mis-spellings. && replace with step 3.1 below.
   
 s.key    <- semi_join(as.data.frame(s.missing), # remove geometry
                       as.data.frame(s.there),   # remove geometry
@@ -119,6 +119,7 @@ s.key.incomplete    <- left_join(s.key,
   # this object here will tell us how many cases of district preloaded variables find multiple
   # entries in the gps/wb data (the number of rows for school_district_preload),
   # and how many different entries in the gps/wb data there are (n)
+
 preload.dups <-
   group_by(s.key.incomplete,
            school_district_preload) %>%
@@ -145,7 +146,7 @@ preload.dups <-
 if (matchop == 1) {
   
   
-  # 3.1 recreate the key by removing the district preloads that have multiple WB entries
+  # 3.1 recreate the key by removing the district preloads that have multiple WB entries &&
   s.key.op1 <- s.key %>%
                 filter(!(school_district_preload %in% preload.dups$school_district_preload))
   
@@ -158,8 +159,7 @@ if (matchop == 1) {
              g0, g1, g2, countryname, school_district_preload)
   
   
-  # 5.1 merge the key back onto the main dataset 
-    # %% here we have to figure out how to replace the missing values instead of creating a new row.
+  # 5.1 merge the key back onto the main dataset && change _op1 to simply main_school_data
     # question is, using method 1, how many schools do we get back?
   main_school_data_op1a <- left_join(main_school_data,
                                     s.key.op1,
@@ -167,36 +167,170 @@ if (matchop == 1) {
                                     suffix = c('.x', '.y')) # for missings in x, we want to overwrite with y
   
   
-  ## 5.1.1 replace missings in .x if there's a non-missing in y
+  ## 5.1.1 replace missings in .x if there's a non-missing in y (ie, update)
     # since we can't 'update' the geovars, we have two copies: a .x (from main dataset) and 
     # .y (from) the key we just made. for most obs, .x is correct and will be kepts, but 
     # now we have to now replace .x with .y is .x is missing and theres something in .y
-  main_school_data_op1<- mutate( main_school_data_op1a,
-                                  ADM0_NAME = if_else(is.na(ADM0_NAME.x) & !is.na(ADM0_NAME.y), ADM0_NAME.y, ADM0_NAME.x),
-                                  ADM1_NAME = if_else(is.na(ADM1_NAME.x) & !is.na(ADM1_NAME.y), ADM1_NAME.y, ADM1_NAME.x),
-                                  ADM2_NAME = if_else(is.na(ADM2_NAME.x) & !is.na(ADM2_NAME.y), ADM2_NAME.y, ADM2_NAME.x),
-                                  ADM0_CODE = if_else(is.na(ADM0_CODE.x) & !is.na(ADM0_CODE.y), ADM0_CODE.y, ADM0_CODE.x),
-                                  ADM1_CODE = if_else(is.na(ADM1_CODE.x) & !is.na(ADM1_CODE.y), ADM1_CODE.y, ADM1_CODE.x),
-                                  ADM2_CODE = if_else(is.na(ADM2_CODE.x) & !is.na(ADM2_CODE.y), ADM2_CODE.y, ADM2_CODE.x),
-                                  g0        = if_else(is.na(g0.x)        & !is.na(g0.y)       , g0.y       , g0.x),
-                                  g1        = if_else(is.na(g1.x)        & !is.na(g1.y)       , g1.y       , g1.x),
-                                  g2        = if_else(is.na(g2.x)        & !is.na(g2.y)       , g2.y       , g2.x)
+  main_school_data_op1<- mutate( 
+    main_school_data_op1a,
+      ADM0_NAME = if_else(is.na(ADM0_NAME.x) & !is.na(ADM0_NAME.y), ADM0_NAME.y, ADM0_NAME.x),
+      ADM1_NAME = if_else(is.na(ADM1_NAME.x) & !is.na(ADM1_NAME.y), ADM1_NAME.y, ADM1_NAME.x),
+      ADM2_NAME = if_else(is.na(ADM2_NAME.x) & !is.na(ADM2_NAME.y), ADM2_NAME.y, ADM2_NAME.x),
+      ADM0_CODE = if_else(is.na(ADM0_CODE.x) & !is.na(ADM0_CODE.y), ADM0_CODE.y, ADM0_CODE.x),
+      ADM1_CODE = if_else(is.na(ADM1_CODE.x) & !is.na(ADM1_CODE.y), ADM1_CODE.y, ADM1_CODE.x),
+      ADM2_CODE = if_else(is.na(ADM2_CODE.x) & !is.na(ADM2_CODE.y), ADM2_CODE.y, ADM2_CODE.x),
+      g0        = if_else(is.na(g0.x)        & !is.na(g0.y)       , g0.y       , g0.x),
+      g1        = if_else(is.na(g1.x)        & !is.na(g1.y)       , g1.y       , g1.x),
+      g2        = if_else(is.na(g2.x)        & !is.na(g2.y)       , g2.y       , g2.x)
                                 ) %>%
-    select(-ADM0_NAME.x, -ADM0_NAME.y, 
-           -ADM1_NAME.x, -ADM1_NAME.y,
-           -ADM2_NAME.x, -ADM2_NAME.y,
-           -ADM0_CODE.x, -ADM0_CODE.y,
-           -ADM1_CODE.x, -ADM1_CODE.y,
-           -ADM2_CODE.x, -ADM2_CODE.y,
-           -g0.x,        -g0.y,
-           -g1.x,        -g1.y,
-           -g2.x,        -g2.y)
+  select(-ADM0_NAME.x, -ADM0_NAME.y, 
+         -ADM1_NAME.x, -ADM1_NAME.y,
+         -ADM2_NAME.x, -ADM2_NAME.y,
+         -ADM0_CODE.x, -ADM0_CODE.y,
+         -ADM1_CODE.x, -ADM1_CODE.y,
+         -ADM2_CODE.x, -ADM2_CODE.y,
+         -g0.x,        -g0.y,
+         -g1.x,        -g1.y,
+         -g2.x,        -g2.y)
 
   
   # compare missing value rates
-  #sum(is.na(main_school_data_op1$ADM2_NAME.x)) # n miss=180
-  sum(is.na(main_school_data_op1$ADM2_NAME)) ##  n miss=148; gains 32 schools! 
+ remain1 <- sum(is.na(main_school_data$ADM2_NAME)) # n miss=180
+ remain2 <- sum(is.na(main_school_data_op1$ADM2_NAME)) ##  n miss=148; gains 32 schools! 
 }
+
+
+
+
+
+
+
+
+                            # ----------------------------- #
+                            # 			   manual matching	 		 ----
+                            # ----------------------------- #
+
+                  # as object `remain1` indciates we still have 148 schools that
+                  # cannot be matched to the world bank poly data using either the 
+                  # direct GPS method or by copying known geodata from schools in 
+                  # the same district (above). The final method will be manual matching: 
+                  # I will export a list of districts that remain empty of geodata and 
+                  # match them to district names in the WB polygon dataset in excel, then
+                  # reimport them and continue filling in missing geodata. This will be done 
+                  # by hand for two reasons: 1) the number of unique districts amongst the 148 
+                  # observations will be reasonably low, and 2) this avoids potential errors
+                  # with string matching via programs (such as "Washington, DC, The capital" 
+                  # might be matched to a much longer-named city than "Washington" in programs).
+
+# 1. Export a list of unique country-districts of the remained 148 observations.
+
+districts_to_match <- main_school_data_op1 %>%
+  filter(is.na(ADM2_CODE) == TRUE) %>%    # take only those schools with no WB district data
+  st_drop_geometry() %>%                   # remove geometry column
+  distinct(countryname, school_province_preload, school_district_preload)  # make a list of unique country-districts
+
+
+
+# # Do not run, will overwrite. 
+# write.csv(districts_to_match,
+#           file = file.path(repo.encrypt, "main/districts-to-match.csv"),
+#           fileEncoding = "UTF-8")
+
+
+wbp <- wb.poly.m %>% #searchable easily
+  st_drop_geometry()
+
+
+
+
+# 2. Import the manually-matched list
+
+if (matchop == 1) {
+  
+manual_match_import <- read_csv(file = file.path(repo.encrypt, "main/IN-districts-to-match.csv"),
+                         col_names   = TRUE
+                         ) 
+    # select variables
+    man.key <- select(manual_match_import,
+                      countryname, school_province_preload, school_district_preload,
+                      district_number, 
+                      region_number
+                      )
+    
+    
+    
+# 3. Use the man.key to link missing districts in main dataset with wb poly info
+
+    # 4.1 merge gps info onto subset of 'missing-gps' places. this is now a key.
+    man.key <- left_join(man.key,
+                           wb.poly.m,
+                           by = c(
+                                  "region_number"  = "ADM1_CODE",
+                                  "district_number"= "ADM2_CODE"),
+                           keep = TRUE)  %>% 
+      # then filter out entries with missing values 
+      filter(is.na(ADM1_CODE) == FALSE)  %>%
+      # then keep only necessary columns 
+      select(countryname, school_province_preload, school_district_preload, 
+             ADM2_CODE, ADM1_CODE, ADM2_NAME, ADM1_NAME, ADM0_CODE, ADM0_NAME,
+             g0, g1, g2)
+  
+
+}
+
+
+
+
+
+
+# 4. Match key back to maindataset, rename columns for same-named variablbes. 
+
+main_school_data_op1b <- left_join(main_school_data_op1,
+                                   man.key,
+                                   by    = c("school_district_preload"),
+                                   suffix = c('.x', '.y')) # for missings in x, we want to overwrite with y
+      ## %%here, there are two schools that aren't matching based on the string match: school code preload: 296012; 444869
+
+## 4.1. replace missings in .x if there's a non-missing in y
+# since we can't 'update' the geovars, we have two copies: a .x (from main dataset) and 
+# .y (from) the key we just made. for most obs, .x is correct and will be kepts, but 
+# now we have to now replace .x with .y is .x is missing and theres something in .y
+main_school_data_op1<- mutate( 
+  main_school_data_op1b,
+  ADM0_NAME = if_else(is.na(ADM0_NAME.x) & !is.na(ADM0_NAME.y), ADM0_NAME.y, ADM0_NAME.x),
+  ADM1_NAME = if_else(is.na(ADM1_NAME.x) & !is.na(ADM1_NAME.y), ADM1_NAME.y, ADM1_NAME.x),
+  ADM2_NAME = if_else(is.na(ADM2_NAME.x) & !is.na(ADM2_NAME.y), ADM2_NAME.y, ADM2_NAME.x),
+  ADM0_CODE = if_else(is.na(ADM0_CODE.x) & !is.na(ADM0_CODE.y), ADM0_CODE.y, ADM0_CODE.x),
+  ADM1_CODE = if_else(is.na(ADM1_CODE.x) & !is.na(ADM1_CODE.y), ADM1_CODE.y, ADM1_CODE.x),
+  ADM2_CODE = if_else(is.na(ADM2_CODE.x) & !is.na(ADM2_CODE.y), ADM2_CODE.y, ADM2_CODE.x),
+  g0        = if_else(is.na(g0.x)        & !is.na(g0.y)       , g0.y       , g0.x),
+  g1        = if_else(is.na(g1.x)        & !is.na(g1.y)       , g1.y       , g1.x),
+  g2        = if_else(is.na(g2.x)        & !is.na(g2.y)       , g2.y       , g2.x),
+  school_province_preload = if_else(is.na(school_province_preload.x) & !is.na(school_province_preload.y),
+                                    school_province_preload.y, school_province_preload.x) 
+) %>%
+  select(-ADM0_NAME.x, -ADM0_NAME.y, 
+         -ADM1_NAME.x, -ADM1_NAME.y,
+         -ADM2_NAME.x, -ADM2_NAME.y,
+         -ADM0_CODE.x, -ADM0_CODE.y,
+         -ADM1_CODE.x, -ADM1_CODE.y,
+         -ADM2_CODE.x, -ADM2_CODE.y,
+         -g0.x,        -g0.y,
+         -g1.x,        -g1.y,
+         -g2.x,        -g2.y,
+         -school_province_preload.x, 
+         -school_province_preload.y)
+
+
+# compare missing value rates
+remain1 <- sum(is.na(main_school_data$ADM2_NAME)) # n miss=180
+remain3 <- sum(is.na(main_school_data_op1$ADM2_NAME)) ##  n miss=148; gains 32 schools! 
+
+miss <- filter(main_school_data_op1,
+               is.na(ADM2_CODE) == TRUE) %>%
+  st_drop_geometry()
+
+
 
 
 
@@ -248,4 +382,7 @@ save(main_po_data, main_school_data,
               path = file.path(repo.encrypt, "main/final_main_school_data_op1.dta"),
               version = 14
             )
+    
+    
+    
     
