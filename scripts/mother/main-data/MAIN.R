@@ -17,7 +17,8 @@ pacman::p_load(tidyverse,
                assertthat,
                rio,
                haven,
-               sjlabelled)
+               sjlabelled,
+               eeptools)
 
 
 # ----------------------------- #
