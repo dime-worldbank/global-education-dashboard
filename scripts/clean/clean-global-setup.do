@@ -59,7 +59,7 @@
 		gl 			sch0 					"B:/main/final_main_school_data.dta"
 		}
 		if (${s6} == 1) {
-		gl 			sch0 					"B:/main/final_main_school_data_op1.dta"
+		gl 			sch0 					"B:/main/final_main_school_data_mt.dta"
 		}
 
 		gl 			po0 					"B:/main/final_main_po_data.dta"
