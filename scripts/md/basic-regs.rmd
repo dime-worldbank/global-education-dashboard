@@ -20,6 +20,7 @@ library(sjPlot)
 library(shiny)
 library(summarytools)
 library(miceadds)
+library(estimatr)
 
 # object with outcome variables 
 yvars <- c("student_knowledge",
@@ -48,153 +49,150 @@ md <- read.dta13(file = "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/gl
 
 # Changes From Last Time
 
-I succeeded in adding a whopping 14 schools by recovering missing GPS data. This 14 number is conservative, but could increase by a few schools depending on how liberal we want to be in our geo-guessing.
+I succeeded in increasing the total number of schools to 315. The drop in 50 observations for some indicators is due to missing data for Mozambique schools.
 
 # Model Specifications
-- Country Fixed Effects (where each country is an indicator; Peru is the excluded/compared country)
-- Standard Errors are clustered on District
+- Country Fixed Effects (where each country is an indicator)
+- Standard Errors are clustered on District, specified to standard clustering in Stata
 
 ## Main findings 
-1. With the data we have,we see that the overall Bureaucracy Index it not a good predictor of any school outcomes, except for maybe school infrastructure. <br>
-2. Signifant relationships among the secondary indicators are sparse, but what few there are are promising: <br>
+1. With the data we have, we see that the overall Bureaucracy Index it not a good predictor of any school outcomes, except for maybe school infrastructure. <br>
+2. Significant relationships among the secondary indicators are sparse, but what few there are are promising: <br>
   - National Learning Goals predict 2 variables related to instruction. <br>
-  - Mandates and Accountability has a mild relationship with Student Knowledge <br>
-  - Quality of Bureaucracy predicts infrastructure <br>
   - Impartial Decision-Making predicts 3 school-level indicators
 
 ```{r models,  include=FALSE}
 # run + store all regressions regressions as objects
 
 # explanatory = bi 
-lm.bi.1 <- lm.cluster(data = md, 
-   student_knowledge ~ bi + as.factor(countryname), cluster = md$g2)
-lm.bi.2 <- lm.cluster(data = md, 
-   ecd_student_knowledge ~ bi + as.factor(countryname), cluster = "g2")
-lm.bi.3 <- lm.cluster(data = md, 
-   inputs ~ bi + as.factor(countryname), cluster = "g2")
-lm.bi.4 <- lm.cluster(data = md, 
-   infrastructure ~ bi + as.factor(countryname), cluster = "g2")
-lm.bi.5 <- lm.cluster(data = md, 
-   intrinsic_motivation ~ bi + as.factor(countryname), cluster = "g2")
-lm.bi.6 <- lm.cluster(data = md, 
-   content_knowledge ~ bi + as.factor(countryname), cluster = "g2")
-lm.bi.8 <- lm.cluster(data = md, 
-   operational_manage ~ bi + as.factor(countryname), cluster = "g2")
-lm.bi.9 <- lm.cluster(data = md, 
-   instr_leader ~ bi + as.factor(countryname), cluster = "g2")
-lm.bi.10 <- lm.cluster(data = md, 
-   principal_knowl_score ~ bi + as.factor(countryname), cluster = "g2")
-lm.bi.11 <- lm.cluster(data = md, 
-   principal_manage ~ bi + as.factor(countryname), cluster = "g2")
+lm.bi.1 <- lm_robust(data = md, 
+   student_knowledge ~ bi + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.bi.2 <- lm_robust(data = md, 
+   ecd_student_knowledge ~ bi + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.bi.3 <- lm_robust(data = md, 
+   inputs ~ bi + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.bi.4 <- lm_robust(data = md, 
+   infrastructure ~ bi + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.bi.5 <- lm_robust(data = md, 
+   intrinsic_motivation ~ bi + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.bi.6 <- lm_robust(data = md, 
+   content_knowledge ~ bi + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.bi.8 <- lm_robust(data = md, 
+   operational_manage ~ bi + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.bi.9 <- lm_robust(data = md, 
+   instr_leader ~ bi + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.bi.10 <- lm_robust(data = md, 
+   principal_knowl_score ~ bi + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.bi.11 <- lm_robust(data = md, 
+   principal_manage ~ bi + as.factor(countryname), clusters = g2, se_type = "stata")
 
 # explanatory = nlg 
-lm.nlg.1 <- lm.cluster(data = md, 
-   student_knowledge ~ national_learning_goals + as.factor(countryname), cluster = "g2")
-lm.nlg.2 <- lm.cluster(data = md, 
-   ecd_student_knowledge ~ national_learning_goals + as.factor(countryname), cluster = "g2")
-lm.nlg.3 <- lm.cluster(data = md, 
-   inputs ~ national_learning_goals + as.factor(countryname), cluster = "g2")
-lm.nlg.4 <- lm.cluster(data = md, 
-   infrastructure ~ national_learning_goals + as.factor(countryname), cluster = "g2")
-lm.nlg.5 <- lm.cluster(data = md, 
-   intrinsic_motivation ~ national_learning_goals + as.factor(countryname), cluster = "g2")
-lm.nlg.6 <- lm.cluster(data = md, 
-   content_knowledge ~ national_learning_goals + as.factor(countryname), cluster = "g2")
-lm.nlg.8 <- lm.cluster(data = md, 
-   operational_manage ~ national_learning_goals + as.factor(countryname), cluster = "g2")
-lm.nlg.9 <- lm.cluster(data = md, 
-   instr_leader ~ national_learning_goals + as.factor(countryname), cluster = "g2")
-lm.nlg.10 <- lm.cluster(data = md, 
-   principal_knowl_score ~ national_learning_goals + as.factor(countryname), cluster = "g2")
-lm.nlg.11 <- lm.cluster(data = md, 
-   principal_manage ~ national_learning_goals + as.factor(countryname), cluster = "g2")
+lm.nlg.1 <- lm_robust(data = md, 
+   student_knowledge ~ national_learning_goals + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.nlg.2 <- lm_robust(data = md, 
+   ecd_student_knowledge ~ national_learning_goals + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.nlg.3 <- lm_robust(data = md, 
+   inputs ~ national_learning_goals + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.nlg.4 <- lm_robust(data = md, 
+   infrastructure ~ national_learning_goals + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.nlg.5 <- lm_robust(data = md, 
+   intrinsic_motivation ~ national_learning_goals + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.nlg.6 <- lm_robust(data = md, 
+   content_knowledge ~ national_learning_goals + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.nlg.8 <- lm_robust(data = md, 
+   operational_manage ~ national_learning_goals + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.nlg.9 <- lm_robust(data = md, 
+   instr_leader ~ national_learning_goals + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.nlg.10 <- lm_robust(data = md, 
+   principal_knowl_score ~ national_learning_goals + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.nlg.11 <- lm_robust(data = md, 
+   principal_manage ~ national_learning_goals + as.factor(countryname), clusters = g2, se_type = "stata")
 
 # explanatory = ma
-lm.ma.1 <- lm.cluster(data = md, 
-   student_knowledge ~ mandates_accountability + as.factor(countryname), cluster = "g2")
-lm.ma.2 <- lm.cluster(data = md, 
-   ecd_student_knowledge ~ mandates_accountability + as.factor(countryname), cluster = "g2")
-lm.ma.3 <- lm.cluster(data = md, 
-   inputs ~ mandates_accountability + as.factor(countryname), cluster = "g2")
-lm.ma.4 <- lm.cluster(data = md, 
-   infrastructure ~ mandates_accountability + as.factor(countryname), cluster = "g2")
-lm.ma.5 <- lm.cluster(data = md, 
-   intrinsic_motivation ~ mandates_accountability + as.factor(countryname), cluster = "g2")
-lm.ma.6 <- lm.cluster(data = md, 
-   content_knowledge ~ mandates_accountability + as.factor(countryname), cluster = "g2")
-lm.ma.8 <- lm.cluster(data = md, 
-   operational_manage ~ mandates_accountability + as.factor(countryname), cluster = "g2")
-lm.ma.9 <- lm.cluster(data = md, 
-   instr_leader ~ mandates_accountability + as.factor(countryname), cluster = "g2")
-lm.ma.10 <- lm.cluster(data = md, 
-   principal_knowl_score ~ mandates_accountability + as.factor(countryname), cluster = "g2")
-lm.ma.11 <- lm.cluster(data = md, 
-   principal_manage ~ mandates_accountability + as.factor(countryname), cluster = "g2")
+lm.ma.1 <- lm_robust(data = md, 
+   student_knowledge ~ mandates_accountability + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.ma.2 <- lm_robust(data = md, 
+   ecd_student_knowledge ~ mandates_accountability + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.ma.3 <- lm_robust(data = md, 
+   inputs ~ mandates_accountability + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.ma.4 <- lm_robust(data = md, 
+   infrastructure ~ mandates_accountability + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.ma.5 <- lm_robust(data = md, 
+   intrinsic_motivation ~ mandates_accountability + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.ma.6 <- lm_robust(data = md, 
+   content_knowledge ~ mandates_accountability + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.ma.8 <- lm_robust(data = md, 
+   operational_manage ~ mandates_accountability + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.ma.9 <- lm_robust(data = md, 
+   instr_leader ~ mandates_accountability + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.ma.10 <- lm_robust(data = md, 
+   principal_knowl_score ~ mandates_accountability + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.ma.11 <- lm_robust(data = md, 
+   principal_manage ~ mandates_accountability + as.factor(countryname), clusters = g2, se_type = "stata")
 
 
 # explanatory = qb
-lm.qb.1 <- lm.cluster(data = md, 
-   student_knowledge ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
-lm.qb.2 <- lm.cluster(data = md, 
-   ecd_student_knowledge ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
-lm.qb.3 <- lm.cluster(data = md, 
-   inputs ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
-lm.qb.4 <- lm.cluster(data = md, 
-   infrastructure ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
-lm.qb.5 <- lm.cluster(data = md, 
-   intrinsic_motivation ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
-lm.qb.6 <- lm.cluster(data = md, 
-   content_knowledge ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
-lm.qb.8 <- lm.cluster(data = md, 
-   operational_manage ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
-lm.qb.9 <- lm.cluster(data = md, 
-   instr_leader ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
-lm.qb.10 <- lm.cluster(data = md, 
-   principal_knowl_score ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
-lm.qb.11 <- lm.cluster(data = md, 
-   principal_manage ~ quality_bureaucracy + as.factor(countryname), cluster = "g2")
+lm.qb.1 <- lm_robust(data = md, 
+   student_knowledge ~ quality_bureaucracy + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.qb.2 <- lm_robust(data = md, 
+   ecd_student_knowledge ~ quality_bureaucracy + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.qb.3 <- lm_robust(data = md, 
+   inputs ~ quality_bureaucracy + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.qb.4 <- lm_robust(data = md, 
+   infrastructure ~ quality_bureaucracy + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.qb.5 <- lm_robust(data = md, 
+   intrinsic_motivation ~ quality_bureaucracy + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.qb.6 <- lm_robust(data = md, 
+   content_knowledge ~ quality_bureaucracy + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.qb.8 <- lm_robust(data = md, 
+   operational_manage ~ quality_bureaucracy + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.qb.9 <- lm_robust(data = md, 
+   instr_leader ~ quality_bureaucracy + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.qb.10 <- lm_robust(data = md, 
+   principal_knowl_score ~ quality_bureaucracy + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.qb.11 <- lm_robust(data = md, 
+   principal_manage ~ quality_bureaucracy + as.factor(countryname), clusters = g2, se_type = "stata")
 
 # explanatory = idm
-lm.idm.1 <- lm.cluster(data = md, 
-   student_knowledge ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
-lm.idm.2 <- lm.cluster(data = md, 
-   ecd_student_knowledge ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
-lm.idm.3 <- lm.cluster(data = md, 
-   inputs ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
-lm.idm.4 <- lm.cluster(data = md, 
-   infrastructure ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
-lm.idm.5 <- lm.cluster(data = md, 
-   intrinsic_motivation ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
-lm.idm.6 <- lm.cluster(data = md, 
-   content_knowledge ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
-lm.idm.8 <- lm.cluster(data = md, 
-   operational_manage ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
-lm.idm.9 <- lm.cluster(data = md, 
-   instr_leader ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
-lm.idm.10 <- lm.cluster(data = md, 
-   principal_knowl_score ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
-lm.idm.11 <- lm.cluster(data = md, 
-   principal_manage ~ impartial_decision_making + as.factor(countryname), cluster = "g2")
+lm.idm.1 <- lm_robust(data = md, 
+   student_knowledge ~ impartial_decision_making + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.idm.2 <- lm_robust(data = md, 
+   ecd_student_knowledge ~ impartial_decision_making + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.idm.3 <- lm_robust(data = md, 
+   inputs ~ impartial_decision_making + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.idm.4 <- lm_robust(data = md, 
+   infrastructure ~ impartial_decision_making + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.idm.5 <- lm_robust(data = md, 
+   intrinsic_motivation ~ impartial_decision_making + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.idm.6 <- lm_robust(data = md, 
+   content_knowledge ~ impartial_decision_making + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.idm.8 <- lm_robust(data = md, 
+   operational_manage ~ impartial_decision_making + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.idm.9 <- lm_robust(data = md, 
+   instr_leader ~ impartial_decision_making + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.idm.10 <- lm_robust(data = md, 
+   principal_knowl_score ~ impartial_decision_making + as.factor(countryname), clusters = g2, se_type = "stata")
+lm.idm.11 <- lm_robust(data = md, 
+   principal_manage ~ impartial_decision_making + as.factor(countryname), clusters = g2, se_type = "stata")
 
 ```
 
 ## Summary Stats
 
 ```{r}
-dfSummary(md,
-          style = "grid", plain.ascii = TRUE,
-          varnumbers = FALSE, valid.col = FALSE, tmp.img.dir = "./img")
-```
+# dfSummary(md,
+#           style = "grid", plain.ascii = TRUE,
+#           varnumbers = FALSE, valid.col = FALSE, tmp.img.dir = "./img")
 ```
 
 
 
 ## Regression Tables
 
-```{r bi}
+```{r bi, warning=FALSE}
 # table 1
-tab_model(lm.bi.1$lm_res, lm.bi.2$lm_res, lm.bi.3$lm_res, lm.bi.4$lm_res, lm.bi.5$lm_res, lm.bi.6$lm_res,
-          lm.bi.8$lm_res, lm.bi.9$lm_res, lm.bi.10$lm_res,lm.bi.11$lm_res,
+tab_model(lm.bi.1, lm.bi.2, lm.bi.3, lm.bi.4, lm.bi.5, lm.bi.6,
+          lm.bi.8, lm.bi.9, lm.bi.10,lm.bi.11,
           pred.labels = c("Bureaucracy Index"),
           title = "Bureaucracy Index",
           show.ci = FALSE,
@@ -202,15 +200,16 @@ tab_model(lm.bi.1$lm_res, lm.bi.2$lm_res, lm.bi.3$lm_res, lm.bi.4$lm_res, lm.bi.
           collapse.se = TRUE,
           linebreak = TRUE,
           show.intercept = FALSE,
-          p.style = "stars",
+          show.r2 = FALSE,
+          p.style = "numeric",
           terms = c("bi"))
 
 ```
-
-```{r nlg}
+<br><br>
+```{r nlg, warning=FALSE}
 # table 1
-tab_model(lm.nlg.1$lm_res, lm.nlg.2$lm_res, lm.nlg.3$lm_res, lm.nlg.4$lm_res, lm.nlg.5$lm_res, lm.nlg.6$lm_res,
-          lm.nlg.8$lm_res, lm.nlg.9$lm_res, lm.nlg.10$lm_res,lm.nlg.11$lm_res,
+tab_model(lm.nlg.1, lm.nlg.2, lm.nlg.3, lm.nlg.4, lm.nlg.5, lm.nlg.6,
+          lm.nlg.8, lm.nlg.9, lm.nlg.10,lm.nlg.11,
           pred.labels = c("National Learning Goals"),
           title = "National Learning Goals",
           show.ci = FALSE,
@@ -218,15 +217,17 @@ tab_model(lm.nlg.1$lm_res, lm.nlg.2$lm_res, lm.nlg.3$lm_res, lm.nlg.4$lm_res, lm
           collapse.se = TRUE,
           linebreak = TRUE,
           show.intercept = FALSE,
-          p.style = "stars",
+          show.r2 = FALSE,
+          p.style = "numeric",
           terms = c("national_learning_goals"))
 
 ```
+<br><br>
 
-```{r ma}
+```{r ma, warning=FALSE}
 # table 1
-tab_model(lm.ma.1$lm_res, lm.ma.2$lm_res, lm.ma.3$lm_res, lm.ma.4$lm_res, lm.ma.5$lm_res, lm.ma.6$lm_res,
-          lm.ma.8$lm_res, lm.ma.9$lm_res, lm.ma.10$lm_res,lm.ma.11$lm_res,
+tab_model(lm.ma.1, lm.ma.2, lm.ma.3, lm.ma.4, lm.ma.5, lm.ma.6,
+          lm.ma.8, lm.ma.9, lm.ma.10,lm.ma.11,
           pred.labels = c("Mandates + Acct'y"),
           title = "Mandates and Accountability",
           show.ci = FALSE,
@@ -234,16 +235,18 @@ tab_model(lm.ma.1$lm_res, lm.ma.2$lm_res, lm.ma.3$lm_res, lm.ma.4$lm_res, lm.ma.
           collapse.se = TRUE,
           linebreak = TRUE,
           show.intercept = FALSE,
-          p.style = "stars",
+          show.r2 = FALSE,
+          p.style = "numeric",
           terms = c("mandates_accountability"))
 
 ```
+<br><br>
 
 
-```{r qb}
+```{r qb, warning=FALSE}
 # table 1
-tab_model(lm.qb.1$lm_res, lm.qb.2$lm_res, lm.qb.3$lm_res, lm.qb.4$lm_res, lm.qb.5$lm_res, lm.qb.6$lm_res,
-          lm.qb.8$lm_res, lm.qb.9$lm_res, lm.qb.10$lm_res,lm.qb.11$lm_res,
+tab_model(lm.qb.1, lm.qb.2, lm.qb.3, lm.qb.4, lm.qb.5, lm.qb.6,
+          lm.qb.8, lm.qb.9, lm.qb.10,lm.qb.11,
           pred.labels = c("Qual. of Bureaucracy"),
           title = "Quality of Bureaucracy",
           show.ci = FALSE,
@@ -251,16 +254,18 @@ tab_model(lm.qb.1$lm_res, lm.qb.2$lm_res, lm.qb.3$lm_res, lm.qb.4$lm_res, lm.qb.
           collapse.se = TRUE,
           linebreak = TRUE,
           show.intercept = FALSE,
-          p.style = "stars",
+          show.r2 = FALSE,
+          p.style = "numeric",
           terms = c("quality_bureaucracy"))
 
 ```
+<br><br>
 
 
-```{r idm}
+```{r idm, warning=FALSE}
 # table 1
-tab_model(lm.idm.1$lm_res, lm.idm.2$lm_res, lm.idm.3$lm_res, lm.idm.4$lm_res, lm.idm.5$lm_res, lm.idm.6$lm_res,
-          lm.idm.8$lm_res, lm.idm.9$lm_res, lm.idm.10$lm_res,lm.idm.11$lm_res,
+tab_model(lm.idm.1, lm.idm.2, lm.idm.3, lm.idm.4, lm.idm.5, lm.idm.6,
+          lm.idm.8, lm.idm.9, lm.idm.10,lm.idm.11,
           pred.labels = c("Impar. Dec'n-Making"),
           title = "Impartial Decision-Making",
           show.ci = FALSE,
@@ -268,12 +273,19 @@ tab_model(lm.idm.1$lm_res, lm.idm.2$lm_res, lm.idm.3$lm_res, lm.idm.4$lm_res, lm
           collapse.se = TRUE,
           linebreak = TRUE,
           show.intercept = FALSE,
-          p.style = "stars",
+          show.r2 = FALSE,
+          p.style = "numeric",
           terms = c("impartial_decision_making"))
 
 ```
 
 
+
+## Summary Statistics 
+
 ```{r}
+dfSummary(md,
+          style = "grid", plain.ascii = FALSE, round.digits = 2,
+          varnumbers = FALSE, valid.col = TRUE, graph.col = FALSE, na.col = TRUE)
 ```
 
