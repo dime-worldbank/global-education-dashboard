@@ -42,6 +42,7 @@ if (user == 1) {
   shared <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard/code-review"
   wbpoly <- file.path(shared, "gis/20160921_GAUL_GeoJSON_TopoJSON")
   scripts <- "C:/Users/WB551206/local/GitHub/global-edu-dashboard/scripts/mother"
+  ipums   <- "C:/Users/WB551206/WBG/Daniel Rogger - 2_Politics Dashboard/5. Data/ipums"
 }
 
 if (user == 2) {
@@ -70,8 +71,9 @@ matchop <- 1  # 1 if we want to exclude all schools in question.
 
 
 # run script settings, set to 1 to run
-s1 <- 1 # mdataset
-s2 <- 1 # adds missing gps cords 
+s1 <- 0 # mdataset
+s2 <- 0 # adds missing gps cords 
+s3 <- 0 # runs IMPUMS data import and processing
 
 
 
@@ -88,4 +90,9 @@ if (s1 == 1) {
 # Recover missing GPS obs
 if (s2 == 1) {
   source(file.path(scripts, "main-data/recover.R"))
+}
+
+# IPUMS data import/processing
+if (s3 == 1) {
+  source(file.path(scripts, "main-data/ipums.R"))
 }
