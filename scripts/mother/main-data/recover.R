@@ -330,7 +330,44 @@ remainingmiss <- filter(main_school_data_mt,
 
 
 
-# 11.save and export. ----
+# 11.create a new match variable 
+
+# we want to know from the onset how many schools are in districts with public officials, and
+# how many public officials are in districts with schools. So what we will do is extract a 
+# vector of unique ADM2 (district) codes for schools and public officials. Then, in the opposite 
+# dataset, we will create a "match" variable that indicates true for if the observation is in the 
+# same district as any other observation. 
+
+
+## Extract a vector of unique ADM2 codes for schools, exclude NA values 
+li.school.ad2codes = unique(main_school_data_mt$ADM2_CODE[!is.na(main_school_data_mt$ADM2_CODE)]) # district
+li.school.ad1codes = unique(main_school_data_mt$ADM1_CODE[!is.na(main_school_data_mt$ADM1_CODE)]) # region
+
+
+## Extract a vector of unique ADM2 Codes for the public officials, exclude NA values 
+li.po.ad2codes = unique(main_po_data$ADM2_CODE[!is.na(main_po_data$ADM2_CODE)]) # district
+li.po.ad1codes = unique(main_po_data$ADM1_CODE[!is.na(main_po_data$ADM1_CODE)]) # region
+
+## make the same list using only district level officials
+main_po_data.t3 <- filter(main_po_data, govt_tier == "District Office")
+
+li.po.t3.ad2codes = unique(main_po_data.t3$ADM2_CODE[!is.na(main_po_data.t3$ADM2_CODE)]) # district
+#  rm(main_po_data.t3)
+
+
+## make a boolean variable for schools if that obs's adm2 code matches any code from the public official's vector
+main_school_data_mt$match_dist_po   <- main_school_data_mt$ADM2_CODE %in% li.po.ad2codes # district
+main_school_data_mt$match_region_po <- main_school_data_mt$ADM1_CODE %in% li.po.ad1codes # region
+main_school_data_mt$match_dist_pot3 <- main_school_data_mt$ADM2_CODE %in% li.po.t3.ad2codes # district, matching only tier 3 po's
+### we should get max 315 school observations when merged under these parameters
+
+
+## make a boolean variable for public officials if that obs's adm2 code matches any code from the school's vector
+# main_po_data$match_dist_school   <- main_po_data$ADM2_CODE %in% li.school.ad2codes # district
+# main_po_data$match_region_school <- main_po_data$ADM1_CODE %in% li.school.ad1codes # region
+# main_po_data.t3$match_dist_school<- main_po_data.t3$ADM2_CODE %in% li.school.ad2codes # district, matching only tier 3
+
+# 12.save and export. ----
   
 
 if (export == 1) {

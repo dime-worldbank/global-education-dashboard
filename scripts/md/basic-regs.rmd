@@ -1,10 +1,10 @@
 ---
-title: "Basic Regressions"
+title: "basic-regs"
 author: "Tom"
-date: "September 1, 2020"
+date: "September 14, 2020"
 output: html_document
-runtime: shiny
 ---
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -18,6 +18,7 @@ library(tidyverse)
 library(readstata13)
 library(sjPlot)
 library(shiny)
+library(summarytools)
 library(miceadds)
 
 # object with outcome variables 
@@ -177,6 +178,17 @@ lm.idm.11 <- lm.cluster(data = md,
 
 ```
 
+## Summary Stats
+
+```{r}
+dfSummary(md,
+          style = "grid", plain.ascii = TRUE,
+          varnumbers = FALSE, valid.col = FALSE, tmp.img.dir = "./img")
+```
+```
+
+
+
 ## Regression Tables
 
 ```{r bi}
@@ -263,129 +275,5 @@ tab_model(lm.idm.1$lm_res, lm.idm.2$lm_res, lm.idm.3$lm_res, lm.idm.4$lm_res, lm
 
 
 ```{r}
-summary(lm.bi.1)
-summary(lm.bi.2)
-summary(lm.bi.3)
 ```
 
-
-### Interactive By-Country Visualizations
-Select up to two pairs of explanatory variables (Bureaucracy Indicators) and Outcomes Variables (School Outcomes) to visualize the scatterplots and best-fit lines by country.
-
-####Variable Selector
-Plot 1
-```{r}
-
-
-# inputs 1
-selectInput("yvar1", #inputid
-            "Outcome Variable 1", #label
-           choices = c("Student Knowledge" = "student_knowledge",
-           "1st Grade Student Knowledge" = "ecd_student_knowledge",
-           "Inputs" = "inputs",
-           "Infrastructure" = "infrastructure",
-           "Teacher Motivation" = "intrinsic_motivation",
-           "Teacher Content Knowledge" = "content_knowledge",
-           "Operational Management" = "operational_manage",
-           "Instructional Leadership" = "instr_leadership",
-           "Principal Knolwedge Score" = "principal_knowl_score",
-           "Principal Management" = "principal_manage"),
-           multiple = FALSE,
-           selected = "infrastructure"
-)
-           
-selectInput("xvar1", #inputid
-            "Explanatory Variable 1", #label
-           choices = c("Bureaucracy Index" = "bi",
-                       "National Learning Goals" = "national_learning_goals",
-                       "Mandates and Accountability" = "mandates_accountability",
-                       "Quality of Bureaucracy" = "quality_bureaucracy",
-                       "Impartial Decision-Making" = "impartial_decision_making"),
-           multiple = FALSE,
-           selected = "bi"
-)
-```
-
-
-
-Plot 2
-```{r}
-# inputs 2
-selectInput("yvar2", #inputid
-            "Outcome Variable 2", #label
-           choices = c("Student Knowledge" = "student_knowledge",
-           "1st Grade Student Knowledge" = "ecd_student_knowledge",
-           "Inputs" = "inputs",
-           "Infrastructure" = "infrastructure",
-           "Teacher Motivation" = "intrinsic_motivation",
-           "Teacher Content Knowledge" = "content_knowledge",
-           "Operational Management" = "operational_manage",
-           "Instructional Leadership" = "instr_leadership",
-           "Principal Knolwedge Score" = "principal_knowl_score",
-           "Principal Management" = "principal_manage"),
-           multiple = FALSE,
-           selected = "content_knowledge"
-)
-           
-selectInput("xvar2", #inputid
-            "Explanatory Variable 2", #label
-           choices = c("Bureaucracy Index" = "bi",
-                       "National Learning Goals" = "national_learning_goals",
-                       "Mandates and Accountability" = "mandates_accountability",
-                       "Quality of Bureaucracy" = "quality_bureaucracy",
-                       "Impartial Decision-Making" = "impartial_decision_making"),
-           multiple = FALSE,
-           selected = "national_learning_goals"
-)
-
-
-
-```
-
-
-Plot 1
-```{r, fig.align='center', fig.show='hold'}
-
-# plot 1
-renderPlot({
-  # make the plot 
- ggplot(md, aes_string(input$xvar1, input$yvar1)) +
-    geom_jitter() +
-    geom_smooth(method = lm) +
-    facet_wrap(~ countryname)
-  
-},
-# plot options
-  width  = 500,
-  height = 400,
-  res = 100
-)
-
-
-```
-
-Plot 2
-
-```{r}
-
-
-
-# plot 2         
-renderPlot({
-  # make the plot 
- ggplot(md, aes_string(input$xvar2, input$yvar2)) +
-    geom_jitter() +
-    geom_smooth(method = lm) +
-    facet_wrap(~ countryname)
-  
-},
-# plot options
-  width  = 500,
-  height = 400,
-  res = 100
-)
-
-
-
-```
- 
