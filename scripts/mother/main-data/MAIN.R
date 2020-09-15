@@ -59,18 +59,19 @@ if (user == 2) {
 
 imprtjson <- 0 # 1 = import the raw geojson file for the worldbank polys (takes ~10 min)
 # 0 = import the saved file on tom's local folder to skip the import
-# 2 = import the saved file on the shared folder to skip this.
+# 
 savepoly  <- 1 # 1 = save the polygon file to Tom's wb folder for later use.
 # 2 = save the file to the shared folder, should be run with imprtjson == 2 if you
 # want to import the file that you save in the shared folder.
+# 
 export  <- 1  # 1 if you want to export/save the files.
 
 matchop <- 1  # 1 if we want to exclude all schools in question.
 
 
 # run script settings, set to 1 to run
-s1 <- 0 # mdataset
-s2 <- 0 # adds missing gps cords (or some)
+s1 <- 1 # mdataset
+s2 <- 1 # adds missing gps cords 
 
 
 

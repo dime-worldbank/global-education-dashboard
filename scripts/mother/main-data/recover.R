@@ -270,7 +270,7 @@ miss.filledin <- bind_rows(miss.copy, miss.manual )
 
 
 ## assert that the number of rows didn't change between beginning and end
-assert_that(nrow(miss) == nrow(miss.filledin))
+assert_that(nrow(s.missing) == nrow(miss.filledin))
 
 
 
@@ -386,11 +386,11 @@ if (export == 1) {
 save(main_po_data, main_school_data, # original datasets
      main_school_data_mt, # matched school datasets
      m.po, m.school,
-     miss, miss.copy, miss.manual, miss.filledin, miss.manual.key, # missing dataset progression
+     miss.copy, miss.manual, miss.filledin, miss.manual.key, # missing dataset progression
      sorting.hat, unique.matches, 
      wb.poly.m,
      po.l, school.l, # new: 'light' datasets
-     preload.dups, s.key, s.key.op1, s.missing, s.there, # new:
+    s.missing, s.there, # new:
      tiers,
      newtiers,
      offices,

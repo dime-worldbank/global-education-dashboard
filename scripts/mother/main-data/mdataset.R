@@ -319,14 +319,13 @@ if (savepoly == 1) {
 saveRDS(wb.poly.m,
         file = file.path(root, "main/wb-poly-m.Rda"))
 }
-if (savepoly == 2) {
-saveRDS(wb.poly.m,
-        file = file.path(shared, "out/wb-poly-m.Rda"))
-}
 
 
-} # end imprtjson switch
 
+} # end imprtjson switch, if imprtjson == 1
+
+
+# if imprtjson == 0, then we just import the randomized data already created.
 if (imprtjson == 0) {
   wb.poly.m <- readRDS(file.path(root, "main/wb-poly-m.Rda"))
 }
@@ -436,7 +435,19 @@ districtoffices <- filter(offices, govt_tier == "District Office",
                                     is.na(ADM2_CODE) == FALSE)
 
 
-# Join by District, remove geometry, then region, remove geometry. %% fix this.
+
+
+                      
+                      # ------------------------------------- #
+                      #    Calculate distrances to offices    # ----
+                      # ------------------------------------- #
+
+          # %% for future: fix code, should be done after recover anyway.
+
+# # Join by District, remove geometry, then region, remove geometry. 
+# school.id <- select(main_school_data,
+#                     
+# 
 # school_dist<-left_join(main_school_data, # 1. join join by district
 #                       as.data.frame(districtoffices),
 #                       by = "ADM2_CODE",
@@ -447,19 +458,26 @@ districtoffices <- filter(offices, govt_tier == "District Office",
 #                        geometry.do,
 #                        by_element = TRUE)/1000 # we know that the pairwise elements are correct, in km
 #     ) 
-#   
-#   rename(school_dist, district_idoffice = idoffice)  # rename office id to district
-#   left_join(                                # 2. begin joining by region.
-#             as.data.frame(regionoffices),
-#             by = c("ADM1_CODE.school" = "ADM1_CODE"),
-#             suffix = c(".school", ".ro")) %>%
+# 
+# #rename 
+# rename(.data = school_dist,
+#        district_idoffice = idoffice)  # rename office id to district
+# 
+# # left join
+# school_dist <- left_join(school_dist ,                              # 2. begin joining by region.
+#                         as.data.frame(regionoffices),
+#                         by = c("ADM1_CODE.school" = "ADM1_CODE"),
+#                         suffix = c(".school", ".ro")) %>%
 #   select(idschool, idoffice, everything()) %>%
 #   mutate(
 #     dist_to_ro = st_distance(geometry.school,
 #                              geometry, # where geometry is the point of region since not duped
 #                              by_element = TRUE)/1000 # we know that the pairwise elements are correct, in km
-#   ) %>%
-#   rename(region_idoffice = idoffice, # rename variables to be consistent
+#   ) 
+# 
+# # rename + select 
+# school_dist<- rename(school_dist,
+#          region_idoffice = idoffice, # rename variables to be consistent
 #          g0.ro = g0,
 #          g1.ro = g1,
 #          g2.ro = g2,
@@ -473,8 +491,8 @@ districtoffices <- filter(offices, govt_tier == "District Office",
 # 		dist_to_ro, dist_to_do,
 # 		everything()
 # 	)
-# 
-# 
+
+
 
                               
                               # ------------------------------------- #
@@ -530,7 +548,7 @@ save(main_po_data, main_school_data,
      tiers,
      newtiers,
      offices,
-     school_dist,
+     #school_dist,
      file = file.path(repo.encrypt, "main/final_main_data.Rdata"))
 
 #determine lists of vars to change length
