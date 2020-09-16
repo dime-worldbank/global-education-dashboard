@@ -74,6 +74,7 @@ matchop <- 1  # 1 if we want to exclude all schools in question.
 s1 <- 0 # mdataset
 s2 <- 0 # adds missing gps cords 
 s3 <- 0 # runs IMPUMS data import and processing
+s4 <- 0 # merges IPUMS data to wb-poly scheme
 
 
 
@@ -96,3 +97,9 @@ if (s2 == 1) {
 if (s3 == 1) {
   source(file.path(scripts, "main-data/ipums.R"))
 }
+
+# Merge IPUMS data to wb polys
+if (s4 == 1) {
+  source(file.path(scripts, "main-data/ipums-merge.R"))
+}
+
