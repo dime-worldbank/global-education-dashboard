@@ -38,8 +38,14 @@ data <- read_ipums_micro(ddi, # calls to same directory as ddi
                         # ----------------------------- #
 
 
-# ensure there are no missing district level obs 
+# ensure there are no missing key variables 
+
+## district number 
 assert_that(sum(is.na(data$GEOLEV2)) == 0)
+
+## weight variable
+assert_that(sum(is.na(data$HHWT)) == 0)
+
 
 
 # clean labels
@@ -59,16 +65,33 @@ sum <- data %>% group_by(COUNTRY) %>%
   dfSummary(graph.col = FALSE, na.col = TRUE, style = 'grid')
 
 
+# Transform categorical varialbes into indicator 
+
+## replace w/ NA the values that seem 'valid' in data but really mean missing 
+data$urb <- lbl_na_if(data$URBAN,    ~.val >= 9) # urbanity
+data$sch <- lbl_na_if(data$SCHOOL,   ~.val == 0 | .val == 9) # school attnd
+data$lit <- lbl_na_if(data$LIT,      ~.val == 0 | .val == 9) # literacy 
+data$edu <- lbl_na_if(data$EDATTAIN, ~.val == 0 | .val == 9) # edu attain 
+
+
+
 # collapse by country, district; generate 'average' indicators
 i.sum <- data %>%
   group_by(COUNTRY, GEOLEV2) %>%
   summarise(
-    pct.urban = mean((URBAN == 1))
+    med_age   = median(AGE2, na.rm = TRUE), # median age
+    pct_urban = weighted.mean((urb == 1), w = PERWT, na.rm = TRUE), # pct urban
+    pct_attn  = weighted.mean((sch == 1 | sch == 3), w = PERWT, na.rm = TRUE), # pct ever attnded school
+    pct_lit   = weighted.mean((lit == 2), w = PERWT, na.rm = TRUE), # pct literate
+    pct_edu1  = weighted.mean((edu >= 2), w = PERWT, na.rm = TRUE), # pct complete primary
+    pct_edu2  = weighted.mean((edu >= 3), w = PERWT, na.rm = TRUE) # pct complete secondary
   )
+
 
 
 # remove data full object
 rm(data)
+
 
 
 
@@ -102,6 +125,10 @@ ipumsi <- ipums_shape_inner_join(
 )
 
 
+# check that we didn't lose districts in the merge 
+assert_that(nrow(ipumsi) == nrow(i.sum))
+
+
 
 
 
@@ -115,8 +142,11 @@ ipumsi <- ipums_shape_inner_join(
 save.image(file =
    "C:/Users/WB551206/WBG/Daniel Rogger - 2_Politics Dashboard/5. Data/ipums/ipums22/ipums-data-processed.Rdata")
 
-# only export the geographic file to project repo.
-# saveRDS(ipumsi,
-#         file = 
-#           file.path(repo.encrypt,
-#                     "main/district-conditionals.Rda"))
+#only export the geographic file to project repo.
+saveRDS(ipumsi,
+        file =
+          file.path(repo.encrypt,
+                    "main/district-conditionals.Rda"))
+
+# remove files 
+rm(ddi, ipumsi, sf_world2)
