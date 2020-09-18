@@ -76,8 +76,6 @@ data$age   <- lbl_na_if(data$AGE,      ~.val == 999) # continuous age.
 data$work  <- lbl_na_if(data$LABFORCE, ~.val == 8 | .val == 9) # labor force participation
 
 
-# %% winsorize here. 
-
 ## additional variable construction
 
 ### Indicator for School Age
@@ -87,6 +85,7 @@ data$schoolage <- if_else((data$age < 15 & data$age >= 6), TRUE, FALSE)
 
 # collapse by country, district; generate 'average' indicators
 i.sum <- data %>%
+  Winsorize()
   group_by(COUNTRY, GEOLEV2) %>%
   summarise(
     med_age      = median(age, na.rm = TRUE), # median age
@@ -97,16 +96,24 @@ i.sum <- data %>%
     pct_edu2     = weighted.mean((edu >= 3), w = PERWT, na.rm = TRUE), # pct complete secondary
     pct_work     = weighted.mean((work== 1), w = PERWT, na.rm = TRUE), # pct labor force partic
     pct_schoolage= weighted.mean((schoolage == TRUE), w = PERWT, na.rm = TRUE), # pct schoolage
-    n_schoolage  = sum(wt = PERWT)
-    )
+    n_schoolage  = sum(wt = PERWT),
+    ) %>%
 
-
+x <- i.sum$n_schoolage # orignial
+summary(x)
+summary(i.sum$n_schoolage)
 # create log variables
 i.sum <- i.sum %>%
   mutate(
     ln_schoolage = log(n_schoolage)
   )
-    
+  
+# create summary object of 
+sum2 <- i.sum %>% 
+  dfSummary(graph.col = TRUE, na.col = TRUE, style = 'grid')
+
+view(sum2
+)
 
 # create object of summary stats for district level indicators 
 district.sum <- dfSummary(ipumsi,
