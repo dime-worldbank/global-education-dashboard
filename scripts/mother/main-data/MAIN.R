@@ -7,18 +7,17 @@
 # 			 startup	 		          ----
 # ----------------------------- #
 
-if (!is.element("pacman", installed.packages())) {
-  install.packages("pacman", dep= T)
-}
+# if (!is.element("pacman", installed.packages())) {
+#   install.packages("pacman", dep= T)
+# }
+library(tidyverse)
+library(readstata13)
+library(sf)
+library(assertthat)
+library(rio)
+library(haven)
+library(sjlabelled)
 
-pacman::p_load(tidyverse,
-               readstata13,
-               sf,
-               assertthat,
-               rio,
-               haven,
-               sjlabelled,
-               eeptools)
 
 
 # ----------------------------- #

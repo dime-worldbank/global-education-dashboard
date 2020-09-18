@@ -15,13 +15,13 @@ loadip <- 1 # default to not load data, takes up too much memory
 
 # packages 
 library(ipumsr)
-library(assertthat)
 library(summarytools)
+library(DescTools)
 
 
 # load ipums data 
 
-ddi  <- read_ipums_ddi(ddi_file = file.path(ipums, "ipums22/ipumsi_00022.xml"))
+ddi  <- read_ipums_ddi(ddi_file = file.path(ipums, "ipums23/ipumsi_00023.xml"))
 
 if (loadip == 1) {
 data <- read_ipums_micro(ddi, # calls to same directory as ddi
@@ -67,11 +67,21 @@ sum <- data %>% group_by(COUNTRY) %>%
 
 # Transform categorical varialbes into indicator 
 
-## replace w/ NA the values that seem 'valid' in data but really mean missing 
-data$urb <- lbl_na_if(data$URBAN,    ~.val >= 9) # urbanity
-data$sch <- lbl_na_if(data$SCHOOL,   ~.val == 0 | .val == 9) # school attnd
-data$lit <- lbl_na_if(data$LIT,      ~.val == 0 | .val == 9) # literacy 
-data$edu <- lbl_na_if(data$EDATTAIN, ~.val == 0 | .val == 9) # edu attain 
+## replace w/ NA the values that are coded as another level in data but really mean missing 
+data$urb   <- lbl_na_if(data$URBAN,    ~.val >= 9) # urbanity
+data$school<- lbl_na_if(data$SCHOOL,   ~.val == 0 | .val == 9) # school attnd
+data$lit   <- lbl_na_if(data$LIT,      ~.val == 0 | .val == 9) # literacy 
+data$edu   <- lbl_na_if(data$EDATTAIN, ~.val == 0 | .val == 9) # edu attain 
+data$age   <- lbl_na_if(data$AGE,      ~.val == 999) # continuous age. 
+data$work  <- lbl_na_if(data$LABFORCE, ~.val == 8 | .val == 9) # labor force participation
+
+
+# %% winsorize here. 
+
+## additional variable construction
+
+### Indicator for School Age
+data$schoolage <- if_else((data$age < 15 & data$age >= 6), TRUE, FALSE)
 
 
 
@@ -79,13 +89,34 @@ data$edu <- lbl_na_if(data$EDATTAIN, ~.val == 0 | .val == 9) # edu attain
 i.sum <- data %>%
   group_by(COUNTRY, GEOLEV2) %>%
   summarise(
-    med_age   = median(AGE2, na.rm = TRUE), # median age
-    pct_urban = weighted.mean((urb == 1), w = PERWT, na.rm = TRUE), # pct urban
-    pct_attn  = weighted.mean((sch == 1 | sch == 3), w = PERWT, na.rm = TRUE), # pct ever attnded school
-    pct_lit   = weighted.mean((lit == 2), w = PERWT, na.rm = TRUE), # pct literate
-    pct_edu1  = weighted.mean((edu >= 2), w = PERWT, na.rm = TRUE), # pct complete primary
-    pct_edu2  = weighted.mean((edu >= 3), w = PERWT, na.rm = TRUE) # pct complete secondary
+    med_age      = median(age, na.rm = TRUE), # median age
+    pct_urban    = weighted.mean((urb == 1), w = PERWT, na.rm = TRUE), # pct urban
+    pct_school   = weighted.mean((school == 1 | school == 3), w = PERWT, na.rm = TRUE), # pct ever attnded school
+    pct_lit      = weighted.mean((lit == 2), w = PERWT, na.rm = TRUE), # pct literate
+    pct_edu1     = weighted.mean((edu >= 2), w = PERWT, na.rm = TRUE), # pct complete primary
+    pct_edu2     = weighted.mean((edu >= 3), w = PERWT, na.rm = TRUE), # pct complete secondary
+    pct_work     = weighted.mean((work== 1), w = PERWT, na.rm = TRUE), # pct labor force partic
+    pct_schoolage= weighted.mean((schoolage == TRUE), w = PERWT, na.rm = TRUE), # pct schoolage
+    n_schoolage  = sum(wt = PERWT)
+    )
+
+
+# create log variables
+i.sum <- i.sum %>%
+  mutate(
+    ln_schoolage = log(n_schoolage)
   )
+    
+
+# create object of summary stats for district level indicators 
+district.sum <- dfSummary(ipumsi,
+                          valid.col = TRUE,
+                          na.col = TRUE,
+                          graph.col = TRUE,
+                          graph.magnif = 0.75,
+                          style = 'grid',
+                          plain.ascii = FALSE
+)
 
 
 
