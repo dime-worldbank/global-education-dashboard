@@ -4,7 +4,16 @@ Function: merges the district-level averages to countries
 -- --- ---- ----- ------ ------- -------- -------- --------- -------------------*/
 
 
-								* | Merge at district level, all tiers | *
+				/* 	This script conducts two merges: the first merge amounts
+					to matching the individual school observations to the
+					district-averaged bureaucracy scores. The second merge will
+					then adds on district-averaged conditional variables pulled
+					from IPUMS, such as literacy rates/median age in the district.
+
+				*/
+
+
+						* | Merge at district level, all tiers | *
 
 
 	use `"${D_sch}"', clear  					// start with schools dataset
@@ -15,8 +24,8 @@ Function: merges the district-level averages to countries
 			merge 			m:1 	countryname g2 	///
 									using "${publicofficial}/Dataset/col_po_g2_alltier.dta" ///
 									, gen(merge)
-									
-			* save as tempfile, will need later 
+
+			* save as tempfile, will need later
 			tempfile 	mergeg2
 			save 		`mergeg2'
 
@@ -27,7 +36,7 @@ Function: merges the district-level averages to countries
 
 			* 2.  Generate top/bottom quartile tags
 			* generate a variable that lists the number of schools in each district
-			
+
 
 			* tag schools in areas that are in the lower quartile of 5 bureaucracy indicators
 			collapse (mean) ${bi} nsch_dist, by(country g2)
@@ -68,6 +77,12 @@ Function: merges the district-level averages to countries
 			* Verify quality of dataset after the drop.
 				/* run another checkscript (diff cuz this time we loose school obs) */
 
+			* 4. Merge the IPUMS data
+			merge m:1 	g2 ///
+						using "${encryptFolder}/main/school_dist_conditionals.dta" ///
+						, assert(match)
+
+
 				* save the dataset as a new version.
 				la data 	"School indicators with all tiers of officials averaged by district"
 				save 		"${baseline_dt}/final/merge_district_alltiers.dta", replace
@@ -92,8 +107,8 @@ Function: merges the district-level averages to countries
 				merge 		m:1 	countryname g2 	///
 									using "${publicofficial}/Dataset/col_po_g2_tier3.dta" ///
 									, gen(merge)
-									
-			* save as tempfile, will need later 
+
+			* save as tempfile, will need later
 			tempfile 	mergeg2b // "a" is above, careful not to mess with overwriting tempfiles, etc
 			save 		`mergeg2b'
 
@@ -104,7 +119,7 @@ Function: merges the district-level averages to countries
 
 			* 2.  Generate top/bottom quartile tags
 			* generate a variable that lists the number of schools in each district
-			
+
 
 			* tag schools in areas that are in the lower quartile of 5 bureaucracy indicators
 			collapse (mean) ${bi} nsch_dist, by(country g2)
@@ -144,6 +159,13 @@ Function: merges the district-level averages to countries
 			* Verify quality of dataset after the drop.
 				/* run another checkscript (diff cuz this time we loose school obs) */
 
+
+			* 4. Merge the IPUMS data
+			merge m:1 	g2 ///
+						using "${encryptFolder}/main/school_dist_conditionals.dta" ///
+						, assert(match)
+
+						
 				* save the dataset as a new version.
 				la data 	"School indicators w/ only district officials averaged by district"
 				save 		"${baseline_dt}/final/merge_district_tdist.dta", replace
