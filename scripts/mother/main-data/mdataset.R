@@ -232,16 +232,16 @@ m.school.gps <- select(m.school,
                                 # ------------------------------------- #
                                 # import WB subnational geojson files   # ----
                                 # ------------------------------------- #
-					# this takes a long time and is saved as Rda, if imprtjson ==0, will import rda.
-					# however, I'm having the reviewer import the raw geojson file because this code
-					# is an important step. (sorry!)
-					# however, i've made a switch you adjust in the introduction up top where, after you run
-					# or check the code once, you can save an rda file and reimport it to save time when
-					# running the code again.
+					# this takes a long time and is saved as Rda, if imprtjson == 1, will import rda.
+					# if imprtjson == 1, then the import of the raw geojson files will happen and the 
+					# random geoids for g1 g2 and g3 will be generated. Setting imprtjson == 1 will skip
+					# the creation of the wb.poly.m/skip the creation of g1, g2, g3 and simply import 
+					# wb.poly.m that was previously generated. 
+
 
 if (imprtjson == 1) {
 
-wb.poly <- st_read(file.path(shared, "gis/g2015_2014_2.geojson")) %>%
+wb.poly <- st_read(file.path(repo, "GIS/20160921_GAUL_GeoJSON_TopoJSON/GeoJSON/g2015_2014_2.geojson")) %>%
   filter(ADM0_NAME == "Peru" | ADM0_NAME == "Jordan" | ADM0_NAME == "Mozambique" | ADM0_NAME == "Rwanda") %>%
   distinct(ADM2_CODE, ADM1_CODE, ADM0_CODE, .keep_all = TRUE)  # remove any possible duplicates
 
@@ -334,19 +334,21 @@ school <- st_as_sf(m.school,
                    na.fail = FALSE)
 
 
-    # set the crs of school + po as the same as the world poly crs
-    st_crs(po) <- st_crs(wb.poly.m)
-    st_crs(school) <- st_crs(wb.poly.m)
-    st_crs(wb.poly.m)
-    st_crs(po)
+# set the crs of school + po as the same as the world poly crs
+st_crs(po) <- st_crs(wb.poly.m)
+st_crs(school) <- st_crs(wb.poly.m)
+st_crs(wb.poly.m)
+st_crs(po)
 
-    st_is_longlat(po)
-    st_is_longlat(wb.poly.m)
+st_is_longlat(po)
+st_is_longlat(wb.poly.m)
 
+    
 # set the variable order
 order <- c("ADM0_NAME", "ADM1_NAME", "ADM2_NAME",
            "ADM0_CODE", "ADM1_CODE", "ADM2_CODE",
            "g0", "g1", "g2")
+
 
 # join poly and po datasets
 main_po_data <- st_join(po, # points
@@ -535,7 +537,6 @@ save(main_po_data, main_school_data,
      tiers,
      newtiers,
      offices,
-     #school_dist,
      file = file.path(repo.encrypt, "main/final_main_data.Rdata"))
 
 #determine lists of vars to change length

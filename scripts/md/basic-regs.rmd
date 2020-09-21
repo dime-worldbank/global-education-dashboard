@@ -1,7 +1,7 @@
 ---
-title: "basic-regs"
+title: "GECD Bureaucracy Indicator Regressions with District Conditionals"
 author: "Tom"
-date: "September 14, 2020"
+date: "September 21, 2020"
 output: html_document
 ---
 
@@ -50,10 +50,15 @@ condl <- c(
           "pct_edu2",
           "pct_work",
           "pct_schoolage",
-          "ln_schoolage" ,
-          "ln_schoolage",
+          "pct_elec" ,
+          "pct_dwell",
           "enrolled"
   )
+
+# Table Labels 
+dvlab <- c("Student Knowledge", "ECD Knowledge", "Inputs", "Intrastructure", "Teacher Motivation", "Teacher Content Knowledge", "Operational Management", "Instructional Leadership", "Pricipal Knowledge", "Principal Management")
+
+ivlab <- c("Bureaucracy Index", "% Urban", "Literacy Rate", "% Schoolage", "% Electricity", "% Improved Dwelling")
 
 
 #load data
@@ -66,141 +71,157 @@ md <- read.dta13(file = "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/gl
 
 # Changes From Last Time
 
-I succeeded in increasing the total number of schools to 315. The drop in 50 observations for some indicators is due to missing data for Mozambique schools.
+I have incorporated district-level conditional variables from IPUMS data, desribed below. The IPUMS data does not use the same global administrative schema as the World Bank does, so I connected IPUMS regions to World Bank Regions by largest overlapping feature.
 
 # Model Specifications
-- Country Fixed Effects (where each country is an indicator)
-- Standard Errors are clustered on District, specified to standard clustering in Stata
+- Country Fixed Effects (coefficients omitted)
+- School size Fixed Effects (coefficients omitted)
+- Standard Errors clustered on District, specified to standard clustering in Stata
+- District-level averages of: 
+  1. Percent Urban ( % of surveyed Households classified as Urban)
+  2. Literacy Rate
+  3. Percent of population that is of school age (see technical note for details)
+  4. Percent of households with access to electricity
+  5. Percent of households with improved dwelling construction materials
+  
+
+## Technical Notes
+Percent Schoolage Population: To be consistent with other IPUMS age categorizations, the schoolage population is defined as the percent of the population from ages 6 through 14, inclusive. Age 14 was chosen as the top-value because IPUMS defines working-age population beginning at age 15. <br><br>
+
+Percent of Households with Improved Dwelling construction: Materials classified as "improved" are Adobe and Stone: all others, such as straw, cloth, bamboo, etc wer considered "not improved". <br><br>
+
+I have coded and prepared other similar variables that were not included in the model specification but could be interchanged as needed. <br>
+1. Percent of Population that ever attended school <br>
+2. Percent of Population that completed Primary School  <br>
+3. Percent of Population that completed Secondary School<br>
+4. Labor Force Participation<br>
+5. District Median Age <br>
+
+  
+
 
 ## Main findings
-1. With the data we have, we see that the overall Bureaucracy Index it not a good predictor of any school outcomes, except for maybe school infrastructure. <br>
-2. Significant relationships among the secondary indicators are sparse, but what few there are are promising: <br>
-  - National Learning Goals predict 2 variables related to instruction. <br>
-  - Impartial Decision-Making predicts 3 school-level indicators
+1. The Overall Bureaucracy Index significantly predicts school infrastructure and teacher content knowledge. <br>
+2. National Learning Goals predicts teacher level indicators <br>
+3. Mandates and Accountability and Quality of Bureaucracy predict a handfull of school outcomes 
+4. Otherwise, indicators for aggregate district wealth (dwelling) and existing infrastructure (Pct Electrified) are strong predictors of school outcomes in many, but not all, models
 
 ```{r models,  include=FALSE}
 # run + store all regressions regressions as objects
 
 # explanatory = bi
 lm.bi.1 <- lm_robust(data = md,
-   student_knowledge ~ bi + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.bi.2 <- lm_robust(data = md,
-   ecd_student_knowledge ~ bi + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.bi.3 <- lm_robust(data = md,
-   inputs ~ bi + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   inputs ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.bi.4 <- lm_robust(data = md,
-   infrastructure ~ bi + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   infrastructure ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.bi.5 <- lm_robust(data = md,
-   intrinsic_motivation ~ bi + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.bi.6 <- lm_robust(data = md,
-   content_knowledge ~ bi + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   content_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.bi.8 <- lm_robust(data = md,
-   operational_manage ~ bi + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   operational_manage ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.bi.9 <- lm_robust(data = md,
-   instr_leader ~ bi + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   instr_leader ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.bi.10 <- lm_robust(data = md,
-   principal_knowl_score ~ bi + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_knowl_score ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.bi.11 <- lm_robust(data = md,
-   principal_manage ~ bi + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_manage ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 
 # explanatory = nlg
 lm.nlg.1 <- lm_robust(data = md,
-   student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.nlg.2 <- lm_robust(data = md,
-   ecd_student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.nlg.3 <- lm_robust(data = md,
-   inputs ~ national_learning_goals + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   inputs ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.nlg.4 <- lm_robust(data = md,
-   infrastructure ~ national_learning_goals + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   infrastructure ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.nlg.5 <- lm_robust(data = md,
-   intrinsic_motivation ~ national_learning_goals + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.nlg.6 <- lm_robust(data = md,
-   content_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   content_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.nlg.8 <- lm_robust(data = md,
-   operational_manage ~ national_learning_goals + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   operational_manage ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.nlg.9 <- lm_robust(data = md,
-   instr_leader ~ national_learning_goals + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   instr_leader ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.nlg.10 <- lm_robust(data = md,
-   principal_knowl_score ~ national_learning_goals + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_knowl_score ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.nlg.11 <- lm_robust(data = md,
-   principal_manage ~ national_learning_goals + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_manage ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 
 # explanatory = ma
 lm.ma.1 <- lm_robust(data = md,
-   student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.ma.2 <- lm_robust(data = md,
-   ecd_student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.ma.3 <- lm_robust(data = md,
-   inputs ~ mandates_accountability + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   inputs ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.ma.4 <- lm_robust(data = md,
-   infrastructure ~ mandates_accountability + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   infrastructure ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.ma.5 <- lm_robust(data = md,
-   intrinsic_motivation ~ mandates_accountability + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.ma.6 <- lm_robust(data = md,
-   content_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   content_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.ma.8 <- lm_robust(data = md,
-   operational_manage ~ mandates_accountability + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   operational_manage ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.ma.9 <- lm_robust(data = md,
-   instr_leader ~ mandates_accountability + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   instr_leader ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.ma.10 <- lm_robust(data = md,
-   principal_knowl_score ~ mandates_accountability + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_knowl_score ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.ma.11 <- lm_robust(data = md,
-   principal_manage ~ mandates_accountability + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_manage ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 
 
 # explanatory = qb
 lm.qb.1 <- lm_robust(data = md,
-   student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.qb.2 <- lm_robust(data = md,
-   ecd_student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.qb.3 <- lm_robust(data = md,
-   inputs ~ quality_bureaucracy + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   inputs ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.qb.4 <- lm_robust(data = md,
-   infrastructure ~ quality_bureaucracy + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   infrastructure ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.qb.5 <- lm_robust(data = md,
-   intrinsic_motivation ~ quality_bureaucracy + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.qb.6 <- lm_robust(data = md,
-   content_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   content_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.qb.8 <- lm_robust(data = md,
-   operational_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   operational_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.qb.9 <- lm_robust(data = md,
-   instr_leader ~ quality_bureaucracy + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   instr_leader ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.qb.10 <- lm_robust(data = md,
-   principal_knowl_score ~ quality_bureaucracy + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_knowl_score ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.qb.11 <- lm_robust(data = md,
-   principal_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 
 # explanatory = idm
 lm.idm.1 <- lm_robust(data = md,
-   student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.idm.2 <- lm_robust(data = md,
-   ecd_student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.idm.3 <- lm_robust(data = md,
-   inputs ~ impartial_decision_making + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   inputs ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.idm.4 <- lm_robust(data = md,
-   infrastructure ~ impartial_decision_making + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   infrastructure ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.idm.5 <- lm_robust(data = md,
-   intrinsic_motivation ~ impartial_decision_making + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.idm.6 <- lm_robust(data = md,
-   content_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   content_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.idm.8 <- lm_robust(data = md,
-   operational_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   operational_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.idm.9 <- lm_robust(data = md,
-   instr_leader ~ impartial_decision_making + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   instr_leader ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.idm.10 <- lm_robust(data = md,
-   principal_knowl_score ~ impartial_decision_making + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_knowl_score ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.idm.11 <- lm_robust(data = md,
-   principal_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_work + pct_edu1 + med_age + ln_schoolage + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 
 ```
 
-## Summary Stats
-
-```{r}
-# dfSummary(md,
-#           style = "grid", plain.ascii = TRUE,
-#           varnumbers = FALSE, valid.col = FALSE, tmp.img.dir = "./img")
-```
 
 
 
@@ -210,7 +231,9 @@ lm.idm.11 <- lm_robust(data = md,
 # table 1
 tab_model(lm.bi.1, lm.bi.2, lm.bi.3, lm.bi.4, lm.bi.5, lm.bi.6,
           lm.bi.8, lm.bi.9, lm.bi.10,lm.bi.11,
-          pred.labels = c("Bureaucracy Index"),
+          pred.labels = ivlab,
+          dv.labels = dvlab,
+          wrap.labels = 20,
           title = "Bureaucracy Index",
           show.ci = FALSE,
           show.se = TRUE,
@@ -219,7 +242,7 @@ tab_model(lm.bi.1, lm.bi.2, lm.bi.3, lm.bi.4, lm.bi.5, lm.bi.6,
           show.intercept = FALSE,
           show.r2 = FALSE,
           p.style = "numeric",
-          terms = c("bi"))
+          terms = c("bi", "pct_lit", "pct_urban", "pct_schoolage", "pct_elec", "pct_dwell"))
 
 ```
 <br><br>
@@ -227,7 +250,8 @@ tab_model(lm.bi.1, lm.bi.2, lm.bi.3, lm.bi.4, lm.bi.5, lm.bi.6,
 # table 1
 tab_model(lm.nlg.1, lm.nlg.2, lm.nlg.3, lm.nlg.4, lm.nlg.5, lm.nlg.6,
           lm.nlg.8, lm.nlg.9, lm.nlg.10,lm.nlg.11,
-          pred.labels = c("National Learning Goals"),
+          pred.labels = ivlab,
+          dv.labels = dvlab,
           title = "National Learning Goals",
           show.ci = FALSE,
           show.se = TRUE,
@@ -236,7 +260,7 @@ tab_model(lm.nlg.1, lm.nlg.2, lm.nlg.3, lm.nlg.4, lm.nlg.5, lm.nlg.6,
           show.intercept = FALSE,
           show.r2 = FALSE,
           p.style = "numeric",
-          terms = c("national_learning_goals"))
+          terms = c("national_learning_goals", "pct_lit", "pct_urban", "pct_schoolage", "pct_elec", "pct_dwell"))
 
 ```
 <br><br>
@@ -245,7 +269,8 @@ tab_model(lm.nlg.1, lm.nlg.2, lm.nlg.3, lm.nlg.4, lm.nlg.5, lm.nlg.6,
 # table 1
 tab_model(lm.ma.1, lm.ma.2, lm.ma.3, lm.ma.4, lm.ma.5, lm.ma.6,
           lm.ma.8, lm.ma.9, lm.ma.10,lm.ma.11,
-          pred.labels = c("Mandates + Acct'y"),
+          pred.labels = ivlab,
+          dv.labels = dvlab,
           title = "Mandates and Accountability",
           show.ci = FALSE,
           show.se = TRUE,
@@ -254,7 +279,7 @@ tab_model(lm.ma.1, lm.ma.2, lm.ma.3, lm.ma.4, lm.ma.5, lm.ma.6,
           show.intercept = FALSE,
           show.r2 = FALSE,
           p.style = "numeric",
-          terms = c("mandates_accountability"))
+          terms = c("mandates_accountability", "pct_lit", "pct_urban", "pct_schoolage", "pct_elec", "pct_dwell"))
 
 ```
 <br><br>
@@ -264,7 +289,8 @@ tab_model(lm.ma.1, lm.ma.2, lm.ma.3, lm.ma.4, lm.ma.5, lm.ma.6,
 # table 1
 tab_model(lm.qb.1, lm.qb.2, lm.qb.3, lm.qb.4, lm.qb.5, lm.qb.6,
           lm.qb.8, lm.qb.9, lm.qb.10,lm.qb.11,
-          pred.labels = c("Qual. of Bureaucracy"),
+          pred.labels = ivlab,
+          dv.labels = dvlab,
           title = "Quality of Bureaucracy",
           show.ci = FALSE,
           show.se = TRUE,
@@ -273,7 +299,7 @@ tab_model(lm.qb.1, lm.qb.2, lm.qb.3, lm.qb.4, lm.qb.5, lm.qb.6,
           show.intercept = FALSE,
           show.r2 = FALSE,
           p.style = "numeric",
-          terms = c("quality_bureaucracy"))
+          terms = c("quality_bureaucracy", "pct_lit", "pct_urban", "pct_schoolage", "pct_elec", "pct_dwell"))
 
 ```
 <br><br>
@@ -283,7 +309,8 @@ tab_model(lm.qb.1, lm.qb.2, lm.qb.3, lm.qb.4, lm.qb.5, lm.qb.6,
 # table 1
 tab_model(lm.idm.1, lm.idm.2, lm.idm.3, lm.idm.4, lm.idm.5, lm.idm.6,
           lm.idm.8, lm.idm.9, lm.idm.10,lm.idm.11,
-          pred.labels = c("Impar. Dec'n-Making"),
+          pred.labels = ivlab,
+          dv.labels = dvlab,
           title = "Impartial Decision-Making",
           show.ci = FALSE,
           show.se = TRUE,
@@ -292,7 +319,7 @@ tab_model(lm.idm.1, lm.idm.2, lm.idm.3, lm.idm.4, lm.idm.5, lm.idm.6,
           show.intercept = FALSE,
           show.r2 = FALSE,
           p.style = "numeric",
-          terms = c("impartial_decision_making"))
+          terms = c("impartial_decision_making", "pct_lit", "pct_urban", "pct_schoolage", "pct_elec", "pct_dwell"))
 
 ```
 
@@ -301,7 +328,7 @@ tab_model(lm.idm.1, lm.idm.2, lm.idm.3, lm.idm.4, lm.idm.5, lm.idm.6,
 ## Summary Statistics
 
 ```{r}
-dfSummary(md,
-          style = "grid", plain.ascii = FALSE, round.digits = 2,
+st_options(style = "rmarkdown", plain.ascii = FALSE, round.digits = 2)
+md %>% dfSummary(
           varnumbers = FALSE, valid.col = TRUE, graph.col = FALSE, na.col = TRUE)
 ```

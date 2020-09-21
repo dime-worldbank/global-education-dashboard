@@ -4,10 +4,11 @@
 * settings: set to 1 to compile the md file
 loc p1 	0	// environmental controls
 loc p2  0	// noise controsl
-loc p3  1 	// rich set of school controls
+loc p3  0 	// rich set of school controls
 loc p4  0	// distance from school to HQ
 loc p5  0	// interactions between school admin+district offices
 
+loc r1  1   // raw regressions
 
 * turn off graph
 	set graph off
@@ -56,3 +57,8 @@ loc slznop 	student_knowledge_z ecd_student_knowledge_z inputs_z infrastructure_
 				nostop 								///		/* continue when error occurs */
 				replace
 }
+
+
+	if (`r1' == 1 ) {
+	do 			"${scripts_clone}/reg/basic-regs.do"
+	}

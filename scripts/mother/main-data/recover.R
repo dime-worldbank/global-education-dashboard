@@ -208,6 +208,10 @@ miss.copy <- distinct(miss.copy,
 
 
 # 8. match the 'no' subset by hand (export to csv, edit, then re-import) ----
+# NOTE: in this section keep in mind that 'school_code' variable is not the 
+# randomly generated variable; school_code is a stable variable that does not 
+# change every time the code is run, so matching on this variable should never
+# be a problem.
    
 ## export to csv, only export key info
 if (csv.export == 1) {
@@ -390,12 +394,11 @@ save(main_po_data, main_school_data, # original datasets
      sorting.hat, unique.matches, 
      wb.poly.m,
      po.l, school.l, # new: 'light' datasets
-    s.missing, s.there, # new:
+     s.missing, s.there, # new:
      tiers,
      newtiers,
      offices,
-     school_dist,
-     file = file.path(repo.encrypt, "main/final_main_data.Rdata"))
+     file = file.path(repo.encrypt, "main/final_main_data_recovered.Rdata"))
 
 
 # export main school dataset as another version

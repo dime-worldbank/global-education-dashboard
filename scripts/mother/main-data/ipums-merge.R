@@ -34,8 +34,7 @@ load(file = file.path(repo.encrypt, "main/final_main_data.Rdata"))
                     # ----------------------------- #
 
 # 1. join ipums to wb.poly by largest overlapping feature
-district.condls <- st_join(wb.poly.m, ipumsi, largest = TRUE) #%>%
-  #select(ADM0_NAME, COUNTRY, ADM2_NAME, ADMIN_NAME)
+district.condls <- st_join(wb.poly.m, ipumsi, largest = TRUE) 
 
 
 ## assert that the number of rows in wb poly dataset stayed constant
@@ -68,7 +67,7 @@ district.condls.export <- district.condls %>%
   select(ADM0_NAME, g0, g1, g2, 
         med_age, pct_urban, pct_school, pct_lit,
         pct_edu1, pct_edu2, pct_work, pct_schoolage, 
-        n_schoolage, ln_schoolage) %>%
+        pct_dwell, pct_elec) %>%
   rename(
     countryname = ADM0_NAME # this will match the string variable in the using data 
   ) %>%

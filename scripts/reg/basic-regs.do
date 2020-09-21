@@ -2,8 +2,8 @@
 
 cls
 
-
-log using "C:\Users\WB551206\OneDrive - WBG\Documents\Dashboard\global-edu-dashboard\out\log/basic-regs2.txt", text replace
+cap log close
+log using "C:\Users\WB551206\OneDrive - WBG\Documents\Dashboard\global-edu-dashboard\out\log/basic-regs3.txt", text replace
 
 use "C:\Users\WB551206\OneDrive - WBG\Documents\Dashboard\global-edu-dashboard\baseline\DataSets\final\merge_district_tdist.dta", clear
 
@@ -18,7 +18,7 @@ di "`bi' vs `s'"
 * Model specification
 reg 	`s' /// outcome variable, one of school variables above
 		`bi' /// buracuracy indicator as main explanatory variable
-		pct_urban pct_lit pct_work pct_edu1 med_age ln_schoolage /// district conditionals
+		pct_urban pct_lit pct_schoolage pct_elec pct_dwell /// district conditionals
 		i.enrolled i.country 	/// enrollment size category and country as factor variables 
 		, vce(cluster g2) 		// cluster on district
 		

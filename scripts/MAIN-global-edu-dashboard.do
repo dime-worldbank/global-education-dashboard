@@ -194,10 +194,10 @@ gl s6 	= 1		// determines which school dataset to merge w during deidenitfy, 0=n
 
 /* script settings settings to 1 if you want to run, default == 0 */
 
-loc clean	= 1		// reconstruct bi vars
-loc agg		= 1 	// conduct collapsing and merging
-loc misc 	= 1 	// misc data processing, prior merging is necessary.
-loc reg 	= 0 	// run regression panels
+loc clean	= 0		// reconstruct bi vars
+loc agg		= 0 	// conduct collapsing and merging
+loc misc 	= 0 	// misc data processing, prior merging is necessary.
+loc reg 	= 1 	// run regression panels
 
 
 * [Global Setup]:

@@ -222,7 +222,7 @@
 								l_bi t_bi l_national_learning_goals t_national_learning_goals l_mandates_accountability ///
 								t_mandates_accountability l_quality_bureaucracy t_quality_bureaucracy ///
 								l_impartial_decision_making t_impartial_decision_making med_age pct_urban ///
-								pct_school pct_lit pct_edu1 pct_edu2 pct_work pct_schoolage n_schoolage ln_schoolage enrolled ///
+								pct_school pct_lit pct_edu1 pct_edu2 pct_work pct_schoolage pct_elec pct_dwell enrolled ///
 								ln_gdp
 
 
