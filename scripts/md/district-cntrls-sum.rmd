@@ -1,0 +1,17 @@
+---
+title: "district-cntrls-sum"
+author: "Tom"
+date: "September 18, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(summarytools)
+```
+
+## R Markdown
+
+```{r}
+view(sum.av)
+```

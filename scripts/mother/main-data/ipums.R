@@ -60,8 +60,8 @@ data$COUNTRY <- lbl_clean(data$COUNTRY)
     # we'll just use one var to work code 
 
     
-# create summary object 
-sum <- data %>% group_by(COUNTRY) %>%
+# create summary object of raw data
+sum.raw <- data %>% group_by(COUNTRY) %>%
   dfSummary(graph.col = FALSE, na.col = TRUE, style = 'grid')
 
 
@@ -85,7 +85,6 @@ data$schoolage <- if_else((data$age < 15 & data$age >= 6), TRUE, FALSE)
 
 # collapse by country, district; generate 'average' indicators
 i.sum <- data %>%
-  Winsorize()
   group_by(COUNTRY, GEOLEV2) %>%
   summarise(
     med_age      = median(age, na.rm = TRUE), # median age
@@ -96,35 +95,16 @@ i.sum <- data %>%
     pct_edu2     = weighted.mean((edu >= 3), w = PERWT, na.rm = TRUE), # pct complete secondary
     pct_work     = weighted.mean((work== 1), w = PERWT, na.rm = TRUE), # pct labor force partic
     pct_schoolage= weighted.mean((schoolage == TRUE), w = PERWT, na.rm = TRUE), # pct schoolage
-    n_schoolage  = sum(wt = PERWT),
-    ) %>%
+    n_schoolage  = sum(wt = PERWT)
+    )
 
-x <- i.sum$n_schoolage # orignial
-summary(x)
-summary(i.sum$n_schoolage)
 # create log variables
-i.sum <- i.sum %>%
-  mutate(
-    ln_schoolage = log(n_schoolage)
-  )
+i.sum$ln_schoolage = log(i.sum$n_schoolage)
+
   
 # create summary object of 
-sum2 <- i.sum %>% 
+sum.av <- i.sum %>% 
   dfSummary(graph.col = TRUE, na.col = TRUE, style = 'grid')
-
-view(sum2
-)
-
-# create object of summary stats for district level indicators 
-district.sum <- dfSummary(ipumsi,
-                          valid.col = TRUE,
-                          na.col = TRUE,
-                          graph.col = TRUE,
-                          graph.magnif = 0.75,
-                          style = 'grid',
-                          plain.ascii = FALSE
-)
-
 
 
 # remove data full object
@@ -165,7 +145,6 @@ ipumsi <- ipums_shape_inner_join(
 
 # check that we didn't lose districts in the merge 
 assert_that(nrow(ipumsi) == nrow(i.sum))
-
 
 
 

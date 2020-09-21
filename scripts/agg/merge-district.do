@@ -70,9 +70,12 @@ Function: merges the district-level averages to countries
 				la data 	"School indicators with all tiers of officials averaged by district; all matches"
 				save 		"${baseline_dt}/Intermediate/merge_district_alltiers_nomatch.dta", replace
 
-			* Then drop non-mereged obs and...
+			* Then drop non-mereged obs and empty observations
 				keep if 	merge == 3
 				drop		merge
+				
+				// drop all obs that are missing on most values 
+				drop if 	countryname == "" 	& g1 == . 	& g2 == .
 
 			* Verify quality of dataset after the drop.
 				/* run another checkscript (diff cuz this time we loose school obs) */
@@ -80,8 +83,17 @@ Function: merges the district-level averages to countries
 			* 4. Merge the IPUMS data
 			merge m:1 	g2 ///
 						using "${encryptFolder}/main/school_dist_conditionals.dta" ///
-						, assert(match)
-
+						, assert(using match)  /// there are more districts in ipums than our data
+						gen(ipums_merge) ///
+						force  	 //convert countryname from long to str10
+						
+				* keep only match, drop that variable 
+				keep if 	ipums_merge == 3
+				drop		ipums_merge
+				
+				* keep only necessary vars 
+				keep 		${finalvars}
+						
 
 				* save the dataset as a new version.
 				la data 	"School indicators with all tiers of officials averaged by district"
@@ -155,6 +167,10 @@ Function: merges the district-level averages to countries
 			* Then drop non-mereged obs and...
 				keep if 	merge == 3
 				drop		merge
+				
+				// drop all obs that are missing on most values 
+				drop if 	countryname == "" 	& g1 == . 	& g2 == .
+				
 
 			* Verify quality of dataset after the drop.
 				/* run another checkscript (diff cuz this time we loose school obs) */
@@ -163,9 +179,23 @@ Function: merges the district-level averages to countries
 			* 4. Merge the IPUMS data
 			merge m:1 	g2 ///
 						using "${encryptFolder}/main/school_dist_conditionals.dta" ///
-						, assert(match)
-
+						, assert(using match)  ///
+						gen(ipums_merge) ///
+						force // force strL into str10 
+					
+					
+				* ensure the observation count is accurate
+				count if 	idschool != . 
+				assert 		r(N) == 315 	// should be school 315 observations
+				
+				* keep only match, drop that variable 
+				keep if 	ipums_merge == 3
+				drop 		ipums_merge
+				
+				* keep only necessary vars 
+				keep 		${finalvars}
 						
+	
 				* save the dataset as a new version.
 				la data 	"School indicators w/ only district officials averaged by district"
 				save 		"${baseline_dt}/final/merge_district_tdist.dta", replace

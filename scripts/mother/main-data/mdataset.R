@@ -137,19 +137,6 @@ m.po <-     bind_rows("Peru"   = peru_po,
 
 
 
-                        # ------------------------------- #
-                        # Manually replace errors in data ----
-                        # ------------------------------- #
-# there seem to be mis-entered data for the office called SDEJT mercufi,
-# data entered as Region Office Data, by mistake?
-
-# if_else(m.po$office_preload == "SDEJT Mecufi", # condition
-#        m.po$govt_tier == "District Office" # true condition
-#   )
-
-
-
-
 
 
                         # ----------------------------- #

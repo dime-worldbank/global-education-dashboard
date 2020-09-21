@@ -175,7 +175,7 @@
 								ADM0_NAME ADM1_NAME ADM2_NAME ADM0_CODE ADM1_CODE ADM2_CODE STR2_YEAR ///
 								EXP2_YEAR STATUS DISP_AREA Shape_Leng Shape_Le_1 Shape_Area ///
 								school_province school_district total_enrolled school_name school_address ///
-								 region total_missing total_missing_teach_grd4_assess gdp ln_gdp
+								 region total_missing total_missing_teach_grd4_assess gdp  
 
 		gl 			piipo 		interview__id interview__key office_preload survey_time responsible_fance_planning ///
 		 						responsible_hring_teachers  responsible_none education ///
@@ -201,6 +201,29 @@
 								 enumerator_number enumerator_code
 
 		gl 			 poorder 	`"idpo countryname country g1 g2 ${biall}"'
+		
+		gl 			 finalvars  idschool countryname country g1 g2 student_knowledge ecd_student_knowledge ///
+								inputs infrastructure intrinsic_motivation content_knowledge pedagogical_knowledge ///
+								operational_manage instr_leader principal_knowl_score principal_manage math_sk lit_sk ///
+								student_prof lit_student_prof math_student_prof lit_content_knowl ecd_student_prof ///
+								ecd_math_student_prof ecd_lit_student_prof blackboard_functional pens_etc textbooks ///
+								share_desk used_ict access_ict drinking_water functioning_toilet internet ///
+								class_electricity disability_accessibility disab_road_access disab_school_ramp ///
+								disab_school_entr disab_class_ramp disab_class_entr disab_screening teacher_attraction ///
+								g0 bi national_learning_goals mandates_accountability quality_bureaucracy ///
+								impartial_decision_making targeting monitoring incentives community_engagement ///
+								coherence transparency accountability knowledge_skills work_environment merit ///
+								motivation_attitudes polit_policy_imp polit_policy_mkng polit_prsnel_mangmnt unions_facil ///
+								govt_tier resp_finance_planning resp_hiring_tchrs resp_monitor_perfrm resp_monitor_none ///
+								avg_class_size_guess avg_absence_guess motivation_relative_start proportion_re_underperform ///
+								proportion_broke_rules proportion_cocts_political proportion_prent_political ///
+								politicized_pmplementation proportion_reted_underperf proportion_contracts_pol ///
+								proportion_producement_pol pol_personnel_management pol_policy_making pol_policy_implementation ///
+								l_bi t_bi l_national_learning_goals t_national_learning_goals l_mandates_accountability ///
+								t_mandates_accountability l_quality_bureaucracy t_quality_bureaucracy ///
+								l_impartial_decision_making t_impartial_decision_making med_age pct_urban ///
+								pct_school pct_lit pct_edu1 pct_edu2 pct_work pct_schoolage n_schoolage ln_schoolage enrolled ///
+								ln_gdp
 
 
 

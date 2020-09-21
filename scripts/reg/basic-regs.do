@@ -14,7 +14,15 @@ foreach bi in bi national_learning_goals mandates_accountability quality_bureauc
 
 foreach s in student_knowledge ecd_student_knowledge inputs infrastructure intrinsic_motivation content_knowledge operational_manage instr_leader principal_knowl_score principal_manage {
 di "`bi' vs `s'"
-reg `s' `bi' i.country, vce(cluster g2)
+
+* Model specification
+reg 	`s' /// outcome variable, one of school variables above
+		`bi' /// buracuracy indicator as main explanatory variable
+		pct_urban pct_lit pct_work pct_edu1 med_age ln_schoolage /// district conditionals
+		i.enrolled i.country 	/// enrollment size category and country as factor variables 
+		, vce(cluster g2) 		// cluster on district
+		
+
 
 di " "
 di " "
