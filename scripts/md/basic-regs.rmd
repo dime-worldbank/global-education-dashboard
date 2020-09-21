@@ -58,7 +58,7 @@ condl <- c(
 # Table Labels 
 dvlab <- c("Student Knowledge", "ECD Knowledge", "Inputs", "Intrastructure", "Teacher Motivation", "Teacher Content Knowledge", "Operational Management", "Instructional Leadership", "Pricipal Knowledge", "Principal Management")
 
-ivlab <- c("Bureaucracy Index", "% Urban", "Literacy Rate", "% Schoolage", "% Electricity", "% Improved Dwelling")
+ivlab <- c("% Urban", "Literacy Rate", "% Schoolage", "% Electricity", "% Improved Dwelling")
 
 
 #load data
@@ -231,7 +231,7 @@ lm.idm.11 <- lm_robust(data = md,
 # table 1
 tab_model(lm.bi.1, lm.bi.2, lm.bi.3, lm.bi.4, lm.bi.5, lm.bi.6,
           lm.bi.8, lm.bi.9, lm.bi.10,lm.bi.11,
-          pred.labels = ivlab,
+          pred.labels = c("Bureaucracy Index", ivlab),
           dv.labels = dvlab,
           wrap.labels = 20,
           title = "Bureaucracy Index",
@@ -247,10 +247,10 @@ tab_model(lm.bi.1, lm.bi.2, lm.bi.3, lm.bi.4, lm.bi.5, lm.bi.6,
 ```
 <br><br>
 ```{r nlg, warning=FALSE}
-# table 1
+# table 2
 tab_model(lm.nlg.1, lm.nlg.2, lm.nlg.3, lm.nlg.4, lm.nlg.5, lm.nlg.6,
           lm.nlg.8, lm.nlg.9, lm.nlg.10,lm.nlg.11,
-          pred.labels = ivlab,
+          pred.labels = c("National Learning Goals", ivlab),
           dv.labels = dvlab,
           title = "National Learning Goals",
           show.ci = FALSE,
@@ -269,7 +269,7 @@ tab_model(lm.nlg.1, lm.nlg.2, lm.nlg.3, lm.nlg.4, lm.nlg.5, lm.nlg.6,
 # table 1
 tab_model(lm.ma.1, lm.ma.2, lm.ma.3, lm.ma.4, lm.ma.5, lm.ma.6,
           lm.ma.8, lm.ma.9, lm.ma.10,lm.ma.11,
-          pred.labels = ivlab,
+          pred.labels = c("Mandates and Accountability", ivlab),
           dv.labels = dvlab,
           title = "Mandates and Accountability",
           show.ci = FALSE,
@@ -289,7 +289,7 @@ tab_model(lm.ma.1, lm.ma.2, lm.ma.3, lm.ma.4, lm.ma.5, lm.ma.6,
 # table 1
 tab_model(lm.qb.1, lm.qb.2, lm.qb.3, lm.qb.4, lm.qb.5, lm.qb.6,
           lm.qb.8, lm.qb.9, lm.qb.10,lm.qb.11,
-          pred.labels = ivlab,
+          pred.labels = c("Quality of Bureaucracy", ivlab),
           dv.labels = dvlab,
           title = "Quality of Bureaucracy",
           show.ci = FALSE,
@@ -309,7 +309,7 @@ tab_model(lm.qb.1, lm.qb.2, lm.qb.3, lm.qb.4, lm.qb.5, lm.qb.6,
 # table 1
 tab_model(lm.idm.1, lm.idm.2, lm.idm.3, lm.idm.4, lm.idm.5, lm.idm.6,
           lm.idm.8, lm.idm.9, lm.idm.10,lm.idm.11,
-          pred.labels = ivlab,
+          pred.labels = c("Impartial Decision-Making", ivlab),
           dv.labels = dvlab,
           title = "Impartial Decision-Making",
           show.ci = FALSE,
@@ -328,7 +328,7 @@ tab_model(lm.idm.1, lm.idm.2, lm.idm.3, lm.idm.4, lm.idm.5, lm.idm.6,
 ## Summary Statistics
 
 ```{r}
-st_options(style = "rmarkdown", plain.ascii = FALSE, round.digits = 2)
-md %>% dfSummary(
-          varnumbers = FALSE, valid.col = TRUE, graph.col = FALSE, na.col = TRUE)
+md %>% dfSummary(style = "grid", plain.ascii = FALSE, tmp.img.dir = 'img',
+                 round.digits = 2, graph.magnif = 0.75,
+                 varnumbers = FALSE, valid.col = FALSE, na.col = FALSE)
 ```

@@ -41,6 +41,7 @@ if (user == 1) {
   repo.encrypt <- file.path("B:")
   repo         <- file.path("C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard")
     wbpoly     <- file.path(repo, "GIS/20160921_GAUL_GeoJSON_TopoJSON")
+    html       <- file.path(repo, "out/html")
   scripts      <- "C:/Users/WB551206/local/GitHub/global-edu-dashboard/scripts/mother"
   ipums        <- "C:/Users/WB551206/WBG/Daniel Rogger - 2_Politics Dashboard/5. Data/ipums"
 }
@@ -74,9 +75,9 @@ export  <- 1  # 1 if you want to export/save the files.
 
 # run script settings, set to 1 to run
 
-s1 <- 1 # main dataset import, processing, construction
-s2 <- 1 # recovers missing geoinformation to schools with missing gpgs coords
-s3 <- 1 # runs IMPUMS data import, processing, matching to WB poly schema
+s1 <- 0 # main dataset import, processing, construction
+s2 <- 0 # recovers missing geoinformation to schools with missing gpgs coords
+s3 <- 0 # runs IMPUMS data import, processing, matching to WB poly schema
 
 
 
