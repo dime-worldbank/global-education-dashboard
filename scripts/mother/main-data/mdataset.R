@@ -530,7 +530,7 @@ main_po_data.t3$match_dist_school<- main_po_data.t3$ADM2_CODE %in% li.school.ad2
                               # ------------------------------------- #
 if (export == 1) {
 
-# save as rds/stata
+# save as rdata
 save(main_po_data, main_school_data,
      m.po, m.school,
      wb.poly.m,

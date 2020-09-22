@@ -61,7 +61,9 @@ imprtjson <- 0  # 1 = import the raw geojson file for the worldbank polys (takes
                 # 0 = import the saved in the project encrypted folder
                 # Note: this switch determines if the geoids (g1, g2, g3) will be randomly 
                 # generated. If imprtjson == 0, they will not be re-generated. If the switch
-                # is set to 1, they will be regenerated.
+                # is set to 1, they will be regenerated. the individual observation ids 
+                # (idpo and idschool) are randomly re-generated each time mdataset.R is run 
+                # regardless of this switch.
  
 savepoly  <- 1  # 1 = save the polygon file to Tom's wb folder for later use. Only applicable 
                 # if imprtjson == 1, but ideally savepoly should be set to 1 so when changes
