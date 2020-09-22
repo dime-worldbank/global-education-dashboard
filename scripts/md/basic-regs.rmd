@@ -323,12 +323,4 @@ tab_model(lm.idm.1, lm.idm.2, lm.idm.3, lm.idm.4, lm.idm.5, lm.idm.6,
 
 ```
 
-
-
-## Summary Statistics
-
-```{r}
-md %>% dfSummary(style = "grid", plain.ascii = FALSE, tmp.img.dir = 'img',
-                 round.digits = 2, graph.magnif = 0.75,
-                 varnumbers = FALSE, valid.col = FALSE, na.col = FALSE)
-```
+<br><br><br>
