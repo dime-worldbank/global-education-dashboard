@@ -91,10 +91,18 @@ Function: merges the district-level averages to countries
 				keep if 	ipums_merge == 3
 				drop		ipums_merge
 				
+			
+			* 5. Mege the District Enrollment data 
+			merge m:1 	g2 ///
+						using "${encryptFolder}/main/by-district-enrollment.dta" ///
+						, assert(using match)  /// there are more districts in using than our data    
+						gen(enroll_merge) ///
+						keepusing(ln_dist_n_stud)
+
 				* keep only necessary vars 
 				keep 		${finalvars}
-						
-
+				 
+				
 				* save the dataset as a new version.
 				la data 	"School indicators with all tiers of officials averaged by district"
 				save 		"${baseline_dt}/final/merge_district_alltiers.dta", replace
@@ -182,15 +190,39 @@ Function: merges the district-level averages to countries
 						, assert(using match)  ///
 						gen(ipums_merge) ///
 						force // force strL into str10 
-					
-					
-				* ensure the observation count is accurate
-				count if 	idschool != . 
-				assert 		r(N) == 315 	// should be school 315 observations
+						
+						
+							
+			* ensure the observation count is accurate
+			count if 	idschool != . 
+			assert 		r(N) == ${magic} 	// should be school 320 observations
+			
+			* keep only match, drop that variable 
+			keep if 	ipums_merge == 3
+			drop 		ipums_merge
+			
+	
+
+			* 5. Mege the District Enrollment data 
+			merge m:1 	g2 ///
+						using "${encryptFolder}/main/by-district-enrollment.dta" ///
+						,   /// there are more districts in using than our data    assert(using match)
+						gen(enroll_merge) ///
+						keepusing(ln_dist_n_stud)
+						
+			
+			* keep only match, drop that variable 
+			keep if 	enroll_merge == 3
+			drop 		enroll_merge
+						
+
+			* ensure the observation count is accurate
+			count if	idschool != .
+			assert 		r(N) == ${magic} 	// should be school 320 observations
+			
+	
 				
-				* keep only match, drop that variable 
-				keep if 	ipums_merge == 3
-				drop 		ipums_merge
+
 				
 				* keep only necessary vars 
 				keep 		${finalvars}

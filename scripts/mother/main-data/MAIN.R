@@ -28,28 +28,58 @@ library(sjlabelled)
                     # 			 settings	 		          ----
                     # ----------------------------- #
 
-user <- 1
+  user <- 1
+
 # where 1 == Tom
 # 		  2 == Other
 
 
 
 # user settings
+
 if (user == 1) {
-  root         <- file.path("A:") # raw data
-    vault      <- file.path(root, "Countries")
-  repo.encrypt <- file.path("B:")
-  repo         <- file.path("C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard")
+  # Repository Root Folder 
+repo.top       <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard" # Replace This with folder path above main data folder.
+  repo         <- file.path("global-edu-dashboard")
     wbpoly     <- file.path(repo, "GIS/20160921_GAUL_GeoJSON_TopoJSON")
     html       <- file.path(repo, "out/html")
-  scripts      <- "C:/Users/WB551206/local/GitHub/global-edu-dashboard/scripts/mother"
-  ipums        <- "C:/Users/WB551206/WBG/Daniel Rogger - 2_Politics Dashboard/5. Data/ipums"
+  
+  # Encrypted folders, same for all users
+  root         <- file.path("A:") # raw data
+    vault      <- file.path(root, "Countries")
+    ipums      <- file.path(root, "ipums")  
+    ipums2     <- "C:/Users/WB551206/WBG/Daniel Rogger - 2_Politics Dashboard/5. Data and Analysis/ipums/impus-geo/to-import"
+  repo.encrypt <- file.path("B:") # processed data, with pii
+ 
+  # GitHub local paths
+  gh           <- "C:/Users/WB551206/local/GitHub/global-edu-dashboard" # replace this with path of local github folder.
+    scripts    <- file.path(gh, "scripts/mother")
+  
+    
+    #dataout      <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard" # depreciated.
 }
 
+
+
 if (user == 2) {
-  root  <- file.path("") # <- insert file path here if you want to copy the files locally.
-  vault <- file.path(root, "Countries")
-  # replace with where you put the 'code-review' folder if you decide to run locally.
+  # Repository Root Folder 
+  repo.top       <- "" # Replace This with folder path above main data folder.
+    repo         <- file.path("global-edu-dashboard")
+      wbpoly     <- file.path(repo, "GIS/20160921_GAUL_GeoJSON_TopoJSON")
+      html       <- file.path(repo, "out/html")
+  
+  # Encrypted folders, same for all users
+    root         <- file.path("A:") # raw data
+      vault      <- file.path(root, "Countries")
+      ipums      <- file.path(root, "ipums")
+    repo.encrypt <- file.path("B:") # processed data, with pii
+  
+  # GitHub local paths
+    gh           <- "" # replace this with path of local github folder.
+      scripts    <- file.path(gh, "scripts/mother")
+  
+  
+  #dataout      <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard" # depreciated.
 }
 
 
@@ -75,11 +105,24 @@ export  <- 1  # 1 if you want to export/save the files.
 
 
 
+# Observation Settings
+    # These values are what we know the final observation count should be;
+    # please change as data grow
+
+ns       =  1060   # should be 1059 schools (or 1060 with obs that is dropped)
+npo      =  721    # should be 721  public officials obs
+
+
+
+
 # run script settings, set to 1 to run
 
-s1 <- 0 # main dataset import, processing, construction
-s2 <- 0 # recovers missing geoinformation to schools with missing gpgs coords
-s3 <- 0 # runs IMPUMS data import, processing, matching to WB poly schema
+u1 <- 1 # runs enrollment-gps.R: only needed to be run once. 
+u2 <- 0 # wb poly import/re-randomize
+
+s1 <- 1 # main dataset import, processing, construction
+s2 <- 1 # recovers missing geoinformation to schools with missing gpgs coords
+s3 <- 1 # runs IMPUMS data import, processing, matching to WB poly schema
 
 
 
@@ -89,6 +132,16 @@ s3 <- 0 # runs IMPUMS data import, processing, matching to WB poly schema
                     # ----------------------------- #
                     # 			 Run Code 	 		         ----
                     # ----------------------------- #
+
+# run the importing of WB polygon files. 
+if (imprtjson == 1) {
+  source(file.path(scripts, "utils/wb-poly-import.R"))
+} 
+
+# Enrollment Data creation.
+if (u1 == 1) {
+  source(file.path(scripts, "utils/enrollment-gps.R"))
+}
 
 # Run Mdataset.R
 if (s1 == 1) {
@@ -104,3 +157,4 @@ if (s2 == 1) {
 if (s3 == 1) {
   source(file.path(scripts, "main-data/ipums.R"))
 }
+

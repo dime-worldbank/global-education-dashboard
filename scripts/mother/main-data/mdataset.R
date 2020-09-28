@@ -2,15 +2,31 @@
 # Author: Tom
 # appends all schools datasets and all public officials dataset (raw), performs basic
 # 	cleaning, and does geoprocessing on gps coordinates to determine admin unit, distances etc
-
+# 
+# Note: this script assumes that you have run MAIN.R
 
 
 
                       # ----------------------------- #
                       # Load+append schools datasets  #----
                       # ----------------------------- #
+                 # At this point we will also merge the enrollment info by
+                 # using school code. since, for some schools, the roster/
+                 # enrollment object has GPS coordinates for the schools, 
+                 # we will rename this imported lat/long from rost_lat to 
+                 # simply lat, and rename the survey-generated lat/lon 
+                 # to 'survey_lat'. We will use the roster lat/lon as the 
+                 # official coordinates as the data is more complete. We also 
+                 # want to drop the variable n_students because this variable 
+                 # is already loaded elsewhere in the survey data and the 
+                 # n_students variable is really only useful for calculating 
+                 # district-wide student enrollment. 
 
-# load each country's GDP data
+# load the enrollment data 
+load(file = file.path(root, "main/enrollment.Rdata"))                      
+                                  
+
+# load each country's GDP data, except for MOZ which doesn't exist yet
 peru_gdp <- import(file.path(vault,
 	"Peru/Data/Full_Data/school_indicators_data.RData"),
 	which = "school_gdp")
@@ -18,8 +34,6 @@ peru_gdp <- import(file.path(vault,
 jordan_gdp <- import(file.path(vault,
 	"Jordan/Data/Full_Data/school_indicators_data.RData"),
 	which = "school_gdp")
-
-# note there is no moz GDP yet
 
 rwanda_gdp <- import(file.path(vault,
 	"Rwanda/Data/Full_Data/school_indicators_data.RData"),
@@ -29,14 +43,31 @@ rwanda_gdp <- import(file.path(vault,
 peru_school <- import(file.path(vault,
                      "Peru/Data/Full_Data/school_indicators_data.RData"),
                     which = "school_dta_short")
-peru_school <- left_join(peru_school, peru_gdp, by = "school_code") # should keep all obs in main
+
+peru_school <- peru_school %>%
+  left_join(peru_gdp,     by = "school_code") %>%
+  rename(survey_lat = lat, survey_lon = lon) %>%
+  left_join(per.s.roster, by = c("school_code" = "rost_id1")) %>%
+  rename(lat = rost_lat, lon = rost_lon) %>%
+  mutate(total_enrolled = coalesce(total_enrolled, n_students)) %>%
+  select(-n_students, -countryname) 
+  
+
+
 
 # Jordan
 jordan_school <- import(file.path(vault,
                                "Jordan/Data/Full_Data/school_indicators_data.RData"),
                      which = "school_dta_short")
-jordan_school <- left_join(jordan_school, jordan_gdp, by = "school_code") # should keep all obs in main
 
+jordan_school <- jordan_school %>% 
+  left_join(jordan_gdp, by = "school_code") %>%
+  rename(survey_lat = lat, survey_lon = lon) %>%
+  left_join(jor.s.roster, by = c("school_code" = "rost_id1")) %>%
+  rename(lat = rost_lat, lon = rost_lon) %>%
+  mutate(total_enrolled = coalesce(total_enrolled, n_students)) %>%
+  select(-n_students, -countryname)
+  
 
 # Mozambique :: note there is no Rdata file.
 mozambique_school <- import(file.path(vault,
@@ -50,12 +81,28 @@ mozambique_school <- import(file.path(vault,
          principal_management = management_skills) %>%
   select(school_name_preload:lon)
 
+mozambique_school <- mozambique_school %>%  # not rename lat/long because we'll use survey lat/lon
+  left_join(moz.s.roster, by = c("school_code" = "rost_id1"), keep = TRUE) %>% # rost_id1 is def matching id
+  select(-countryname, -rost_district, -rost_province,
+         -rost_id1, -rost_id2, -rost_id3) %>%
+  rename(total_enrolled = n_students)  # pull enrollment data from the roster, as its not in survey,
+  
+
+
+
 # Rwanda
 rwanda_school <- import(file.path(vault,
                                "Rwanda/Data/Full_Data/school_indicators_data.RData"),
                      which = "school_dta_short")
-rwanda_school <- left_join(rwanda_school, rwanda_gdp, by = "school_code") %>% # should keep all obs in main
-                select(-(c("total_enrolled.x", "total_enrolled.y")))
+
+rwanda_school <- rwanda_school %>%
+  left_join(rwanda_gdp, by = "school_code") %>% 
+  select(-total_enrolled.y) %>% # remove this variable, (use the variable from the surey), leave lat/lon
+  rename(total_enrolled = total_enrolled.x) %>%
+  left_join(rwa.s.roster, by = "school_code") %>%
+  mutate(total_enrolled = coalesce(total_enrolled, n_students)) %>%
+  select(-n_students, -countryname)
+  
 
 
 # bind rows
@@ -133,6 +180,9 @@ m.po <-     bind_rows("Peru"   = peru_po,
                                      ))
 
 
+# check the observation number is correct 
+assert_that(nrow(m.school) == ns )
+assert_that(nrow(m.po)     == npo)
                         
 
 
@@ -229,9 +279,9 @@ m.school.gps <- select(m.school,
 
 
 
-                                # ------------------------------------- #
-                                # import WB subnational geojson files   # ----
-                                # ------------------------------------- #
+                            # ------------------------------------- #
+                            # import WB subnational geojson files   # ----
+                            # ------------------------------------- #
 					# this takes a long time and is saved as Rda, if imprtjson == 1, will import rda.
 					# if imprtjson == 1, then the import of the raw geojson files will happen and the 
 					# random geoids for g1 g2 and g3 will be generated. Setting imprtjson == 1 will skip
@@ -239,83 +289,12 @@ m.school.gps <- select(m.school,
 					# wb.poly.m that was previously generated. 
 
 
-if (imprtjson == 1) {
-
-wb.poly <- st_read(file.path(repo, "GIS/20160921_GAUL_GeoJSON_TopoJSON/GeoJSON/g2015_2014_2.geojson")) %>%
-  filter(ADM0_NAME == "Peru" | ADM0_NAME == "Jordan" | ADM0_NAME == "Mozambique" | ADM0_NAME == "Rwanda") %>%
-  distinct(ADM2_CODE, ADM1_CODE, ADM0_CODE, .keep_all = TRUE)  # remove any possible duplicates
-
-
-# check for duplicates: district code
-assert_that(anyDuplicated(wb.poly$ADM2_CODE) == 0)
-
-
-
-
-                                # ------------------------------------- #
-                                #         random ID creation             ----
-                                # ------------------------------------- #
-
-
-# create random g0 id (ADM0_CODE): country
-wbpoly0 <- as.data.frame(select(wb.poly, ADM0_CODE)) %>%
-  group_by(ADM0_CODE) %>%
-  summarize()   #collapse by unique value of ADM0_code
-
-set.seed(417)
-wbpoly0$g0 <-
-  runif(length(wbpoly0$ADM0_CODE))  %>% # generate a random id based on seed
-  rank()
-
-
-
-# create random g1 id (ADM1_CODE): region
-wbpoly1 <- as.data.frame(select(wb.poly, ADM1_CODE, ADM0_CODE)) %>%
-  group_by(ADM1_CODE, ADM0_CODE) %>%
-  summarize()    #collapse by unique value of ADM0_code
-
-set.seed(417)
-wbpoly1$g1 =  runif(length(wbpoly1$ADM1_CODE))  %>% # generate a random id based on seed
-  rank()
-
-
-
-# create random g2 id (ADM2_CODE): district
-wbpoly2 <- as.data.frame(select(wb.poly, ADM2_CODE, ADM1_CODE, ADM0_CODE)) %>%
-  group_by(ADM2_CODE, ADM1_CODE, ADM0_CODE) %>%
-  summarize()    #collapse by unique value of ADM0_code
-
-set.seed(417)
-wbpoly2$g2 =  runif(length(wbpoly2$ADM2_CODE))  %>% # generate a random id based on seed
-  rank()
-
-
-
-# merge id's back to world poly
-wb.poly.m <-
-  left_join(wb.poly, wbpoly0, by = "ADM0_CODE") %>%
-  left_join(wbpoly1, by = c("ADM0_CODE", "ADM1_CODE")) %>%
-  left_join(wbpoly2, by =  c("ADM0_CODE", "ADM1_CODE", "ADM2_CODE")) %>%
-  distinct(g0, g1, g2, .keep_all = TRUE)
-
-# assert that there are no duplicates of the three randomized ids
-assert_that(anyDuplicated(wb.poly.m$g2,
-                          wb.poly.m$g1,
-                          wb.poly.m$g0) == 0)
-if (savepoly == 1) {
-saveRDS(wb.poly.m,
-        file = file.path(root, "main/wb-poly-m.Rda"))
-}
-
-
-
-} # end imprtjson switch, if imprtjson == 1
-
-
-# if imprtjson == 0, then we just import the randomized data already created.
-if (imprtjson == 0) {
   wb.poly.m <- readRDS(file.path(root, "main/wb-poly-m.Rda"))
-}
+
+
+
+
+
 
 
                             # ------------------------------------- #
@@ -484,9 +463,9 @@ districtoffices <- filter(offices, govt_tier == "District Office",
 
 
                               
-                              # ------------------------------------- #
-                              #    Create "match" variable            # ----
-                              # ------------------------------------- #
+                       # ------------------------------------- #
+                      #    Create "match" variable            # ----
+                      # ------------------------------------- #
 
         # we want to know from the onset how many schools are in districts with public officials, and
         # how many public officials are in districts with schools. So what we will do is extract a 
@@ -525,8 +504,56 @@ main_po_data.t3$match_dist_school<- main_po_data.t3$ADM2_CODE %in% li.school.ad2
 
 
 
+
+
+
                               # ------------------------------------- #
-                              #               export                  # ----
+                              #    replace missing "total_enrolled    # ----
+                              # ------------------------------------- #
+                         # some schools do not have enrollment data, so we will replace 
+                         # that school enrollment with the median enrollment in that' 
+                         # school's district. If this value is also 0, then we will replace 
+                         # the missing with the country median (this is only the case for
+                         # Mozambique)
+                         # 
+# create country median of rmozambique.
+med.moz <- median(moz.s.roster$n_students)
+
+
+# restrict to simiply coalescing. 
+by.dist.enrollment.short <- select(by.dist.enrollment, ADM2_CODE, med_stud_school, geometry) %>%
+  st_drop_geometry()
+
+
+# replace values
+main_school_data <-
+  left_join(
+    main_school_data, 
+    by.dist.enrollment.short,
+    by = "ADM2_CODE",
+    keep = FALSE) %>%
+  mutate(
+    total_enrolled_colsc = coalesce(total_enrolled, med_stud_school),
+    total_enrolled3 = if_else( is.na(total_enrolled_colsc) == TRUE & countryname == "Mozambique",
+                               med.moz, total_enrolled_colsc)
+  ) %>% 
+  rename(total_enrolled_old  = total_enrolled) %>%
+  rename(total_enrolled      = total_enrolled3) %>%
+  select(-total_enrolled_colsc, -total_enrolled_old)
+
+
+
+
+     
+# check that there are no missing values for total enrolled
+ assert_that( sum(is.na(main_school_data$total_enrolled)) == 0)
+ 
+ 
+
+
+
+                              # ------------------------------------- #
+                              #               export                   ----
                               # ------------------------------------- #
 if (export == 1) {
 

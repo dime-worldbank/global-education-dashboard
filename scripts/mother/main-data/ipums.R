@@ -142,8 +142,7 @@ rm(data)
 
 # load shapfiles from zip file, select only our relevant countries
 sf_world2 <- read_ipums_sf(shape_file = 
-                            file.path(ipums,
-                                      "impus-geo/to-import/world_geolev2_2019.zip"),
+                             file.path(ipums, "ipums-gis/world_geolev2_2019.zip"),
                            verbose = TRUE,
                            encoding = "UTF-8")
 
@@ -183,8 +182,8 @@ assert_that(nrow(ipums.dist.sum) == nrow(i.sum))
 
 
 # save the full space in Dan's folder
-save.image(file =
-   "C:/Users/WB551206/WBG/Daniel Rogger - 2_Politics Dashboard/5. Data/ipums/ipums24/ipums-data-processed.Rdata")
+save.image(file = file.path(ipums, "ipums24/ipums-data-processed.Rdata"))
+
 
 # remove files 
 #rm(ddi, sf_world2)
@@ -244,6 +243,9 @@ assert_that(nrow(district.condls) == n_distinct(district.condls$g2))
                     #           Export            ----
                     # ----------------------------- #
 
+if (export == 1) {
+
+
 # select key variables to export 
 district.condls.export <- district.condls %>%
   select(ADM0_NAME, g0, g1, g2, 
@@ -270,4 +272,4 @@ write_dta(data = district.condls.export,
           version = 14
 )
 
-
+}

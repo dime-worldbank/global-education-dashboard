@@ -59,7 +59,7 @@
 		gl 			sch0 					"B:/main/final_main_school_data.dta"
 		}
 		if (${s6} == 1) {
-		gl 			sch0 					"B:/main/final_main_school_data_mt.dta"
+		gl 			sch0 					"B:/main/final_main_school_data_mt.dta" 
 		}
 
 		gl 			po0 					"B:/main/final_main_po_data.dta"
@@ -223,7 +223,7 @@
 								t_mandates_accountability l_quality_bureaucracy t_quality_bureaucracy ///
 								l_impartial_decision_making t_impartial_decision_making med_age pct_urban ///
 								pct_school pct_lit pct_edu1 pct_edu2 pct_work pct_schoolage pct_elec pct_dwell enrolled ///
-								ln_gdp
+								ln_gdp ln_dist_n_stud
 
 
 

@@ -150,6 +150,8 @@ sorting.hat <- miss.district
 
 
 # 6. split the missing dataset using the sorting hat----
+## here we 'sort out' the districts that have a unique, direct match internally
+## in the dataset (miss.copy) vs those that must be matched manually (miss.manual)
 
 ## this is the subset that we will copy from the internal data
 miss.copy <- left_join(s.missing,
@@ -208,6 +210,7 @@ miss.copy <- distinct(miss.copy,
 
 
 # 8. match the 'no' subset by hand (export to csv, edit, then re-import) ----
+# 
 # NOTE: in this section keep in mind that 'school_code' variable is not the 
 # randomly generated variable; school_code is a stable variable that does not 
 # change every time the code is run, so matching on this variable should never
@@ -219,7 +222,8 @@ if (csv.export == 1) {
 #   select(school_code, countryname, school_province_preload, school_district_preload) %>%
 #   write.csv(file = file.path(repo.encrypt, "main/match/schools-to-match.csv")
 #             )
-} # end csv switch
+           
+  } # end csv switch
 
 ## Import the CSV, select all relevant vars
 miss.manual.key <-
@@ -320,8 +324,8 @@ assert_that(nrow(main_school_data) == nrow(main_school_data_mt))
 
 
 ## compare the number of schools with missing geo info
-remain1 <- sum(is.na(main_school_data$ADM2_NAME)) # n miss=180
-remain2 <- sum(is.na(main_school_data_mt$ADM2_NAME)) ##  n miss=83; gains 97 schools! 
+remain1 <- sum(is.na(main_school_data$ADM2_NAME)) # n miss=180, now 90
+remain2 <- sum(is.na(main_school_data_mt$ADM2_NAME)) ##  n miss=83; now 68, 
 
 ### by country
 remainingmiss <- filter(main_school_data_mt,
@@ -363,7 +367,7 @@ li.po.t3.ad2codes = unique(main_po_data.t3$ADM2_CODE[!is.na(main_po_data.t3$ADM2
 main_school_data_mt$match_dist_po   <- main_school_data_mt$ADM2_CODE %in% li.po.ad2codes # district
 main_school_data_mt$match_region_po <- main_school_data_mt$ADM1_CODE %in% li.po.ad1codes # region
 main_school_data_mt$match_dist_pot3 <- main_school_data_mt$ADM2_CODE %in% li.po.t3.ad2codes # district, matching only tier 3 po's
-### we should get max 315 school observations when merged under these parameters
+### we should get max 320 school observations when merged under these parameters
 
 
 ## make a boolean variable for public officials if that obs's adm2 code matches any code from the school's vector
