@@ -109,6 +109,8 @@ wb.poly.m <- readRDS(file = file.path(root, "main/wb-poly-m.Rda"))
               # Note: rost_  prefix indicates from the school roster data but 
               #       that also may change/be inaccurate. We may have double or 
               #       even triple variables that indicate the same thing.
+              #       
+              #       %% keep nightshift school variables. 
 
 # vectors of column names to keep 
 jor.raw.keep <- c("Organization code", "Supervisory authority", "longitude", "Latitude",
@@ -257,7 +259,8 @@ per.s.roster <-
                     # ----------------------------- #
       # here we will create an indicator variable that is TRUE if public and false 
       # otherwiese, and further trim down datasets 
-
+      
+# %% create nightshift school. 
 
 # create public variable
 jor.s.roster$public <- if_else(jor.s.roster$type == "Private", true = FALSE, false = TRUE)
@@ -341,7 +344,7 @@ jor.s.roster.sf <- jor.s.roster.sf %>%
 
 
 
-## Group by district and summaryize 
+## Group by district and summarize 
 per.s.roster.sum <- per.s.roster.sf %>%
   filter(is.na(g2) == FALSE) %>%
   group_by(g0, g1, g2, ADM2_CODE) %>%
