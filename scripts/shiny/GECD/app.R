@@ -273,7 +273,7 @@ ui <- fluidPage(
                  ),
         
         tabPanel("Notes",
-                 markdownToHTML(file = "notes.Rmd") # %% fix this tomorrow
+                 includeMarkdown("notes.md") # %% fix this tomorrow
                  
                  
                  
