@@ -117,7 +117,7 @@ jor.raw.keep <- c("Organization code", "Supervisory authority", "longitude", "La
                   "Foundation period", "Total students", "Total male students", 
                   "Total female students", "Directorate", "Governorate")
 
-rwa.raw.keep <- c("SCHOOL NAME", "DISTRICT", "SECTOR", "STATUS",
+rwa.raw.keep <- c("SCHOOL NAME", "DISTRICT", "SECTOR", "STATUS", "PROVINCE",
                   "Female students", "Male students", "Total  students", "school_code")
 
 moz.raw.keep <- c("codigo", "turno", "ensino", "id", "school", 
@@ -147,7 +147,7 @@ jor.s.roster <-
     n_male        = "Total male students",
     n_female      = "Total female students",
     rost_district = "Directorate",  
-    rost_region   = "Governorate"
+    rost_region   = "Governorate" 
   ) %>%
   replace_na(list(n_male = 0, n_female =0)) %>%
   mutate(
@@ -170,7 +170,7 @@ rwa.s.roster <-
   select(rwa.raw.keep) %>%
   rename(
     rost_name      = "SCHOOL NAME",
-    rost_district  = "DISTRICT",  # "DISTRICT" corresponds to admin2 code in WB poly
+    rost_district  = "PROVINCE",  # "DISTRICT" corresponds to admin2 code in WB poly, "PROVINCE" to region/adm1
     n_students     = "Total  students",
     n_male         = "Male students",
     n_female       = "Female students"
@@ -214,7 +214,8 @@ moz.s.roster <-
                              true  = n_students.sum,
                              false = rost_n_students), 
     countryname    = "Mozambique",
-    type           = as.factor(ensino)
+    type           = as.factor(ensino),
+    turno          = as.factor(turno)
     
   )
 
@@ -260,7 +261,13 @@ per.s.roster <-
       # here we will create an indicator variable that is TRUE if public and false 
       # otherwiese, and further trim down datasets 
       
-# %% create nightshift school. 
+# create nightshift school. (night) 
+jor.s.roster$night <- if_else(jor.s.roster$period == "Evening", true = TRUE, false = FALSE) # insert varname and value that refers to nightshift school
+rwa.s.roster$night <- FALSE # there is no variable for RWA so we assume all are day
+moz.s.roster$night <- if_else(moz.s.roster$turno == "Diurno", true = FALSE, false = TRUE) # where diurno means "day"
+per.s.roster$night <- FALSE # same for peru we assume that all are day
+
+
 
 # create public variable
 jor.s.roster$public <- if_else(jor.s.roster$type == "Private", true = FALSE, false = TRUE)
@@ -280,17 +287,17 @@ assert_that(sum(is.na(per.s.roster$public)) == 0 )
 
 # simplify variables and order 
 jor.s.roster <- jor.s.roster %>%
-  select(countryname, rost_id1, n_students, public, rost_lat, rost_lon)
+  select(countryname, rost_id1, n_students, public, night, rost_lat, rost_lon)
 
 rwa.s.roster <- rwa.s.roster %>%
-  select(countryname, rost_name, school_code, rost_district, n_students, public)
+  select(countryname, rost_name, school_code, rost_district, night, n_students, public)
 
 moz.s.roster <- moz.s.roster %>%
   select(countryname, rost_district, rost_province,
-         rost_id1, rost_id2, rost_id3, rost_district, n_students, public)
+         rost_id1, rost_id2, rost_id3, rost_district, night, n_students, public)
 
 per.s.roster <- per.s.roster %>%
-  select(countryname, rost_id1, rost_id2, n_students, public, rost_lat, rost_lon)
+  select(countryname, rost_id1, rost_id2, n_students, public, night, rost_lat, rost_lon)
 
 
 
@@ -387,7 +394,7 @@ moz.wb.poly <- wb.poly.m %>%
 ## Group by district and summarize 
 ### RWA
 rwa.s.roster.sf <- rwa.s.roster %>%
-  filter(is.na(rost_district) == FALSE)
+  filter(is.na(rost_district) == FALSE) # note that this is really filtering by region as rost_district is set to the region var
 
 rwa.s.roster.sum <-
   mutate(rwa.s.roster.sf, # change to title case
@@ -399,9 +406,11 @@ rwa.s.roster.sum <-
     n_schools      = n(),
     med_stud_school= median(n_students)
   ) %>%
-  left_join(rwa.wb.poly, by = c("rost_dist_titl" = "ADM2_NAME"), keep = TRUE) %>%
-  select(dist_n_stud, ln_dist_n_stud, n_schools, med_stud_school, g0, g1, g2, ADM2_CODE, geometry) %>%
-  st_as_sf() 
+  left_join(rwa.wb.poly,
+            by = c("rost_dist_titl" = "ADM1_NAME"),
+            keep = TRUE) %>% # where 'rost_dist_titl' == name of region, fomerly ADM2_CODE
+  select(dist_n_stud, ln_dist_n_stud, n_schools, med_stud_school, g0, g1, g2, ADM2_CODE, ADM1_CODE, geometry) %>%
+  st_as_sf() # rwa will be matched by ADM2_CODE
 
 
 
@@ -495,14 +504,14 @@ by.dist.enrollment <- bind_rows(moz.s.roster.sum, rwa.s.roster.sum, per.s.roster
                         #            Export	      ----
                         # ----------------------------- #
 if (export == 1) {
-  
-# save Rdata  
+
+# save Rdata
 save(jor.s.roster, rwa.s.roster, moz.s.roster, per.s.roster,
      by.dist.enrollment,
      file = file.path(root, "main/enrollment.Rdata"))
 
-# export as dta 
-## remove geometry 
+# export as dta
+## remove geometry
 by.dist.enrollment %>%
   st_drop_geometry() %>%
   write_dta(
@@ -510,5 +519,5 @@ by.dist.enrollment %>%
           version = 14
  )
 
-  
+
 }
