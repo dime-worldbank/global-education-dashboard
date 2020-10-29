@@ -251,15 +251,6 @@ of <- mutate(of,
 m.po <- left_join(m.po, of, by = "office_preload") # merge id back to full po dataset
 
 
-# save as main datasets (only if we are running the real data. Reviewer's code will not run this)
-# if (appendskip != 1) {
-# 
-# saveRDS(m.school,
-#         file = file.path(root, "main/m-school.Rda"))
-# saveRDS(m.po,
-#         file = file.path(root, "main/m-po.Rda"))
-# }
-
 
 # gerenate gps only datasets with country id,
 m.po.gps <- select(m.po,
@@ -296,12 +287,12 @@ m.school.gps <- select(m.school,
 
 
 
-
                             # ------------------------------------- #
                             #   spatial join with main dataset      # ----
                             # ------------------------------------- #
 					# uses st_join to match mother dataset obs to geographic
 					# location based on gps
+					# where do I put the part where I change the values for ADM-2 for RWA? (substitute ) (or not substitute?)
 
 # convert po + school dataset to sf objects
 po <- st_as_sf(m.po,
@@ -329,7 +320,7 @@ order <- c("ADM0_NAME", "ADM1_NAME", "ADM2_NAME",
            "g0", "g1", "g2")
 
 
-# join poly and po datasets
+# join poly and po datasets  
 main_po_data <- st_join(po, # points
                         wb.poly.m) %>% #polys
                 left_join(m.po.gps, # join back to gps coords for reference
@@ -472,6 +463,8 @@ districtoffices <- filter(offices, govt_tier == "District Office",
         # vector of unique ADM2 (district) codes for schools and public officials. Then, in the opposite 
         # dataset, we will create a "match" variable that indicates true for if the observation is in the 
         # same district as any other observation. 
+        # 
+        # %% note, this may have to be replaced with g2, not ADM2_CODE
 
 
 # Extract a vector of unique ADM2 codes for schools, exclude NA values 
@@ -516,6 +509,8 @@ main_po_data.t3$match_dist_school<- main_po_data.t3$ADM2_CODE %in% li.school.ad2
                          # the missing with the country median (this is only the case for
                          # Mozambique)
                          # 
+                         # 
+                         # This may %% also have to be changed o g2 but should be ok because it's moz
 # create country median of rmozambique.
 med.moz <- median(moz.s.roster$n_students)
 

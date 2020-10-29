@@ -53,7 +53,7 @@ loc region 		: list numbers - g1 // for region we don't want either g2 or g1
 			la data 	"All tiers of public official indicators averaged at the region"
 			save 		"${publicofficial}/Dataset/col_po_g1_alltier.dta", replace
 					restore
-
+ * should also restrict the same to only region level officials as well.
 
 
 
