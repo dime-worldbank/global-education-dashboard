@@ -46,25 +46,22 @@ wb.poly.1 <-
 
 
 # check for duplicates: region code
-assert_that(anyDuplicated(rwa.poly$ADM1_CODE) == 0)
+assert_that(anyDuplicated(wb.poly.1$ADM1_CODE) == 0)
 
 
 # check for duplicates: district code
-assert_that(anyDuplicated(wb.poly3$ADM2_CODE) == 0)
-
-# append the dataframes
-wb.poly <- wb.poly3 %>%
-  bind_rows(., rwa.poly)
-
+assert_that(anyDuplicated(wb.poly.2$ADM2_CODE) == 0)
 
 
 
                     # ------------------------------------- #
                     #         random ID creation             ----
                     # ------------------------------------- #
+              # we only need to randomly generate ids for one of the 
+              # two dataframes, so I will use the district one
 
 # create random g0 id (ADM0_CODE): country
-wbpoly0 <- as.data.frame(select(wb.poly, ADM0_CODE)) %>%
+wbpoly0 <- as.data.frame(select(wb.poly.2, ADM0_CODE)) %>%
   group_by(ADM0_CODE) %>%
   summarize()   #collapse by unique value of ADM0_code
 
@@ -76,7 +73,7 @@ wbpoly0$g0 <-
 
 
 # create random g1 id (ADM1_CODE): region
-wbpoly1 <- as.data.frame(select(wb.poly, ADM1_CODE, ADM0_CODE)) %>%
+wbpoly1 <- as.data.frame(select(wb.poly.2, ADM1_CODE, ADM0_CODE)) %>%
   group_by(ADM1_CODE, ADM0_CODE) %>%
   summarize()    #collapse by unique value of ADM0_code
 
@@ -87,7 +84,7 @@ wbpoly1$g1 =  runif(length(wbpoly1$ADM1_CODE))  %>% # generate a random id based
 
 
 # create random g2 id (ADM2_CODE): district.
-wbpoly2 <- as.data.frame(select(wb.poly, ADM2_CODE, ADM1_CODE, ADM0_CODE)) %>%
+wbpoly2 <- as.data.frame(select(wb.poly.2, ADM2_CODE, ADM1_CODE, ADM0_CODE)) %>%
   group_by(ADM2_CODE, ADM1_CODE, ADM0_CODE) %>%
   filter(is.na(ADM2_CODE) == FALSE) %>% # excludes missings
   summarize()    #collapse by unique value of ADM0_code
@@ -99,8 +96,8 @@ wbpoly2$g2 =  runif(length(wbpoly2$ADM2_CODE))  %>% # generate a random id based
 
 
 # merge id's back to world poly
-wb.poly.m <-
-  left_join(wb.poly, wbpoly0, by = "ADM0_CODE") %>%
+wb.poly.2 <-
+  left_join(wb.poly.2, wbpoly0, by = "ADM0_CODE") %>%
   left_join(wbpoly1, by = c("ADM0_CODE", "ADM1_CODE")) %>%
   left_join(wbpoly2, by =  c("ADM0_CODE", "ADM1_CODE", "ADM2_CODE")) %>%
   distinct(g0, g1, g2, .keep_all = TRUE)
@@ -108,15 +105,10 @@ wb.poly.m <-
 
 
 # assert that there are no duplicates of the three randomized ids
-assert_that(anyDuplicated(wb.poly.m, by = c("g0", "g1", "g2"), na.rm = TRUE) == 0)
-assert_that(anyDuplicated(wb.poly.m, by = c("g0"), na.rm = TRUE) == 0)
-assert_that(anyDuplicated(wb.poly.m, by = c("g1"), na.rm = TRUE) == 0)
-assert_that(anyDuplicated(wb.poly.m, by = c("g2"), na.rm = TRUE) == 0)
-
-
-
-# assert that the only missing values for g2 are from RWA
-assert_that( sum(is.na(wb.poly.m$g2)) == nrow(rwa.poly) )
+assert_that(anyDuplicated(wb.poly.2, by = c("g0", "g1", "g2"), na.rm = TRUE) == 0)
+assert_that(anyDuplicated(wb.poly.2, by = c("g0"), na.rm = TRUE) == 0)
+assert_that(anyDuplicated(wb.poly.2, by = c("g1"), na.rm = TRUE) == 0)
+assert_that(anyDuplicated(wb.poly.2, by = c("g2"), na.rm = TRUE) == 0)
 
 
 
@@ -125,7 +117,9 @@ assert_that( sum(is.na(wb.poly.m$g2)) == nrow(rwa.poly) )
                     # ------------------------------------- #
                     #      bind region column geometry   ----
                     # ------------------------------------- #
-wb.poly <- cbind(wb.poly1, wb.poly2) # %% test and adjust, drop dup names.
+wb.poly <- left_join(wb.poly.2, wb.poly.1,
+                     by = c("ADM01_CODE"),
+                     suffix = c(".d", ".r")) # for region and district geometries # %% test and adjust, drop dup names.
 
 
 #check that wb.poly.m has the correct number of observations
