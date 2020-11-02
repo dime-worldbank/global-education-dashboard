@@ -116,8 +116,8 @@ npo      =  721    # should be 721  public officials obs
 
 # run script settings, set to 1 to run
 
-u1 <- 1 # wb poly import/re-randomize
-u2 <- 1 # runs enrollment-gps.R: only needed to be run once.
+u1 <- 0 # wb poly import/re-randomize
+u2 <- 0 # runs enrollment-gps.R: only needed to be run once.
 
 s1 <- 0 # main dataset import, processing, construction
 s2 <- 0 # recovers missing geoinformation to schools with missing gpgs coords
