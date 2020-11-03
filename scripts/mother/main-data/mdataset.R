@@ -280,7 +280,7 @@ m.school.gps <- select(m.school,
 					# wb.poly.m that was previously generated. 
 
 
-  wb.poly.m <- readRDS(file.path(root, "main/wb-poly-m.Rda"))
+load(file.path(root, "main/wbpolydata.Rdata"))
 
 
 
