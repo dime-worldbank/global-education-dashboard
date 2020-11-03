@@ -67,3 +67,18 @@ rwa <-
 
 ### this works but keeps only "left-hand" / rwa2 / district geometry. I want both geometry columns.
 rwa %>% select(ADM1_NAME) %>% plot(., main = 'merged geometry')
+
+
+
+### using edzer's example
+
+# load nc dataset 
+demo(nc, ask = FALSE, echo = FALSE)
+
+# make a second geom column: Main difference here is that edzer GENERATES the data but I want to merge 
+# two already existing columns
+nc$geom2 = st_centroid(st_geometry(nc))
+
+# # change active geom column 
+st_geometry(nc) <- "geom2"
+plot(st_geometry(nc))
