@@ -100,7 +100,7 @@ savepoly  <- 1  # 1 = save the polygon file to Tom's wb folder for later use. On
                 # == 1 is what imprtjson == 0 imports.
 
 
-export  <- 1  # 1 if you want to export/save the files.
+export  <- 0  # 1 if you want to export/save the files.
 
 
 
