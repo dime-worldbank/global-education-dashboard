@@ -343,18 +343,18 @@ order <- c("ADM0_NAME", "ADM1_NAME", "ADM2_NAME",
 
 main_po_data <- st_join(po, # points
                         wb.poly.dm, #polys
-                        largest = TRUE) %>% 
+                        largest = TRUE) %>%
                 select(idpo, interview__id, idoffice, order, everything())
 
 
 # join poly and school datasets
 main_school_data <- st_join(school, # points
                             wb.poly.dm, #polys
-                            largest = TRUE) %>% 
+                            largest = TRUE) %>%
                     select(idschool, school_code, order, everything())
 
 
-# ensure that the spatial join didn't produce extra observations 
+# ensure that the spatial join didn't produce extra observations
 assert_that( nrow(main_po_data) == npo )
 assert_that( nrow(main_school_data) == (ns - 1) ) # one obs is dropped, this is expected
 
@@ -459,11 +459,13 @@ main_school_data <-
     main_school_data,
     by.dist.enrollment.short,
     by = "ADM2_CODE",
+	na_matches = 'never', # %% this is where I begin on fri. why are there like 10k obs? is this solution?
     keep = FALSE) %>%
   mutate(
     total_enrolled_colsc = coalesce(total_enrolled, med_stud_school),
     total_enrolled3 = if_else( is.na(total_enrolled_colsc) == TRUE & countryname == "Mozambique",
-                               med.moz, total_enrolled_colsc)
+                               med.moz,
+							   total_enrolled_colsc)
   ) %>%
   rename(total_enrolled_old  = total_enrolled) %>%
   rename(total_enrolled      = total_enrolled3) %>%
@@ -476,19 +478,19 @@ main_school_data <-
 # check that there are no missing values for total enrolled
  assert_that( sum(is.na(main_school_data$total_enrolled)) == 0)
 
- 
-# check that there are the correct number of obs for school and po datasets 
+
+# check that there are the correct number of obs for school and po datasets
 assert_that( nrow(main_po_data) == npo)
 assert_that( nrow(main_school_data) == (ns - 1) ) # one obs is dropped, this is expected
 
- 
+
 
                               # ------------------------------------- #
                               #               export                   ----
                               # ------------------------------------- #
-                              
- 
-                            
+
+
+
 if (export == 1) {
 
 # save as rdata
@@ -561,7 +563,7 @@ write_dta(data = peru_school_export,
 
 } # end export switch
 
- 
+
 # # credits: https://stackoverflow.com/questions/6986657/find-duplicated-rows-based-on-2-columns-in-data-frame-in-r
 # https://gis.stackexchange.com/questions/224915/extracting-data-frame-from-simple-features-object-in-r
 # https://dominicroye.github.io/en/2019/calculating-the-distance-to-the-sea-in-r/
