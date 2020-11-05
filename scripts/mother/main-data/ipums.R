@@ -247,11 +247,15 @@ load(file = file.path(repo.encrypt, "main/final_main_data_recovered.Rdata"))
 
 
 # 1. join ipums to wb.poly by largest overlapping feature
-# note that this will not be valid for RWA because the wb.poly.m file does not have
-# district polys for RWA, only districts.
-district.condls <- st_join(wb.poly.m,  # wb polygons: district level
+# note that this will be valid for Rwanda because even though we will be joining the
+# schools with the public officials at the region level for this country, we can still
+# have conditional variables at the district level since the main unit of observation is
+# still schools
+
+district.condls <- st_join(wb.poly.2,  # wb polygons: district level
                            ipums.dist.sum,     # ipums.dist.sum summary by district
                            largest = TRUE) # match by largest overlap
+
 
 
 ## assert that the number of rows didn't change after merge.
@@ -274,7 +278,7 @@ assert_that(nrow(district.condls) == n_distinct(district.condls$g2))
 
 
 # 2. do the same as in 1 for regions.
-region.condls <- st_join(wb.poly.m,  # wb polygons: district level
+region.condls <- st_join(wb.poly.2,  # wb polygons: district level
                            ipums.reg.sum,     # ipums.dist.sum summary by district
                            largest = TRUE) # match by largest overlap
 
