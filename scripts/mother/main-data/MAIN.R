@@ -118,7 +118,7 @@ npo      =  721    # should be 721  public officials obs
 
 ## utilities (not required to be run every time)
 u1 <- 1 # wb poly import/re-randomize
-u2 <- 0 # runs enrollment-gps.R: only needed to be run once.
+u2 <- 1 # runs enrollment-gps.R: only needed to be run once.
 
 ## main scripts (should be run every time)
 s1 <- 1 # main dataset import, processing, construction

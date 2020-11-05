@@ -428,8 +428,6 @@ assert_that(n_distinct(moz.s.roster.sum$rost_dist_titl) == nrow(moz.s.roster.sum
 by.dist.enrollment <- bind_rows(moz.s.roster.sum, rwa.s.roster.sum, per.s.roster.sum, jor.s.roster.sum) %>%
   select(-rost_dist_titl)
 
-# %% create a summarized object from by.dist.enrollment by region. (except maybe this is the same thing since we
-# replaced RWA g2 with g1?)
 
 
 
@@ -441,12 +439,14 @@ by.dist.enrollment <- bind_rows(moz.s.roster.sum, rwa.s.roster.sum, per.s.roster
 if (export == 1) {
 
 # save Rdata
+# the roster files are used in mdataset.R to port over gps info
 save(jor.s.roster, rwa.s.roster, moz.s.roster, per.s.roster,
      by.dist.enrollment,
      file = file.path(root, "main/enrollment.Rdata"))
 
 # export as dta
-## remove geometry
+## remove geometry.
+## the .dta file is used in stata stage to merge district info by randomized id to the school data.
 by.dist.enrollment %>%
   st_drop_geometry() %>%
   write_dta(
