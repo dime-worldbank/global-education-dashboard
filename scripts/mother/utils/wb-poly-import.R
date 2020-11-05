@@ -62,7 +62,7 @@ assert_that(anyDuplicated(wb.poly.2$ADM2_CODE) == 0)
                     # ------------------------------------- #
                     #         random ID creation             ----
                     # ------------------------------------- #
-              # we only need to randomly generate ids for one of the 
+              # we only need to randomly generate ids for one of the
               # two dataframes, so I will use the district one
 
 
@@ -105,10 +105,10 @@ wbpoly2$g2 =  runif(length(wbpoly2$ADM2_CODE))  %>% # generate a random id based
 
 
               # -   -    -    -    -    -    -    -    -   -   -  #
-              # Bind random ids to main datasets (districts) ----                  
+              # Bind random ids to main datasets (districts) ----
 
 
-# district level       
+# district level
 wb.poly.2 <-
   left_join(wb.poly.2, wbpoly0, by = "ADM0_CODE") %>%
   left_join(wbpoly1, by = c("ADM0_CODE", "ADM1_CODE")) %>%
@@ -134,12 +134,12 @@ assert_that(anyDuplicated(wb.poly.2, by = c("g2"), na.rm = TRUE) == 0)
 
 wb.poly.1 <- left_join(wb.poly.2, wb.poly.1,
                      by = c("ADM01_CODE"),
-                     suffix = c(".d", ".r")) 
+                     suffix = c(".d", ".r"))
 
 
 
 #check that wb.poly.m has the correct number of observations
-assert_that(nrow(wb.poly) == 403) # should be back to 428 yeah? no. should be back to total numbers of districts. 
+assert_that(nrow(wb.poly) == 403) # should be back to 428 yeah? no. should be back to total numbers of districts.
 
 
 
@@ -149,21 +149,21 @@ assert_that(nrow(wb.poly) == 403) # should be back to 428 yeah? no. should be ba
 
 
 
-                
+
                 # -   -    -    -    -    -    -    -    -   -   -  #
                 #   Make a decision-making level dataset      ----
-                
+
             # in practicality, the decision-making level for the education ministries differs
             # by country, so in the project we will merge by different admin levels. this
             # dataset is contains the level at which we will merge.
-            # 
+            #
             # For the countries so far, the dm level is:
             #       Peru: district      (adm2)
             #     Jordan: district      (adm2)
             # Mozambique: district      (adm2)
             #     Rwanda: region   (adm1)
 
-# first make the country-specific objects
+# first make the country-specific objects selected from the decision-making level
 per <- wb.poly.2 %>%
   select(ADM0_NAME == "Peru")
 
@@ -186,19 +186,19 @@ wb.poly.dm <- # read: dm = decision-making
 
 
 
-              
-              
+
+
               # -   -    -    -    -    -    -    -    -   -   -  #
               #     Create a lightweight dictionary       ----
-              
+
           # this will include randomized ids and also wb polygon ADM* codes
-          # and should facilitate merging in the future. 
-          # 
-          # note that we only need to subset/select columns from the district 
-          # level dataset because this "lowest" admin level down contains 
+          # and should facilitate merging in the future.
+          #
+          # note that we only need to subset/select columns from the district
+          # level dataset because this "lowest" admin level down contains
           # all of the information
 
-polykey <- 
+polykey <-
   wb.poly.2 %>%
   select(ADM0_CODE, ADM1_CODE, ADM2_CODE,
          g0, g1, g2)
@@ -217,5 +217,6 @@ if (savepoly == 1) {
   save(wb.poly.1,
        wb.poly.2,
        wb.poly.dm,
+	   polykey,
           file = file.path(root, "main/wbpolydata.Rdata"))
 }
