@@ -289,7 +289,7 @@ m.school.gps <- select(m.school,
 					# wb.poly.m that was previously generated.
 
 
-load(file.path(root, "main/wbpolydata.Rdata"))
+load(file.path(repo.encrypt, "main/geo/wbpolydata.Rdata"))
 		# this loads:
 			# wb.poly.1: polygons at admin 1 (region) level
 		    # wb.poly.2: polygons at admin 2 (district) level
@@ -342,16 +342,21 @@ order <- c("ADM0_NAME", "ADM1_NAME", "ADM2_NAME",
 # by the decision-making level
 
 main_po_data <- st_join(po, # points
-                        wb.poly.dm) %>% #polys
+                        wb.poly.dm, #polys
+                        largest = TRUE) %>% 
                 select(idpo, interview__id, idoffice, order, everything())
 
 
 # join poly and school datasets
 main_school_data <- st_join(school, # points
-                            wb.poly.dm) %>% #polys
+                            wb.poly.dm, #polys
+                            largest = TRUE) %>% 
                     select(idschool, school_code, order, everything())
 
 
+# ensure that the spatial join didn't produce extra observations 
+assert_that( nrow(main_po_data) == npo )
+assert_that( nrow(main_school_data) == (ns - 1) ) # one obs is dropped, this is expected
 
 
 
@@ -471,13 +476,17 @@ main_school_data <-
 # check that there are no missing values for total enrolled
  assert_that( sum(is.na(main_school_data$total_enrolled)) == 0)
 
-
-
-
+ 
+ 
+ 
+ 
 
                               # ------------------------------------- #
                               #               export                   ----
                               # ------------------------------------- #
+                              
+ 
+                            
 if (export == 1) {
 
 # save as rdata
@@ -544,8 +553,13 @@ write_dta(data = peru_school_export,
           version = 14
 ) # default, leave factors as value labels, use variable name as var label
 
+
+
+
+
 } # end export switch
 
+ 
 # # credits: https://stackoverflow.com/questions/6986657/find-duplicated-rows-based-on-2-columns-in-data-frame-in-r
 # https://gis.stackexchange.com/questions/224915/extracting-data-frame-from-simple-features-object-in-r
 # https://dominicroye.github.io/en/2019/calculating-the-distance-to-the-sea-in-r/

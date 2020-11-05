@@ -48,6 +48,12 @@ wb.poly.1 <-
   distinct(ADM1_CODE, ADM0_CODE, .keep_all = TRUE)  # remove any possible duplicates
 
 
+# remove extra long region names after '/'
+wb.poly.1 <- wb.poly.1 %>%
+  separate(., ADM1_NAME, into = c("ADM1_NAME", 'rest'), sep =  "/", remove = TRUE) %>%
+  select(-rest) # this renames the ADM1 name to be consistent with other names
+
+
 # check for duplicates: region code
 assert_that(anyDuplicated(wb.poly.1$ADM1_CODE) == 0)
 
@@ -132,15 +138,23 @@ assert_that(anyDuplicated(wb.poly.2, by = c("g2"), na.rm = TRUE) == 0)
                 #   Bind random ids to main datasets (region)  ----
 
 
-wb.poly.1 <- left_join(wb.poly.2, wb.poly.1,
-                     by = c("ADM01_CODE"),
-                     suffix = c(".d", ".r"))
+
+# region level (same as district but exclude g2)
+wb.poly.1 <-
+  left_join(wb.poly.1, wbpoly0, by = "ADM0_CODE") %>%
+  left_join(wbpoly1, by = c("ADM0_CODE", "ADM1_CODE")) %>%
+  distinct(g0, g1, .keep_all = TRUE)
 
 
 
-#check that wb.poly.m has the correct number of observations
-assert_that(nrow(wb.poly) == 403) # should be back to 428 yeah? no. should be back to total numbers of districts.
 
+#check that wb.poly datasets has the correct number of observations
+## district
+assert_that(nrow(wb.poly.2) == 428) 
+
+## region 
+assert_that(nrow(wb.poly.1) == 53) 
+assert_that(nrow(wb.poly.1) == n_distinct(wb.poly.2$ADM1_CODE) )
 
 
 
@@ -165,16 +179,16 @@ assert_that(nrow(wb.poly) == 403) # should be back to 428 yeah? no. should be ba
 
 # first make the country-specific objects selected from the decision-making level
 per <- wb.poly.2 %>%
-  select(ADM0_NAME == "Peru")
+  filter(ADM0_NAME == "Peru")
 
 jor <- wb.poly.2 %>%
-  select(ADM0_NAME == "Jordan")
+  filter(ADM0_NAME == "Jordan")
 
 moz <- wb.poly.2 %>%
-  select(ADM0_NAME == "Mozambique")
+  filter(ADM0_NAME == "Mozambique")
 
-rwa <- wb.poly.1 %>%
-  select(ADM0_NAME == "Rwanda")
+rwa <- wb.poly.1 %>% # note we want region for rwa
+  filter(ADM0_NAME == "Rwanda")
 
 
 # append rows
@@ -204,6 +218,12 @@ polykey <-
          g0, g1, g2)
 
 
+# make the same thing without geometry
+polykey_nogeo <- 
+  polykey %>%
+  st_drop_geometry()
+
+
 
 
 
@@ -217,6 +237,7 @@ if (savepoly == 1) {
   save(wb.poly.1,
        wb.poly.2,
        wb.poly.dm,
-	   polykey,
-          file = file.path(root, "main/wbpolydata.Rdata"))
+	     polykey,
+       polykey_nogeo,
+          file = file.path(repo.encrypt, "main/geo/wbpolydata.Rdata"))
 }
