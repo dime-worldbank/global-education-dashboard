@@ -34,7 +34,7 @@ data <- read_ipums_micro(ddi, # calls to same directory as ddi, reads same-named
 
 
                         # ----------------------------- #
-                        # 	 Data Transformation	 		   ----
+                        # 	IPUMS Data Transformation	 	 ----
                         # ----------------------------- #
 
 

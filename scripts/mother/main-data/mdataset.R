@@ -477,8 +477,10 @@ main_school_data <-
  assert_that( sum(is.na(main_school_data$total_enrolled)) == 0)
 
  
- 
- 
+# check that there are the correct number of obs for school and po datasets 
+assert_that( nrow(main_po_data) == npo)
+assert_that( nrow(main_school_data) == (ns - 1) ) # one obs is dropped, this is expected
+
  
 
                               # ------------------------------------- #

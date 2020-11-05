@@ -40,7 +40,7 @@ schoolkeyvars<-c("idschool", "school_code", "ADM0_NAME",
               "g1", "g2", "countryname",
               "school_name_preload", "school_address_preload", "school_province_preload",
               "school_district_preload",
-              "lat", "lon", "geometry")
+              "geometry")
 
 pokeyvars<-c("idpo", "interview__id", "idoffice",
             "ADM0_NAME", "ADM1_NAME", "ADM2_NAME",
@@ -51,7 +51,7 @@ pokeyvars<-c("idpo", "interview__id", "idoffice",
             "province", "location", "govt_tier",
             "enumerator_name", "enumerator_number", "survey_time",
             "consent", "national_learning_goals",
-            "lat", "lon", "geometry")
+            "geometry")
 
 
 
@@ -245,7 +245,7 @@ miss.manual.key.short <-
 
 
 ## run a quick id check
-#assert_that(nrow(wb.poly.m)             == n_distinct(wb.poly.m$ADM2_CODE)) # not needed?
+#assert_that(nrow(wb.poly.2)             == n_distinct(wb.poly.2$ADM2_CODE)) # not needed?
 assert_that(nrow(miss.manual)           == n_distinct(miss.manual$school_code))
 assert_that(nrow(miss.manual.key.short) == n_distinct(miss.manual.key.short$school_code))
 
