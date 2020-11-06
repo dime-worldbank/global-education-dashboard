@@ -320,11 +320,11 @@ school <- st_as_sf(m.school,
 
 
 # set the crs of school + po as the same as the world poly crs
-st_crs(po) <- st_crs(wb.poly.m)
-st_crs(school) <- st_crs(wb.poly.m)
+st_crs(po) <- st_crs(wb.poly.2)
+st_crs(school) <- st_crs(wb.poly.2)
 
 st_is_longlat(po)
-st_is_longlat(wb.poly.m)
+st_is_longlat(school)
 
 
 
@@ -496,10 +496,9 @@ if (export == 1) {
 # save as rdata
 save(main_po_data, main_school_data,
      m.po, m.school,
-     wb.poly.m,
+     wb.poly.1, wb.poly.2, wb.poly.dm, polykey,
      tiers,
      newtiers,
-     offices,
      file = file.path(repo.encrypt, "main/final_main_data.Rdata"))
 
 #determine lists of vars to change length

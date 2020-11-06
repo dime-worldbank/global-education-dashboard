@@ -156,6 +156,7 @@ sorting.hat <- miss.district
 ## this is the subset that we will copy from the internal data
 miss.copy <- left_join(s.missing,
                        sorting.hat,
+                       na_matches = 'never',
                        by = c("countryname", "school_district_preload")) %>%
              filter(match == TRUE) %>%
              st_drop_geometry()
@@ -164,6 +165,7 @@ miss.copy <- left_join(s.missing,
 ## this is the subset that we will will match manually
 miss.manual <- left_join(s.missing,
                          sorting.hat,
+                         na_matches = 'never',
                          by = c("countryname", "school_district_preload")) %>%
                 filter(match == FALSE) %>%
                 st_drop_geometry()
@@ -183,6 +185,7 @@ assert_that(
 ## match/merge
 miss.copy <- left_join(miss.copy,
                        s.there,
+                       na_matches = 'never',
                        by = c("countryname", "school_district_preload"),
                        suffix = c(".x", ".y"))
 
@@ -254,6 +257,7 @@ assert_that(nrow(miss.manual.key.short) == n_distinct(miss.manual.key.short$scho
 ## Match miss.manual to csv imported, match by school code and country
 miss.manual <- left_join(miss.manual,
                          miss.manual.key.short,
+                         na_matches = 'never',
                          by = c("school_code", 'countryname')) %>%
                select(school_code, countryname, District.number, Region.number,
                       school_district_preload, countryname)
@@ -265,8 +269,9 @@ miss.manual <-
   left_join(
 	  miss.manual,
 	  wb.poly.dm, # merge to decision-making df
-      by = c("District.number" = "ADM2_CODE"),
-      keep = TRUE) %>%
+	  na_matches = 'never',
+    by = c("District.number" = "ADM2_CODE"),
+    keep = TRUE) %>%
   select(names(miss.copy))
 
 
@@ -291,6 +296,7 @@ assert_that(nrow(s.missing) == nrow(miss.filledin))
 main_school_data_mt <-
   left_join(main_school_data,
             miss.filledin,
+            na_matches = 'never',
             by = "school_code",
             suffix = c(".x", ".y")) %>%
   mutate(
@@ -321,7 +327,7 @@ main_school_data_mt <-
 
 
 
-## confirm the correct number of rows
+## confirm the correct number of rows 
 assert_that(nrow(main_school_data) == nrow(main_school_data_mt))
 
 
@@ -397,7 +403,7 @@ save(main_po_data, main_school_data, # original datasets
      s.missing, s.there, # new:
      tiers,
      newtiers,
-     offices,
+    # offices,
      file = file.path(repo.encrypt, "main/final_main_data_recovered.Rdata"))
 
 

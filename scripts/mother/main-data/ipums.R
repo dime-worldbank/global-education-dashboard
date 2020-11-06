@@ -109,10 +109,7 @@ i.sum <- data %>%
     pct_schoolage= weighted.mean((schoolage == TRUE), w = PERWT, na.rm = TRUE), # pct schoolage
     pct_dwell    = weighted.mean((dwell == TRUE), w = HHWT, na.rm = TRUE), # pct improved dwelling,
     pct_elec     = weighted.mean((elec  == 1), w = HHWT, na.rm = TRUE)  # pct access to electricity.
-) %>%
-	# filter out RWA since this is not being merged at the district level.
-filter(COUNTRY != "Rwanda")
-
+)
 
 
 # collapse by country, region; generate 'average' indicators
@@ -129,9 +126,7 @@ i.sum.reg <- data %>%
     pct_schoolage= weighted.mean((schoolage == TRUE), w = PERWT, na.rm = TRUE), # pct schoolage
     pct_dwell    = weighted.mean((dwell == TRUE), w = HHWT, na.rm = TRUE), # pct improved dwelling,
     pct_elec     = weighted.mean((elec  == 1), w = HHWT, na.rm = TRUE)  # pct access to electricity.
-) %>%
-# filter out countries we are merging at the district level
-filter(COUNTRY == "Rwanda")
+)
 
 
 
@@ -179,7 +174,6 @@ sf_world2 <- sf_world2 %>%
 
 
 # merge using ipums merge
-
 ## for districts
 ipums.dist.sum <- ipums_shape_inner_join(
   i.sum,
@@ -194,6 +188,7 @@ ipums.reg.sum <- ipums_shape_inner_join(
   sf_world2,
   by = c("GEOLEV1" = "GEOLEVEL1")
 )
+
 
 
 # check that we didn't lose districts in the merge
