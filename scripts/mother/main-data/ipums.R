@@ -115,6 +115,7 @@ i.sum <- data %>%
 # collapse by country, region; generate 'average' indicators
 i.sum.reg <- data %>%
   group_by(COUNTRY, GEOLEV1) %>%
+  filter(is.na(GEOLEV1) == FALSE) %>% # remove missing obs where geolev1 code is missing
   summarise(
     med_age      = median(age, na.rm = TRUE), # median age
     pct_urban    = weighted.mean((urb == 1), w = HHWT, na.rm = TRUE), # pct urban (from HH surveys)
@@ -158,9 +159,17 @@ rm(data)
 
 
 
-# load shapfiles from zip file, select only our relevant countries %% may have to use lvl1?
+# load district level shapfiles from zip file,
 sf_world2 <- read_ipums_sf(shape_file =
-                             file.path(ipums, "ipums-gis/world_geolev2_2019.zip"),
+                             file.path(ipumsgeo, "world_geolev2_2019.zip"),
+                           verbose = TRUE,
+                           encoding = "UTF-8")
+
+
+
+# load region level shapfiles from zip file
+sf_world1 <- read_ipums_sf(shape_file =
+                             file.path(ipumsgeo, "world_geolev1_2019.zip"),
                            verbose = TRUE,
                            encoding = "UTF-8")
 
@@ -171,6 +180,20 @@ sf_world2 <- sf_world2 %>%
          CNTRY_CODE == 508 | # Mozambique
          CNTRY_CODE == 604 | # Peru
          CNTRY_CODE == 646)  # Rwanda
+
+sf_world1 <- sf_world1 %>%
+  filter(CNTRY_CODE == 400 | # Jordan
+           CNTRY_CODE == 508 | # Mozambique
+           CNTRY_CODE == 604 | # Peru
+           CNTRY_CODE == 646)  # Rwanda
+
+
+# test
+names <- sf_world2 %>%
+  st_drop_geometry() %>%
+  select(CNTRY_NAME, CNTRY_CODE) 
+
+names %>% group_by(CNTRY_CODE) %>% summarise( n = n())
 
 
 # merge using ipums merge
@@ -185,7 +208,7 @@ ipums.dist.sum <- ipums_shape_inner_join(
 ## for regions
 ipums.reg.sum <- ipums_shape_inner_join(
   i.sum.reg,
-  sf_world2,
+  sf_world1,
   by = c("GEOLEV1" = "GEOLEVEL1")
 )
 
@@ -210,7 +233,7 @@ assert_that(nrow(ipums.reg.sum) == nrow(i.sum.reg)) # regions
 
 
 # save the full space in Dan's folder
-save.image(file = file.path(ipums, "ipums24/ipums-data-processed.Rdata"))
+#save.image(file = file.path(ipums, "ipums24/ipums-data-processed.Rdata"))
 
 
 # remove files
@@ -223,13 +246,16 @@ save.image(file = file.path(ipums, "ipums24/ipums-data-processed.Rdata"))
 
 
                     # ----------------------------- #
-                    #     Load Main Data             ----
+                    #     Load Polygon Data             ----
                     # ----------------------------- #
-                    # this allows us to pull the wb world
-                    # polygon data
 
-load(file = file.path(repo.encrypt, "main/final_main_data_recovered.Rdata"))
+load(file = file.path(repo.encrypt, "main/geo/wbpolydata.Rdata"))
 
+names2 <- wb.poly.2 %>%
+  st_drop_geometry() %>%
+  select(ADM0_CODE, ADM0_NAME, ADM1_NAME, ADM1_CODE, ADM2_CODE, ADM2_NAME) 
+
+names2 %>% group_by(ADM0_CODE) %>% summarise( n = n())
 
 
 
@@ -273,7 +299,7 @@ assert_that(nrow(district.condls) == n_distinct(district.condls$g2))
 
 
 # 2. do the same as in 1 for regions.
-region.condls <- st_join(wb.poly.2,  # wb polygons: district level
+region.condls <- st_join(wb.poly.1,  # wb polygons: district level
                            ipums.reg.sum,     # ipums.dist.sum summary by district
                            largest = TRUE) # match by largest overlap
 

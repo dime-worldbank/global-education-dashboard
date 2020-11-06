@@ -48,9 +48,9 @@ repo.top       <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard" # Repla
   root         <- file.path("A:") # raw data
     vault      <- file.path(root, "Countries")
     ipums      <- file.path(root, "ipums")
-    ipums2     <- "C:/Users/WB551206/WBG/Daniel Rogger - 2_Politics Dashboard/5. Data and Analysis/ipums/impus-geo/to-import"
   repo.encrypt <- file.path("B:") # processed data, with pii
-
+    ipumsgeo   <- file.path(repo.encrypt, "ipums-geo")
+  
   # GitHub local paths
   gh           <- "C:/Users/WB551206/local/GitHub/global-edu-dashboard" # replace this with path of local github folder.
     scripts    <- file.path(gh, "scripts/mother")
@@ -72,6 +72,7 @@ if (user == 2) {
       vault      <- file.path(root, "Countries")
       ipums      <- file.path(root, "ipums")
     repo.encrypt <- file.path("B:") # processed data, with pii
+      ipumsgeo   <- file.path(repo.encrypt, "ipums-geo")
 
   # GitHub local paths
     gh           <- "" # replace this with path of local github folder.
