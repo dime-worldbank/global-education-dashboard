@@ -425,9 +425,12 @@ assert_that(n_distinct(moz.s.roster.sum$rost_dist_titl) == nrow(moz.s.roster.sum
 
 
 # Append all country objects
-by.dist.enrollment <- bind_rows(moz.s.roster.sum, rwa.s.roster.sum, per.s.roster.sum, jor.s.roster.sum) %>%
+by.dist.enrollment.all <- bind_rows(moz.s.roster.sum, rwa.s.roster.sum, per.s.roster.sum, jor.s.roster.sum) %>%
   select(-rost_dist_titl)
 
+## remove missing values for all geoinformation
+by.dist.enrollment <- by.dist.enrollment.all %>%
+  filter(is.na(g0) == FALSE) # if the country code is missing then there's no point in keeping; will never match
 
 
 

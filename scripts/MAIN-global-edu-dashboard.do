@@ -220,7 +220,7 @@ gl magic= 320   // the magic number of final school observations we expect under
 
 loc clean	= 1		// reconstruct bi vars
 loc agg		= 1 	// conduct collapsing and merging
-loc misc 	= 1 	// misc data processing, prior merging is necessary.
+loc misc 	= 0 	// misc data processing, prior merging is necessary.
 loc reg 	= 0 	// run regression panels
 
 
