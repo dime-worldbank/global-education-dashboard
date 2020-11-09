@@ -122,9 +122,9 @@ u1 <- 0 # wb poly import/re-randomize
 u2 <- 0 # runs enrollment-gps.R: only needed to be run once.
 
 ## main scripts (should be run every time)
-s1 <- 0 # main dataset import, processing, construction
-s2 <- 0 # recovers missing geoinformation to schools with missing gpgs coords
-s3 <- 0 # runs IMPUMS data import, processing, matching to WB poly schema
+s1 <- 1 # main dataset import, processing, construction
+s2 <- 1 # recovers missing geoinformation to schools with missing gpgs coords
+s3 <- 1 # runs IMPUMS data import, processing, matching to WB poly schema
 
 
 
@@ -147,6 +147,7 @@ if (u2 == 1) {
 
 
 
+## Run main scripts
 # Run Mdataset.R
 if (s1 == 1) {
   source(file.path(scripts, "main-data/mdataset.R"))

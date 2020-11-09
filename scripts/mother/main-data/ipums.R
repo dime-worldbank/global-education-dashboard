@@ -238,9 +238,9 @@ assert_that(nrow(ipums.reg.sum) == nrow(i.sum.reg)) # regions
                     # checkpoint does not include raw ipums
                     # data
 
-
+dan_ipums <- "C:/Users/WB551206/WBG/Daniel Rogger - 2_Politics Dashboard/5. Data and Analysis/ipums/ipums24"
 # save the full space in Dan's folder
-save.image(file = file.path(ipums, "ipums24/ipums-data-processed2.Rdata"))
+save.image(file = file.path(dan_ipums, "ipums-data-processed2.Rdata"))
 
 
 # remove files
