@@ -19,7 +19,7 @@ library(summarytools)
 library(DescTools)
 
 
-# load ipums data
+# load ipums micro data
 
 ddi  <- read_ipums_ddi(ddi_file = file.path(ipums, "ipums24/ipumsi_00024.xml"))
 
@@ -59,11 +59,11 @@ data$WALL    <- lbl_clean(data$WALL)
 
 
 # create summary objects of raw data
-sum.raw <- data %>%
-  dfSummary(graph.col = FALSE, na.col = TRUE, style = 'grid')
-
-sum.raw.bycountry <- data %>% group_by(COUNTRY) %>%
-  dfSummary(graph.col = FALSE, na.col = TRUE, style = 'grid')
+# sum.raw <- data %>%
+#   dfSummary(graph.col = FALSE, na.col = TRUE, style = 'grid')
+# 
+# sum.raw.bycountry <- data %>% group_by(COUNTRY) %>%
+#   dfSummary(graph.col = FALSE, na.col = TRUE, style = 'grid')
 
 
 
@@ -134,12 +134,12 @@ i.sum.reg <- data %>%
 
 
 
-# create summary object of district averages
-sum.av <-
-  dfSummary(i.sum,
-            graph.col = TRUE, labels.col = FALSE, na.col = TRUE, style = 'multiline',
-            col.widths = c(5, 40, 100, 60, 100, 40, 40)
-            )
+# # create summary object of district averages
+# sum.av <-
+#   dfSummary(i.sum,
+#             graph.col = TRUE, labels.col = FALSE, na.col = TRUE, style = 'multiline',
+#             col.widths = c(5, 40, 100, 60, 100, 40, 40)
+#             )
 
 
 
@@ -188,13 +188,20 @@ sf_world1 <- sf_world1 %>%
            CNTRY_CODE == 646)  # Rwanda
 
 
-# test
-names <- sf_world2 %>%
-  st_drop_geometry() %>%
-  select(CNTRY_NAME, CNTRY_CODE) 
+# # test
 
-names %>% group_by(CNTRY_CODE) %>% summarise( n = n())
+# sf_world1 %>% filter(CNTRY_NAME == "Rwanda") %>%
+#   plot()
+# 
+# wb.poly.1 %>% filter(ADM0_NAME  == "Rwanda") %>%
+#   plot()
 
+# names <- sf_world2 %>%
+#   st_drop_geometry() %>%
+#   select(CNTRY_NAME, CNTRY_CODE) 
+# 
+# names %>% group_by(CNTRY_CODE) %>% summarise( n = n())
+# 
 
 # merge using ipums merge
 ## for districts
@@ -233,11 +240,11 @@ assert_that(nrow(ipums.reg.sum) == nrow(i.sum.reg)) # regions
 
 
 # save the full space in Dan's folder
-#save.image(file = file.path(ipums, "ipums24/ipums-data-processed.Rdata"))
+save.image(file = file.path(ipums, "ipums24/ipums-data-processed2.Rdata"))
 
 
 # remove files
-#rm(ddi, sf_world2)
+rm(ddi, sf_world1, sf_world2)
 
 
 
@@ -250,12 +257,6 @@ assert_that(nrow(ipums.reg.sum) == nrow(i.sum.reg)) # regions
                     # ----------------------------- #
 
 load(file = file.path(repo.encrypt, "main/geo/wbpolydata.Rdata"))
-
-names2 <- wb.poly.2 %>%
-  st_drop_geometry() %>%
-  select(ADM0_CODE, ADM0_NAME, ADM1_NAME, ADM1_CODE, ADM2_CODE, ADM2_NAME) 
-
-names2 %>% group_by(ADM0_CODE) %>% summarise( n = n())
 
 
 
@@ -279,9 +280,6 @@ district.condls <- st_join(wb.poly.2,  # wb polygons: district level
 
 
 
-## assert that the number of rows didn't change after merge.
-assert_that(nrow(ipums.dist.sum) == nrow(district.condls))
-
 
 ## assert that every row has IPUMS data
 assert_that(sum(is.na(district.condls$GEOLEV2)) == 0)
@@ -300,16 +298,14 @@ assert_that(nrow(district.condls) == n_distinct(district.condls$g2))
 
 # 2. do the same as in 1 for regions.
 region.condls <- st_join(wb.poly.1,  # wb polygons: district level
-                           ipums.reg.sum,     # ipums.dist.sum summary by district
-                           largest = TRUE) # match by largest overlap
-
-
-## assert that the number of rows in wb poly dataset stayed constant
-assert_that(nrow(ipums.reg.sum) == nrow(region.condls))
+                        ipums.reg.sum,     # ipums.dist.sum summary by district
+                        join = st_overlaps, 
+                        largest = TRUE) # match by largest overlap
 
 
 ## assert that every row has IPUMS data
-assert_that(sum(is.na(region.condls$GEOLEV1)) == 0)
+## # this will not be true.
+#assert_that(sum(is.na(region.condls$GEOLEV1)) == 0)
 
 
 ## assert that every row is unique in terms of g2

@@ -72,7 +72,7 @@ if (user == 2) {
       vault      <- file.path(root, "Countries")
       ipums      <- file.path(root, "ipums")
     repo.encrypt <- file.path("B:") # processed data, with pii
-      ipumsgeo   <- file.path(repo.encrypt, "ipums-geo")
+      ipumsgeo   <- file.path(repo.encrypt, "ipums-geo") # formerly  repo.encrypt, "ipums-geo"
 
   # GitHub local paths
     gh           <- "" # replace this with path of local github folder.
