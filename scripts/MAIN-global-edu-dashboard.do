@@ -112,8 +112,8 @@
    * Project folder globals
    * ---------------------
 
-   global dataWorkFolder        "$WBOneDrive/global-edu-dashboard"	// deidentified data
-   global dataWork_clone		"$WBclone/global-edu-dashboard" // this points to scripts.
+   global dataWorkFolder        "$WBOneDrive/global-education-dashboard"	// deidentified data
+   global dataWork_clone		"$WBclone/global-education-dashboard" // this points to scripts.
    global rawencrypt			"A:/Countries" // raw data
    global encryptFolder         `"B:"'	// the encrypted folder where new, encrypted files are kept
 

@@ -5,7 +5,7 @@
 library(rmarkdown)
 library(knitr)
 
-md <- "C:/Users/WB551206/local/GitHub/global-edu-dashboard/scripts/md"
+md <- "C:/Users/WB551206/local/GitHub/global-education-dashboard/scripts/md"
 
 md1 <- 1 # IMPUS district controls
 md2 <- 1 # Basic Regressions

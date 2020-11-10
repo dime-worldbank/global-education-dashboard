@@ -40,7 +40,7 @@ library(sjlabelled)
 if (user == 1) {
   # Repository Root Folder
 repo.top       <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard" # Replace This with folder path above main data folder.
-  repo         <- file.path(repo.top, "global-edu-dashboard")
+  repo         <- file.path(repo.top, "global-education-dashboard")
     wbpoly     <- file.path(repo, "GIS/20160921_GAUL_GeoJSON_TopoJSON")
     html       <- file.path(repo, "out/html")
 
@@ -52,7 +52,7 @@ repo.top       <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard" # Repla
     ipumsgeo   <- file.path(repo.encrypt, "ipums-geo")
   
   # GitHub local paths
-  gh           <- "C:/Users/WB551206/local/GitHub/global-edu-dashboard" # replace this with path of local github folder.
+  gh           <- "C:/Users/WB551206/local/GitHub/global-education-dashboard" # replace this with path of local github folder.
     scripts    <- file.path(gh, "scripts/mother")
 
 
@@ -63,7 +63,7 @@ repo.top       <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard" # Repla
 if (user == 2) {
   # Repository Root Folder
   repo.top       <- "" # Replace This with folder path above main data folder.
-    repo         <- file.path("global-edu-dashboard")
+    repo         <- file.path("global-education-dashboard")
       wbpoly     <- file.path(repo, "GIS/20160921_GAUL_GeoJSON_TopoJSON")
       html       <- file.path(repo, "out/html")
 
@@ -79,7 +79,7 @@ if (user == 2) {
       scripts    <- file.path(gh, "scripts/mother")
 
 
-  #dataout      <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard" # depreciated.
+  #dataout      <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-education-dashboard" # depreciated.
 }
 
 

@@ -3,9 +3,9 @@
 cls
 
 cap log close
-log using "C:\Users\WB551206\OneDrive - WBG\Documents\Dashboard\global-edu-dashboard\out\log/basic-regs3.txt", text replace
+log using "C:\Users\WB551206\OneDrive - WBG\Documents\Dashboard\global-education-dashboard\out\log/basic-regs3.txt", text replace
 
-use "C:\Users\WB551206\OneDrive - WBG\Documents\Dashboard\global-edu-dashboard\baseline\DataSets\final\merge_district_tdist.dta", clear
+use "C:\Users\WB551206\OneDrive - WBG\Documents\Dashboard\global-education-dashboard\baseline\DataSets\final\merge_district_tdist.dta", clear
 
 
 * loop 

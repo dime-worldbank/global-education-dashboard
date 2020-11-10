@@ -46,10 +46,10 @@ ivlab <- c("% Urban", "Literacy Rate", "% Schoolage", "% Electricity", "% Improv
 
 
 #load data
-md <- read.dta13(file = "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard/baseline/DataSets/final/merge_district_tdist.dta",
+md <- read.dta13(file = "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-education-dashboard/baseline/DataSets/final/merge_district_tdist.dta",
                  convert.factors = TRUE) %>%
   select(idschool, countryname, g1, g2, condl, yvars)
 
 
 # save as Rda. 
-saveRDS(md, file = "C:/Users/WB551206/local/GitHub/global-edu-dashboard/scripts/shiny/GECD/final-by-district.Rda")
+saveRDS(md, file = "C:/Users/WB551206/local/GitHub/global-education-dashboard/scripts/shiny/GECD/final-by-district.Rda")
