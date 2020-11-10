@@ -214,7 +214,7 @@ gl s4	= 1		// 1 reconstructs BI vars, 0 leaves raw data and only constructs Aggr
 gl s5	= 0 	// 1 generate raw dates, which becomes PII, whereas 0 only constructs day of week vars.
 gl s6 	= 1		// determines which school dataset to merge w during deidenitfy, 0=normal 1=mild correction
 
-gl magic= 320   // the magic number of final school observations we expect under our merge parameters.
+gl magic= 391   // the magic number of final school observations we expect under our merge parameters.
 
 /* script settings settings to 1 if you want to run, default == 0 */
 

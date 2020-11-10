@@ -105,10 +105,8 @@ clear 		// no data in memory now
 
 			* ensure the observation count is accurate
 			count if 	idschool != .
-			
-			pause on 
-			pause 
-			*assert 		r(N) == ${magic} 	// should be [n] -- before was school 320 observations
+
+			assert 		r(N) == 191	// should be school 191 observationsfor these three countries
 
 			* keep only match, drop that variable
 			keep if 	ipums_merge == 3
@@ -131,7 +129,7 @@ clear 		// no data in memory now
 
 			* ensure the observation count is accurate
 			count if	idschool != .
-		*	assert 		r(N) == ${magic} 	// should be school 320 observations %%
+			assert 		r(N) == 191	// should be school 191 observationsfor these three countries
 
 
 			* save tempfile
@@ -182,7 +180,7 @@ clear 		// no data in memory now
 
 			* ensure the observation count is accurate
 			count if 	idschool != .
-			*assert 		r(N) == ${magic} 	// should be [n] -- before was school 320 observations %%
+			assert 		r(N) == 200	// should be 200 schools for RWA
 
 			* keep only match, drop that variable
 			keep if 	ipums_merge == 3
@@ -205,10 +203,8 @@ clear 		// no data in memory now
 
 			* ensure the observation count is accurate
 			count if	idschool != .
-			
-			pause on 
-			pause
-		*	assert 		r(N) == ${magic} 	// should be school 320 observations
+
+			assert 		r(N) == 200 	// should be school 200 schools for RWA observations
 
 
 			* save tempfile
@@ -230,10 +226,12 @@ clear 						// clear D_sch
 use 		 `mergedist' 	// use the district dataset
 append using `mergereg' 	// append with the region-level dataset
 
+ // check
+count if	idschool != .
+assert 		r(N) == ${magic} 	// should be school 391 school observations
 
 * keep only necessary vars
 keep 		${finalvars}
-
 
  // save
 la data 	"Final Schools Dataset with district-lev conditionals and Decision-Making BI"
