@@ -347,9 +347,9 @@ main_po_data <- st_join(po, # points
                 select(idpo, interview__id, idoffice, order, everything())
 
 
-# join poly and school datasets
+# join poly and school datasets: should be joing with wb.poly.2 since schools don't apply to dm level
 main_school_data <- st_join(school, # points
-                            wb.poly.dm, #polys
+                            wb.poly.2, #polys
                             largest = TRUE) %>%
                     select(idschool, school_code, order, everything())
 

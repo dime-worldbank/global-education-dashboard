@@ -338,7 +338,7 @@ rwa.s.roster.sum <-
     med_stud_school= median(n_students)
   ) %>%
   left_join(rwa.wb.poly,
-            by = c("rost_dist_titl" = "ADM1_NAME"),
+            by = c("rost_dist_titl" = "ADM2_NAME"),
             keep = TRUE) %>% # where 'rost_dist_titl' == name of region, fomerly ADM2_CODE
   select(dist_n_stud, ln_dist_n_stud, n_schools, med_stud_school, g0, g1, g2, ADM2_CODE, ADM1_CODE, geometry) %>%
   st_as_sf() # rwa will be matched by ADM2_CODE

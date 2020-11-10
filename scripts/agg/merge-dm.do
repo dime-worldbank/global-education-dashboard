@@ -174,7 +174,7 @@ clear 		// no data in memory now
 			* 2. Merge the IPUMS data (this gets merged on district)
 			merge m:1 	g2 ///
 						using "${encryptFolder}/main/school_dist_conditionals.dta" ///
-						, assert(using match)  ///
+						,  /// assert(using match) 
 						gen(ipums_merge) ///
 						force // force strL into str10
 
