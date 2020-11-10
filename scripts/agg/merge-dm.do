@@ -11,6 +11,50 @@ Function: merges the district-level averages to countries
 					from IPUMS, such as literacy rates/median age in the district.
 
 				*/
+				
+				
+						* | split up decision-making averages 'using' dataset | *
+						
+				/*	We want to merge the schools dataset with averaged bi indicators taken at the 
+					decision-making level but the problem is, some countries only have g1 and not 
+					g2 if the decision-making level is region (RWA) so when you merge, stata is 
+					not smart enough to just ignore the 'missing' values in a m:1 merge, so we 
+					have to load the tempfile and split it up into by g2 and by g1 merges. 
+				
+				*/
+
+				
+// load file, preserve
+use 		"${publicofficial}/Dataset/col_po_dm.dta", clear 
+preserve 
+
+
+// split off the g2 obs 
+keep if 	g2 != . 
+
+
+// save as tempfile, restore 
+tempfile 	g2 
+save 		`g2'
+
+restore 	// returns to full col_po_dm
+
+
+// split off g1 
+preserve 
+
+keep if 	g2 == . 
+
+
+// save as tempfile, restore, clear 
+tempfile	g1 
+save 		`g1'
+
+restore 	// restores back to col_po_dm
+clear 		// no data in memory now
+
+
+
 
 
 						* | Merge at decision-making level, only appropriate tiers | *
@@ -34,7 +78,7 @@ Function: merges the district-level averages to countries
 
 			* merge with bureaucracy indicators
 				merge 		m:1 	countryname g2 	///
-									using "${publicofficial}/Dataset/col_po_dm.dta" ///
+									using `g2' /// merge with subset of col_po_dm with only non-missing obs for g2
 									, gen(merge)
 
 
@@ -61,7 +105,10 @@ Function: merges the district-level averages to countries
 
 			* ensure the observation count is accurate
 			count if 	idschool != .
-			assert 		r(N) == ${magic} 	// should be [n] -- before was school 320 observations
+			
+			pause on 
+			pause 
+			*assert 		r(N) == ${magic} 	// should be [n] -- before was school 320 observations
 
 			* keep only match, drop that variable
 			keep if 	ipums_merge == 3
@@ -84,7 +131,7 @@ Function: merges the district-level averages to countries
 
 			* ensure the observation count is accurate
 			count if	idschool != .
-			assert 		r(N) == ${magic} 	// should be school 320 observations
+		*	assert 		r(N) == ${magic} 	// should be school 320 observations %%
 
 
 			* save tempfile
@@ -97,7 +144,7 @@ Function: merges the district-level averages to countries
 
 
 
-		** Merge at Disrict-level **   - 	-		-		-
+		** Merge at Region-level **   - 	-		-		-
 
 
 		preserve
@@ -108,7 +155,7 @@ Function: merges the district-level averages to countries
 
 			* merge with bureaucracy indicators (this gets merged on g1/region )
 				merge 		m:1 	countryname g1 	///
-									using "${publicofficial}/Dataset/col_po_dm.dta" ///
+									using `g1' /// merge with subset of col_po_dm with only missing obs for g2, aka region level dm level
 									, gen(merge)
 
 
@@ -135,7 +182,7 @@ Function: merges the district-level averages to countries
 
 			* ensure the observation count is accurate
 			count if 	idschool != .
-			assert 		r(N) == ${magic} 	// should be [n] -- before was school 320 observations
+			*assert 		r(N) == ${magic} 	// should be [n] -- before was school 320 observations %%
 
 			* keep only match, drop that variable
 			keep if 	ipums_merge == 3
@@ -158,7 +205,10 @@ Function: merges the district-level averages to countries
 
 			* ensure the observation count is accurate
 			count if	idschool != .
-			assert 		r(N) == ${magic} 	// should be school 320 observations
+			
+			pause on 
+			pause
+		*	assert 		r(N) == ${magic} 	// should be school 320 observations
 
 
 			* save tempfile

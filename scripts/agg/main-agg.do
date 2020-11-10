@@ -19,6 +19,6 @@ do `"${scripts_clone}/agg/collapse.do"' // note this only does PO
 
 do `"${scripts_clone}/agg/merge-region.do"'		// merges all combos at region level
 do `"${scripts_clone}/agg/merge-district.do"'	// merges all combos at district level.
-do `"${scripts_clone}/agg/merge-dm.do"'	// merges for decsion-making level.
+do  `"${scripts_clone}/agg/merge-dm.do"'	// merges for decsion-making level.
 
 clear

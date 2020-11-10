@@ -195,7 +195,7 @@ Function: merges the district-level averages to countries
 
 			* ensure the observation count is accurate
 			count if 	idschool != .
-			assert 		r(N) == ${magic} 	// should be school 320 observations
+			assert 		r(N) == 191 	// should be school 320 observations $magic, now 191
 
 			* keep only match, drop that variable
 			keep if 	ipums_merge == 3
@@ -218,7 +218,7 @@ Function: merges the district-level averages to countries
 
 			* ensure the observation count is accurate
 			count if	idschool != .
-			assert 		r(N) == ${magic} 	// should be school 320 observations
+			assert 		r(N) == 191 	// should be school 320 observations, formerly magic, now 191
 
 
 
