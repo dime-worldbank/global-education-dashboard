@@ -3,76 +3,6 @@
 #   into repository. This script is designed to be run/sourced within the mdataset.R script.
 
 
-# Explanation
-#
-# because the school administrative data is received differently
-# from each country's respective ministries, there is no standard
-# way incorproate each excel/csv into the respository. the purpose of
-# this script is to serve as an intermediary between the raw csv data
-# and the repository. The script will create a standardized r object
-# with the following key variables: school_code will be the matching
-# varible with the rest of the school-level data.
-#
-#
-#    __________
-#   | Table A. |
-#
-#
-#   school_code   | lon | lat |   sch_tot_enroll  | public | Country | Region  | District
-#
-#
-#
-#  However, the data preparation upon creation of this table is not
-#  yet complete because the variable we are really after is the
-#  total number of students enrolled in each district (and likewise,
-#  how many students are enrolled in the whole country). Because we
-#  cannot rely on the data in the csv's to be good enough to determine
-#  district groupings (mispellings, extra spaces, etc), and becuase
-#  we use the World Bank's administrative data to determine districts,
-#  we will need to validate this table above with the world bank polygon
-#  data created in mdataset.R. We cannot just append this data directly
-#  to the main dataset we create because the data here in enrollment-gps.R
-#  includes all schools in each country, and the working sample in mdataset.R
-#  is actually a subset of this national register. -- so if we matched
-#  by school_code we would drop most of the schools and would have no way of
-#  knowing how many students are enrolled in schools not in our sample.
-#
-#  Therefore, we will have to match by gps coordinate using sf package
-#  functions to determine the location and administrative positioning of
-#  the school in relation to the World Bank scheme, as in Table B. Not all
-#  countries have GPS coordinates; where coordinates are absent, we'll have
-#  to match by closest string name.
-#
-#
-#    __________
-#   | Table B. |
-#
-#
-#   school_code   |  lon  .|.|.|.. sch_tot_enroll | WB District Code | WB country code
-#
-#
-#
-#   We can use Table B to map WB admin data to the school level observations more reliably
-#   than using survey GPS data, since the data in Table B comes from ministries.
-#
-#
-#   We will then have to summarize/collapse by the WB district code to sum the total number
-#   of students enrolled by (world bank) district, which would look like this.
-#
-#
-#    __________
-#   | Table C. |
-#
-#
-#    total_district_enrollment | total_country_enrollment | WB District Code | WB country code
-#
-#
-
-
-
-
-
-
 # PLAN2
 # Ok now because there's such a discrepency of gps/location information avaialable
 # for each country, what the plan is not is to create an object for each country that will be
@@ -99,7 +29,8 @@ library(stringi)
 
 
 # load wb poly data
-wb.poly.m <- readRDS(file = file.path(root, "main/wb-poly-m.Rda"))
+load(file = file.path(repo.encrypt, "main/geo/wbpolydata.Rdata"))
+	# we should be able to use the district level enrollment
 
 
 
@@ -170,7 +101,7 @@ rwa.s.roster <-
   select(rwa.raw.keep) %>%
   rename(
     rost_name      = "SCHOOL NAME",
-    rost_district  = "PROVINCE",  # "DISTRICT" corresponds to admin2 code in WB poly, "PROVINCE" to region/adm1
+    rost_district  = "DISTRICT",  # "DISTRICT" corresponds to admin2 code in WB poly, "PROVINCE" to region/adm1
     n_students     = "Total  students",
     n_male         = "Male students",
     n_female       = "Female students"
@@ -329,8 +260,8 @@ jor.s.roster.sf <- st_as_sf(jor.s.roster,
                             na.fail = FALSE)
 
 ## set the crs as the same as the world poly crs
-st_crs(per.s.roster.sf) <- st_crs(wb.poly.m)
-st_crs(jor.s.roster.sf) <- st_crs(wb.poly.m)
+st_crs(per.s.roster.sf) <- st_crs(wb.poly.2)
+st_crs(jor.s.roster.sf) <- st_crs(wb.poly.2)
 
 
 ## set the variable order
@@ -341,11 +272,11 @@ order <- c("ADM0_NAME", "ADM1_NAME", "ADM2_NAME",
 
 ## join poly and po datasets
 per.s.roster.sf <- per.s.roster.sf %>%
-  st_join(wb.poly.m) %>%
+  st_join(wb.poly.2) %>%
   select(rost_id1, n_students, public, order)
 
 jor.s.roster.sf <- jor.s.roster.sf %>%
-  st_join(wb.poly.m) %>%
+  st_join(wb.poly.2) %>%
   select(rost_id1, n_students, public, order)
 
 
@@ -385,9 +316,9 @@ jor.s.roster.sum <- jor.s.roster.sf %>%
 #### is of course this chance within one country but that chance is much
 #### lower, so we split up the polygons to minimize cross-country
 #### pollenation.
-rwa.wb.poly <- wb.poly.m %>%
+rwa.wb.poly <- wb.poly.2 %>%
   filter(ADM0_NAME == "Rwanda")
-moz.wb.poly <- wb.poly.m %>%
+moz.wb.poly <- wb.poly.2 %>%
   filter(ADM0_NAME == "Mozambique")
 
 
@@ -407,7 +338,7 @@ rwa.s.roster.sum <-
     med_stud_school= median(n_students)
   ) %>%
   left_join(rwa.wb.poly,
-            by = c("rost_dist_titl" = "ADM1_NAME"),
+            by = c("rost_dist_titl" = "ADM2_NAME"),
             keep = TRUE) %>% # where 'rost_dist_titl' == name of region, fomerly ADM2_CODE
   select(dist_n_stud, ln_dist_n_stud, n_schools, med_stud_school, g0, g1, g2, ADM2_CODE, ADM1_CODE, geometry) %>%
   st_as_sf() # rwa will be matched by ADM2_CODE
@@ -494,11 +425,14 @@ assert_that(n_distinct(moz.s.roster.sum$rost_dist_titl) == nrow(moz.s.roster.sum
 
 
 # Append all country objects
-by.dist.enrollment <- bind_rows(moz.s.roster.sum, rwa.s.roster.sum, per.s.roster.sum, jor.s.roster.sum) %>%
+by.dist.enrollment.all <- bind_rows(moz.s.roster.sum, rwa.s.roster.sum, per.s.roster.sum, jor.s.roster.sum) %>%
   select(-rost_dist_titl)
 
-# %% create a summarized object from by.dist.enrollment by region. (except maybe this is the same thing since we
-# replaced RWA g2 with g1?)
+## remove missing values for all geoinformation
+by.dist.enrollment <- by.dist.enrollment.all %>%
+  filter(is.na(g0) == FALSE) # if the country code is missing then there's no point in keeping; will never match
+
+
 
 
 
@@ -508,12 +442,14 @@ by.dist.enrollment <- bind_rows(moz.s.roster.sum, rwa.s.roster.sum, per.s.roster
 if (export == 1) {
 
 # save Rdata
+# the roster files are used in mdataset.R to port over gps info
 save(jor.s.roster, rwa.s.roster, moz.s.roster, per.s.roster,
      by.dist.enrollment,
      file = file.path(root, "main/enrollment.Rdata"))
 
 # export as dta
-## remove geometry
+## remove geometry.
+## the .dta file is used in stata stage to merge district info by randomized id to the school data.
 by.dist.enrollment %>%
   st_drop_geometry() %>%
   write_dta(

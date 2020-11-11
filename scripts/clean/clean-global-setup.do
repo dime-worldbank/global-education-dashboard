@@ -219,9 +219,7 @@
 								proportion_broke_rules proportion_cocts_political proportion_prent_political ///
 								politicized_pmplementation proportion_reted_underperf proportion_contracts_pol ///
 								proportion_producement_pol pol_personnel_management pol_policy_making pol_policy_implementation ///
-								l_bi t_bi l_national_learning_goals t_national_learning_goals l_mandates_accountability ///
-								t_mandates_accountability l_quality_bureaucracy t_quality_bureaucracy ///
-								l_impartial_decision_making t_impartial_decision_making med_age pct_urban ///
+								med_age pct_urban ///
 								pct_school pct_lit pct_edu1 pct_edu2 pct_work pct_schoolage pct_elec pct_dwell enrolled ///
 								ln_gdp ln_dist_n_stud
 

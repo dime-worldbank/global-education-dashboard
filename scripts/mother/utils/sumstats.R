@@ -45,7 +45,7 @@ condl <- c(
 
 
 #load data
-md <- read.dta13(file = "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard/baseline/DataSets/final/merge_district_tdist.dta",
+md <- read.dta13(file = "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-education-dashboard/baseline/DataSets/final/merge_district_tdist.dta",
                  convert.factors = TRUE) %>%
   select(idschool, countryname, country, g1, g2, yvars, condl)
 

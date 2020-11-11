@@ -50,7 +50,7 @@ ivlab <- c("% Urban", "Literacy Rate", "% Schoolage", "% Electricity", "% Improv
 
 
 #load data
-md <- readRDS(file = "final-by-district.Rda") 
+md <- readRDS(file = "final-by-district2.Rda") 
 
 # create by-country objects
 md.per <- md %>% 
@@ -88,7 +88,7 @@ ht.se <- paste('School Outcome: %{y}<br>',
 
 
 
-# Define UI for application that draws a histogram -------
+# Define UI  -------
 ui <- fluidPage(
   
   useShinyjs(),

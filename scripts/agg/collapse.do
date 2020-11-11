@@ -58,6 +58,9 @@ loc region 		: list numbers - g1 // for region we don't want either g2 or g1
 
 
 
+
+							* | By District | *
+
 * By District
 	preserve
 
@@ -93,3 +96,87 @@ loc region 		: list numbers - g1 // for region we don't want either g2 or g1
 				save 		"${publicofficial}/Dataset/col_po_g2_tier3.dta", replace
 
 			restore
+
+
+
+
+
+
+
+
+							* | By Decision-Making Level | *
+
+					/* all countries except for rwa = district; rwa = region */
+					/* keep only officials that match with the decision-making level */
+
+* District-level Counties: PER, MOZ, JOR
+
+
+		// district-level only
+			preserve
+
+				keep if  	countryname 	== "Peru" /// 	keep only countries agg'd at district level
+							| countryname 	== "Jordan" ///
+							| countryname	== "Mozambique"
+
+				keep if 	govt_tier == 3 		// where 3 == district officials
+
+				sort		countryname g1 g2
+				collapse 	(mean) `district', by(countryname g1 g2)
+
+				drop 		idpo			// this doesn't make sense when averaged
+				drop if 	g2 == . 		// we don't want to compress all missing values of g2
+
+				do 			"${scripts_clone}/mother/utils/labpreserve.do" // relabel
+
+
+				// create tempfile; append later
+				tempfile 	dmdistrict
+				save 		`dmdistrict'
+
+			restore
+
+
+
+
+* Region-level countries: RWA
+
+
+		// region-level only
+			preserve
+
+				keep if  	countryname 	== "Rwanda" // 	keep only countries agg'd at district level
+
+				keep if 	govt_tier == 2 		// where 3 == district officials
+
+				sort		countryname g1
+				collapse 	(mean) `region', by(countryname g1)
+
+				drop 		idpo			// this doesn't make sense when averaged
+				drop if 	g1 == . 		// we don't want to compress all missing values of g2
+
+				do 			"${scripts_clone}/mother/utils/labpreserve.do" // relabel
+
+
+				// create tempfile; append later
+				tempfile 	dmregion
+				save 		`dmregion'
+
+			restore
+
+
+
+
+* Append region and district tempfiles to create decision-making dataset
+
+clear 						// clear D_po
+
+use 		 `dmdistrict' 	// use the district dataset
+append using `dmregion' 	// append with the region-level dataset
+
+
+ // save
+la data 	"Decision-Making level dataset with only officials kept at decision-making level"
+save 		"${publicofficial}/Dataset/col_po_dm.dta", replace
+
+clear

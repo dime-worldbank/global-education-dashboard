@@ -37,7 +37,7 @@ library(sjlabelled)
 
 # user settings
 
-if (user == 1) {
+if (user == 1) { 
   # Repository Root Folder
 repo.top       <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard" # Replace This with folder path above main data folder.
   repo         <- file.path(repo.top, "global-edu-dashboard")
@@ -48,11 +48,11 @@ repo.top       <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard" # Repla
   root         <- file.path("A:") # raw data
     vault      <- file.path(root, "Countries")
     ipums      <- file.path(root, "ipums")
-    ipums2     <- "C:/Users/WB551206/WBG/Daniel Rogger - 2_Politics Dashboard/5. Data and Analysis/ipums/impus-geo/to-import"
   repo.encrypt <- file.path("B:") # processed data, with pii
-
+    ipumsgeo   <- file.path(repo.encrypt, "ipums-geo")
+  
   # GitHub local paths
-  gh           <- "C:/Users/WB551206/local/GitHub/global-edu-dashboard" # replace this with path of local github folder.
+  gh           <- "C:/Users/WB551206/local/GitHub/global-education-dashboard" # replace this with path of local github folder.
     scripts    <- file.path(gh, "scripts/mother")
 
 
@@ -63,7 +63,7 @@ repo.top       <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard" # Repla
 if (user == 2) {
   # Repository Root Folder
   repo.top       <- "" # Replace This with folder path above main data folder.
-    repo         <- file.path("global-edu-dashboard")
+    repo         <- file.path("global-education-dashboard")
       wbpoly     <- file.path(repo, "GIS/20160921_GAUL_GeoJSON_TopoJSON")
       html       <- file.path(repo, "out/html")
 
@@ -72,13 +72,14 @@ if (user == 2) {
       vault      <- file.path(root, "Countries")
       ipums      <- file.path(root, "ipums")
     repo.encrypt <- file.path("B:") # processed data, with pii
+      ipumsgeo   <- file.path(repo.encrypt, "ipums-geo") # formerly  repo.encrypt, "ipums-geo"
 
   # GitHub local paths
     gh           <- "" # replace this with path of local github folder.
       scripts    <- file.path(gh, "scripts/mother")
 
 
-  #dataout      <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard" # depreciated.
+  #dataout      <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-education-dashboard" # depreciated.
 }
 
 
@@ -116,12 +117,14 @@ npo      =  721    # should be 721  public officials obs
 
 # run script settings, set to 1 to run
 
+## utilities (not required to be run every time)
 u1 <- 1 # wb poly import/re-randomize
 u2 <- 1 # runs enrollment-gps.R: only needed to be run once.
 
-s1 <- 0 # main dataset import, processing, construction
-s2 <- 0 # recovers missing geoinformation to schools with missing gpgs coords
-s3 <- 0 # runs IMPUMS data import, processing, matching to WB poly schema
+## main scripts (should be run every time)
+s1 <- 1 # main dataset import, processing, construction
+s2 <- 1 # recovers missing geoinformation to schools with missing gpgs coords
+s3 <- 1 # runs IMPUMS data import, processing, matching to WB poly schema
 
 
 
@@ -144,6 +147,7 @@ if (u2 == 1) {
 
 
 
+## Run main scripts
 # Run Mdataset.R
 if (s1 == 1) {
   source(file.path(scripts, "main-data/mdataset.R"))

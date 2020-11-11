@@ -60,12 +60,12 @@
    *
    * ******************************************************************** *
 
-   
-   
-   
-   
-   
-   
+
+
+
+
+
+
    * Users
    * -----------
 
@@ -76,8 +76,8 @@
    *Set this value to the user currently using this file
    global user  1
 
-   
-   
+
+
    * Root folder globals
    * ---------------------
 
@@ -86,8 +86,8 @@
         global WBclone		    "C:/Users/WB551206/local/GitHub"
         global avrclone		     ""
     }
-	
-	
+
+
 	if $user == 2 {
 	global WBOneDrive		"" // replace with folder above data repo
 	global WBclone		    "" // replace with folder above github folder
@@ -95,13 +95,13 @@
     }
 
 
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 * These lines are used to test that the name is not already used (do not edit manually)
 *round*baseline*****************************************************************
 *untObs*publicofficial*school***************************************************
@@ -112,8 +112,8 @@
    * Project folder globals
    * ---------------------
 
-   global dataWorkFolder        "$WBOneDrive/global-edu-dashboard"	// deidentified data
-   global dataWork_clone		"$WBclone/global-edu-dashboard" // this points to scripts.
+   global dataWorkFolder        "$WBOneDrive/global-edu-dashboard"	// deidentified data; correct 'edu' not 'education'
+   global dataWork_clone		"$WBclone/global-education-dashboard" // this points to scripts.
    global rawencrypt			"A:/Countries" // raw data
    global encryptFolder         `"B:"'	// the encrypted folder where new, encrypted files are kept
 
@@ -214,18 +214,18 @@ gl s4	= 1		// 1 reconstructs BI vars, 0 leaves raw data and only constructs Aggr
 gl s5	= 0 	// 1 generate raw dates, which becomes PII, whereas 0 only constructs day of week vars.
 gl s6 	= 1		// determines which school dataset to merge w during deidenitfy, 0=normal 1=mild correction
 
-gl magic= 320   // the magic number of final school observations we expect under our merge parameters. 
+gl magic= 391   // the magic number of final school observations we expect under our merge parameters.
 
 /* script settings settings to 1 if you want to run, default == 0 */
 
 loc clean	= 1		// reconstruct bi vars
 loc agg		= 1 	// conduct collapsing and merging
-loc misc 	= 1 	// misc data processing, prior merging is necessary.
+loc misc 	= 0 	// misc data processing, prior merging is necessary.
 loc reg 	= 0 	// run regression panels
 
 
 * [Global Setup]:
-* really the Cleaning global setup, used as main global setup 
+* really the Cleaning global setup, used as main global setup
 do `"${scripts_clone}/clean/clean-global-setup.do"' // this the the clean-specific and also main
 
 

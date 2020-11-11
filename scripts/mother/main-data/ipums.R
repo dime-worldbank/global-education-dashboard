@@ -19,7 +19,7 @@ library(summarytools)
 library(DescTools)
 
 
-# load ipums data
+# load ipums micro data
 
 ddi  <- read_ipums_ddi(ddi_file = file.path(ipums, "ipums24/ipumsi_00024.xml"))
 
@@ -34,7 +34,7 @@ data <- read_ipums_micro(ddi, # calls to same directory as ddi, reads same-named
 
 
                         # ----------------------------- #
-                        # 	 Data Transformation	 		   ----
+                        # 	IPUMS Data Transformation	 	 ----
                         # ----------------------------- #
 
 
@@ -59,11 +59,11 @@ data$WALL    <- lbl_clean(data$WALL)
 
 
 # create summary objects of raw data
-sum.raw <- data %>%
-  dfSummary(graph.col = FALSE, na.col = TRUE, style = 'grid')
-
-sum.raw.bycountry <- data %>% group_by(COUNTRY) %>%
-  dfSummary(graph.col = FALSE, na.col = TRUE, style = 'grid')
+# sum.raw <- data %>%
+#   dfSummary(graph.col = FALSE, na.col = TRUE, style = 'grid')
+# 
+# sum.raw.bycountry <- data %>% group_by(COUNTRY) %>%
+#   dfSummary(graph.col = FALSE, na.col = TRUE, style = 'grid')
 
 
 
@@ -109,15 +109,13 @@ i.sum <- data %>%
     pct_schoolage= weighted.mean((schoolage == TRUE), w = PERWT, na.rm = TRUE), # pct schoolage
     pct_dwell    = weighted.mean((dwell == TRUE), w = HHWT, na.rm = TRUE), # pct improved dwelling,
     pct_elec     = weighted.mean((elec  == 1), w = HHWT, na.rm = TRUE)  # pct access to electricity.
-) %>%
-	# filter out RWA since this is not being merged at the district level.
-filter(COUNTRY != "Rwanda")
-
+)
 
 
 # collapse by country, region; generate 'average' indicators
 i.sum.reg <- data %>%
   group_by(COUNTRY, GEOLEV1) %>%
+  filter(is.na(GEOLEV1) == FALSE) %>% # remove missing obs where geolev1 code is missing
   summarise(
     med_age      = median(age, na.rm = TRUE), # median age
     pct_urban    = weighted.mean((urb == 1), w = HHWT, na.rm = TRUE), # pct urban (from HH surveys)
@@ -129,21 +127,19 @@ i.sum.reg <- data %>%
     pct_schoolage= weighted.mean((schoolage == TRUE), w = PERWT, na.rm = TRUE), # pct schoolage
     pct_dwell    = weighted.mean((dwell == TRUE), w = HHWT, na.rm = TRUE), # pct improved dwelling,
     pct_elec     = weighted.mean((elec  == 1), w = HHWT, na.rm = TRUE)  # pct access to electricity.
-) %>%
-# filter out countries we are merging at the district level
-filter(COUNTRY == "Rwanda")
+)
 
 
 
 
 
 
-# create summary object of district averages
-sum.av <-
-  dfSummary(i.sum,
-            graph.col = TRUE, labels.col = FALSE, na.col = TRUE, style = 'multiline',
-            col.widths = c(5, 40, 100, 60, 100, 40, 40)
-            )
+# # create summary object of district averages
+# sum.av <-
+#   dfSummary(i.sum,
+#             graph.col = TRUE, labels.col = FALSE, na.col = TRUE, style = 'multiline',
+#             col.widths = c(5, 40, 100, 60, 100, 40, 40)
+#             )
 
 
 
@@ -163,9 +159,17 @@ rm(data)
 
 
 
-# load shapfiles from zip file, select only our relevant countries %% may have to use lvl1?
+# load district level shapfiles from zip file,
 sf_world2 <- read_ipums_sf(shape_file =
-                             file.path(ipums, "ipums-gis/world_geolev2_2019.zip"),
+                             file.path(ipumsgeo, "world_geolev2_2019.zip"),
+                           verbose = TRUE,
+                           encoding = "UTF-8")
+
+
+
+# load region level shapfiles from zip file
+sf_world1 <- read_ipums_sf(shape_file =
+                             file.path(ipumsgeo, "world_geolev1_2019.zip"),
                            verbose = TRUE,
                            encoding = "UTF-8")
 
@@ -177,9 +181,29 @@ sf_world2 <- sf_world2 %>%
          CNTRY_CODE == 604 | # Peru
          CNTRY_CODE == 646)  # Rwanda
 
+sf_world1 <- sf_world1 %>%
+  filter(CNTRY_CODE == 400 | # Jordan
+           CNTRY_CODE == 508 | # Mozambique
+           CNTRY_CODE == 604 | # Peru
+           CNTRY_CODE == 646)  # Rwanda
+
+
+# # test
+
+# sf_world1 %>% filter(CNTRY_NAME == "Rwanda") %>%
+#   plot()
+# 
+# wb.poly.1 %>% filter(ADM0_NAME  == "Rwanda") %>%
+#   plot()
+
+# names <- sf_world2 %>%
+#   st_drop_geometry() %>%
+#   select(CNTRY_NAME, CNTRY_CODE) 
+# 
+# names %>% group_by(CNTRY_CODE) %>% summarise( n = n())
+# 
 
 # merge using ipums merge
-
 ## for districts
 ipums.dist.sum <- ipums_shape_inner_join(
   i.sum,
@@ -191,9 +215,10 @@ ipums.dist.sum <- ipums_shape_inner_join(
 ## for regions
 ipums.reg.sum <- ipums_shape_inner_join(
   i.sum.reg,
-  sf_world2,
+  sf_world1,
   by = c("GEOLEV1" = "GEOLEVEL1")
 )
+
 
 
 # check that we didn't lose districts in the merge
@@ -213,13 +238,13 @@ assert_that(nrow(ipums.reg.sum) == nrow(i.sum.reg)) # regions
                     # checkpoint does not include raw ipums
                     # data
 
-
+dan_ipums <- "C:/Users/WB551206/WBG/Daniel Rogger - 2_Politics Dashboard/5. Data and Analysis/ipums/ipums24"
 # save the full space in Dan's folder
-save.image(file = file.path(ipums, "ipums24/ipums-data-processed.Rdata"))
+save.image(file = file.path(dan_ipums, "ipums-data-processed2.Rdata"))
 
 
 # remove files
-#rm(ddi, sf_world2)
+rm(ddi, sf_world1, sf_world2)
 
 
 
@@ -228,13 +253,10 @@ save.image(file = file.path(ipums, "ipums24/ipums-data-processed.Rdata"))
 
 
                     # ----------------------------- #
-                    #     Load Main Data             ----
+                    #     Load Polygon Data             ----
                     # ----------------------------- #
-                    # this allows us to pull the wb world
-                    # polygon data
 
-load(file = file.path(repo.encrypt, "main/final_main_data_recovered.Rdata"))
-
+load(file = file.path(repo.encrypt, "main/geo/wbpolydata.Rdata"))
 
 
 
@@ -247,15 +269,16 @@ load(file = file.path(repo.encrypt, "main/final_main_data_recovered.Rdata"))
 
 
 # 1. join ipums to wb.poly by largest overlapping feature
-# note that this will not be valid for RWA because the wb.poly.m file does not have
-# district polys for RWA, only districts.
-district.condls <- st_join(wb.poly.m,  # wb polygons: district level
+# note that this will be valid for Rwanda because even though we will be joining the
+# schools with the public officials at the region level for this country, we can still
+# have conditional variables at the district level since the main unit of observation is
+# still schools
+
+district.condls <- st_join(wb.poly.2,  # wb polygons: district level
                            ipums.dist.sum,     # ipums.dist.sum summary by district
                            largest = TRUE) # match by largest overlap
 
 
-## assert that the number of rows didn't change after merge.
-assert_that(nrow(ipums.dist.sum) == nrow(district.condls))
 
 
 ## assert that every row has IPUMS data
@@ -274,17 +297,15 @@ assert_that(nrow(district.condls) == n_distinct(district.condls$g2))
 
 
 # 2. do the same as in 1 for regions.
-region.condls <- st_join(wb.poly.m,  # wb polygons: district level
-                           ipums.reg.sum,     # ipums.dist.sum summary by district
-                           largest = TRUE) # match by largest overlap
-
-
-## assert that the number of rows in wb poly dataset stayed constant
-assert_that(nrow(ipums.reg.sum) == nrow(region.condls))
+region.condls <- st_join(wb.poly.1,  # wb polygons: district level
+                        ipums.reg.sum,     # ipums.dist.sum summary by district
+                        join = st_overlaps, 
+                        largest = TRUE) # match by largest overlap
 
 
 ## assert that every row has IPUMS data
-assert_that(sum(is.na(region.condls$GEOLEV1)) == 0)
+## # this will not be true.
+#assert_that(sum(is.na(region.condls$GEOLEV1)) == 0)
 
 
 ## assert that every row is unique in terms of g2
