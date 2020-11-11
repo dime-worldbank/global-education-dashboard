@@ -40,7 +40,7 @@ wb.poly.2 <- wb.poly.2 %>%
 
 # import at region levels for region geometries (adm1 levels)
 wb.poly.1 <-
-  geojson_sf(geojson_sf(file.path(wbpoly, "GeoJSON/g2015_2014_1.geojson")) %>%
+  geojson_sf(file.path(wbpoly, "GeoJSON/g2015_2014_1.geojson")) %>%
   filter(	ADM0_NAME == "Peru" |
     		ADM0_NAME == "Jordan" |
   			ADM0_NAME == "Mozambique" |
