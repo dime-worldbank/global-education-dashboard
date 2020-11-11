@@ -16,13 +16,13 @@
 			# district level dataset for "region" level geometries
 
 
-require(geojsonsf) # this is necessary for reading geojson files quickly.
-require(stringr)
+library(geojsonsf) # this is necessary for reading geojson files quickly.
+library(stringr)
 
 
 # import at district level (adm2 level)
-wb.poly.2 <- geojson_sf(file.path(repo, "GIS/20160921_GAUL_GeoJSON_TopoJSON/GeoJSON/g2015_2014_2.geojson")) %>%
-  filter(
+wb.poly.2 <- geojson_sf(file.path(wbpoly, "GeoJSON/g2015_2014_2.geojson")) %>%
+  filter(  
     ADM0_NAME == "Peru" |
   	ADM0_NAME == "Jordan" |
 		ADM0_NAME == "Mozambique" |
@@ -40,7 +40,7 @@ wb.poly.2 <- wb.poly.2 %>%
 
 # import at region levels for region geometries (adm1 levels)
 wb.poly.1 <-
-  geojson_sf(file.path(repo, "GIS/20160921_GAUL_GeoJSON_TopoJSON/GeoJSON/g2015_2014_1.geojson")) %>%
+  geojson_sf(geojson_sf(file.path(wbpoly, "GeoJSON/g2015_2014_1.geojson")) %>%
   filter(	ADM0_NAME == "Peru" |
     		ADM0_NAME == "Jordan" |
   			ADM0_NAME == "Mozambique" |

@@ -37,10 +37,10 @@ library(sjlabelled)
 
 # user settings
 
-if (user == 1) {
+if (user == 1) { 
   # Repository Root Folder
 repo.top       <- "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard" # Replace This with folder path above main data folder.
-  repo         <- file.path(repo.top, "global-education-dashboard")
+  repo         <- file.path(repo.top, "global-edu-dashboard")
     wbpoly     <- file.path(repo, "GIS/20160921_GAUL_GeoJSON_TopoJSON")
     html       <- file.path(repo, "out/html")
 
@@ -118,7 +118,7 @@ npo      =  721    # should be 721  public officials obs
 # run script settings, set to 1 to run
 
 ## utilities (not required to be run every time)
-u1 <- 0 # wb poly import/re-randomize
+u1 <- 1 # wb poly import/re-randomize
 u2 <- 1 # runs enrollment-gps.R: only needed to be run once.
 
 ## main scripts (should be run every time)
