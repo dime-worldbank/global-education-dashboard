@@ -10,23 +10,27 @@ Function: runs all the scripts for the cleaning portion.
 								variable names
 								across all datasets 		*/
 
+* load main school data 
+use 		"B:/main/final_main_school_data.dta", clear // path to main schools dataset
 
-if (1) {
+								
+								
+if (0) {
 * create a template using iecodebook
 iecodebook template ///
-			 "B:/main/final_main_school_data.dta" /// path to main schools dataset
 			 using `"${mastData}/codebooks/schools3.xlsx"' /// path to codebook
-			, replace generate(country) match
+			, replace 
 }
 
 		/*excel editing happens manually here. */
 
-
+pause on 
+pause
 * apply to all datasets
 * %% this will not run unless you delete the _appended.xlsx, and replace option wont work
 iecodebook apply ///
-			 using `"${mastData}/codebooks/schools3.xlsx"' /// path to codebook
-			, replace generate(country) clear
+			 using `"${mastData}/codebooks/schools3.xlsx"' // path to codebook
+			
 
 
 
