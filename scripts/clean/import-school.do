@@ -24,8 +24,7 @@ iecodebook template ///
 
 		/*excel editing happens manually here. */
 
-pause on 
-pause
+
 * apply to all datasets
 * %% this will not run unless you delete the _appended.xlsx, and replace option wont work
 iecodebook apply ///
@@ -39,7 +38,7 @@ iecodebook apply ///
 									* | Add country number var | *
 
 * convert to categorical variable with labels (move this into script?)
-do `"${scripts_clone}/mother/utils/countryname.do"'
+ do `"${scripts_clone}/mother/utils/country.do"' 
 
 
 

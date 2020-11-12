@@ -157,7 +157,7 @@
 		global 		tertiary	`"${nlg} ${am} ${qb} ${idm}"'
 		global 		biall 		`"${bi} ${nlg} ${am} ${qb} ${idm}"'
 
-	* Schools
+	* Schools countryname
 		gl 			schoutcome 	student_knowledge ecd_student_knowledge inputs infrastructure intrinsic_motivation ///
 		 						content_knowledge pedagogical_knowledge operational_manage instr_leader ///
 								principal_knowl_score principal_manage
@@ -165,17 +165,21 @@
 								z_intrinsiz_motivation z_content_knowledge z_pedagogical_knowledge ///
 								z_operational_manage z_instructional_leadership z_principal_knowl_score ///
 								z_principal_manage
-		gl 			sorder 		"idschool countryname country g1 g2 ${schoutcome}"
+		gl 			sorder 		"idschool g1 g2 ${schoutcome}"
 
 	* for deidentificaiton
 		gl 			piisch	 	school_code school_province_preload school_district_preload ///
-								lat lon ///
+								countryname school_name_preload school_address_preload ///
+								school_province_preload school_district_preload ///
+								school_code_preload school_emis_preload school_info_correct ///
+								m1s0q2_name m1s0q2_code m1s0q2_emis ///
+								survey_lat survey_lon ///
 								school_name_preload school_address_preload school_code_preload survey_time ///
 								school_emis_preload school_info_correct m1s0q2_name m1s0q2_code m1s0q2_emis ///
 								ADM0_NAME ADM1_NAME ADM2_NAME ADM0_CODE ADM1_CODE ADM2_CODE STR2_YEAR ///
 								EXP2_YEAR STATUS DISP_AREA Shape_Leng Shape_Le_1 Shape_Area ///
-								school_province school_district total_enrolled school_name school_address ///
-								 region total_missing total_missing_teach_grd4_assess gdp  
+								 total_enrolled  ///
+								   miss_class_admin gdp  
 
 		gl 			piipo 		interview__id interview__key office_preload survey_time responsible_fance_planning ///
 		 						responsible_hring_teachers  responsible_none education ///
