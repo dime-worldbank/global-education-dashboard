@@ -10,16 +10,16 @@ Function: runs all the scripts for the cleaning portion.
 								variable names
 								across all datasets 		*/
 
-* load main school data 
-use 		"B:/main/final_main_school_data.dta", clear // path to main schools dataset
+* load main school data
+use 		"B:/main/final_main_school_data_mt.dta", clear // path to main schools dataset, matched
 
-								
-								
+
+
 if (0) {
 * create a template using iecodebook
 iecodebook template ///
 			 using `"${mastData}/codebooks/schools3.xlsx"' /// path to codebook
-			, replace 
+			, replace
 }
 
 		/*excel editing happens manually here. */
@@ -29,7 +29,7 @@ iecodebook template ///
 * %% this will not run unless you delete the _appended.xlsx, and replace option wont work
 iecodebook apply ///
 			 using `"${mastData}/codebooks/schools3.xlsx"' // path to codebook
-			
+
 
 
 
@@ -38,7 +38,7 @@ iecodebook apply ///
 									* | Add country number var | *
 
 * convert to categorical variable with labels (move this into script?)
- do `"${scripts_clone}/mother/utils/country.do"' 
+ do `"${scripts_clone}/mother/utils/country.do"'
 
 
 
