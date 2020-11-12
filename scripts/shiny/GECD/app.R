@@ -199,7 +199,8 @@ ui <- fluidPage(
                                       "% Houses Improved Dwelling" = "pct_dwell",
                                       "% Schoolage" = "pct_schoolage",
                                       "School Size" = "as.factor(enrolled)",
-                                      #"Country FE" = "as.factor(countryname)",
+									  "Public" = "public",
+									  "Second-Shift" = "night",
                                       "Log GDP" = "ln_gdp",
                                       "Log District Enrollment" = "ln_dist_n_stud"
                           ),
