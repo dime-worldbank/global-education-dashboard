@@ -150,7 +150,9 @@ clear 		// no data in memory now
 		* keep only district-level countries
 
 			keep if  	countryname 	== "Rwanda" // 	keep only countries agg'd at region
-
+				
+			pause on 
+			pause
 			* merge with bureaucracy indicators (this gets merged on g1/region )
 				merge 		m:1 	countryname g1 	///
 									using `g1' /// merge with subset of col_po_dm with only missing obs for g2, aka region level dm level
@@ -159,7 +161,7 @@ clear 		// no data in memory now
 
 			* 1.  verify quality of the merge BEFORE dropping
 			/* run schoolcheck.do */
-
+			pause
 
 			* Then drop non-mereged obs and...
 				keep if 	merge == 3
@@ -168,7 +170,7 @@ clear 		// no data in memory now
 				// drop all obs that are missing on most values
 				drop if 	countryname == "" 	& g1 == .
 
-
+			pause 
 			* 2. Merge the IPUMS data (this gets merged on district)
 			merge m:1 	g2 ///
 						using "${encryptFolder}/main/school_dist_conditionals.dta" ///
@@ -177,10 +179,10 @@ clear 		// no data in memory now
 						force // force strL into str10
 
 
-
+			
 			* ensure the observation count is accurate
 			count if 	idschool != .
-			assert 		r(N) == 200	// should be 200 schools for RWA
+			assert 		r(N) == 200	// should be 200 schools for RWA or 189 with GPS info
 
 			* keep only match, drop that variable
 			keep if 	ipums_merge == 3

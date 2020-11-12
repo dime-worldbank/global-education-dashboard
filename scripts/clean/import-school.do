@@ -10,16 +10,16 @@ Function: runs all the scripts for the cleaning portion.
 								variable names
 								across all datasets 		*/
 
+* load main school data
+use 		"B:/main/final_main_school_data_mt.dta", clear // path to main schools dataset, matched
+
+
 
 if (0) {
 * create a template using iecodebook
 iecodebook template ///
-			 "A:/Countries/Peru/Data/PER_school_survey_data_short.dta" /// path to Peru
-			 "A:/Countries/Jordan/Data/final_indicator_school_data.dta" /// Path to jordan
-			 "A:/Countries/Mozambique/Data/school_inicators_data.dta" /// path to moz
-			 "A:/Countries/Rwanda/Data/final_indicator_school_data.dta" /// path to rwanda
-			 using `"${mastData}/codebooks/schools2.xlsx"' /// path to codebook
-			, replace surveys($countrynames) generate(country) match
+			 using `"${mastData}/codebooks/schools3.xlsx"' /// path to codebook
+			, replace
 }
 
 		/*excel editing happens manually here. */
@@ -27,13 +27,9 @@ iecodebook template ///
 
 * apply to all datasets
 * %% this will not run unless you delete the _appended.xlsx, and replace option wont work
-iecodebook append ///
-			 "A:/Countries/Peru/Data/PER_school_survey_data_short.dta" /// path to Peru
-			 "A:/Countries/Jordan/Data/final_indicator_school_data.dta" /// Path to jordan
-			 "A:/Countries/Mozambique/Data/school_inicators_data.dta" /// path to moz
-			 "A:/Countries/Rwanda/Data/final_indicator_school_data.dta" /// path to rwanda
-			 using `"${mastData}/codebooks/schools2.xlsx"' /// path to codebook
-			, replace surveys($countrynames) generate(country) clear
+iecodebook apply ///
+			 using `"${mastData}/codebooks/schools3.xlsx"' // path to codebook
+
 
 
 
@@ -42,7 +38,7 @@ iecodebook append ///
 									* | Add country number var | *
 
 * convert to categorical variable with labels (move this into script?)
-do `"${scripts_clone}/mother/utils/countryname.do"'
+ do `"${scripts_clone}/mother/utils/country.do"'
 
 
 

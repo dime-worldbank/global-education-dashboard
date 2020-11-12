@@ -41,7 +41,6 @@ load(file = file.path(repo.encrypt, "main/geo/wbpolydata.Rdata"))
               #       that also may change/be inaccurate. We may have double or
               #       even triple variables that indicate the same thing.
               #
-              #       %% keep nightshift school variables.
 
 # vectors of column names to keep
 jor.raw.keep <- c("Organization code", "Supervisory authority", "longitude", "Latitude",
