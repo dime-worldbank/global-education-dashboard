@@ -165,11 +165,11 @@
 								z_intrinsiz_motivation z_content_knowledge z_pedagogical_knowledge ///
 								z_operational_manage z_instructional_leadership z_principal_knowl_score ///
 								z_principal_manage
-		gl 			sorder 		"idschool g1 g2 ${schoutcome}"
+		gl 			sorder 		"idschool countryname g1 g2 ${schoutcome}"
 
 	* for deidentificaiton
 		gl 			piisch	 	school_code school_province_preload school_district_preload ///
-								countryname school_name_preload school_address_preload ///
+								 school_name_preload school_address_preload /// include countryname?
 								school_province_preload school_district_preload ///
 								school_code_preload school_emis_preload school_info_correct ///
 								m1s0q2_name m1s0q2_code m1s0q2_emis ///
