@@ -53,11 +53,13 @@ condl <- c(
           "pct_elec" ,
           "pct_dwell",
           "enrolled",
+		  "public",
+		  "night",
           "ln_gdp",
           "ln_dist_n_stud"
   )
 
-# Table Labels 
+# Table Labels
 dvlab <- c("Student Knowledge", "ECD Knowledge", "Inputs", "Intrastructure", "Teacher Motivation", "Teacher Content Knowledge", "Operational Management", "Instructional Leadership", "Pricipal Knowledge", "Principal Management")
 
 ivlab <- c("% Urban", "Literacy Rate", "% Schoolage", "% Electricity", "% Improved Dwelling", "Log N. Students in District", "Log GDP")
@@ -76,16 +78,16 @@ md <- read.dta13(file = "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/gl
                  convert.factors = TRUE) %>%
   select(idschool, countryname, country, g1, g2, yvars, condl)
 
-md.per <- md %>% 
+md.per <- md %>%
   filter(countryname == "Peru")
 
-md.jor <- md %>% 
+md.jor <- md %>%
   filter(countryname == "Jordan")
 
-md.rwa <- md %>% 
+md.rwa <- md %>%
   filter(countryname == "Rwanda")
 
-md.moz <- md %>% 
+md.moz <- md %>%
   filter(countryname == "Mozambique")
 
 
@@ -97,7 +99,10 @@ md.moz <- md %>%
 - Country Fixed Effects (coefficients omitted)
 - School size Fixed Effects (coefficients omitted)
 - Standard Errors clustered on District, specified to standard clustering in Stata
-- District-level averages of: 
+- School-level indicator variables (coefficients omitted):
+  1. Night- or second-shift school (1 = Night/Second-shift, 0 = Day/First-shift)
+  2. Public ( 1 = Public, 0 = non-public)
+- District-level averages of:
   1. Percent Urban ( % of surveyed Households classified as Urban)
   2. Literacy Rate
   3. Percent of population that is of school age (see technical note for details)
@@ -105,7 +110,7 @@ md.moz <- md %>%
   5. Percent of households with improved dwelling construction materials
   6. Natural Log of total enrolled students in the district
   7. Natural Log of school-area GDP (except for Mozambique)
-  
+
 
 ## Technical Notes <br>
 Percent Schoolage Population: To be consistent with other IPUMS age categorizations, the schoolage population is defined as the percent of the population from ages 6 through 14, inclusive. Age 14 was chosen as the top-value because IPUMS defines working-age population beginning at age 15. <br><br>
@@ -119,13 +124,13 @@ I have coded and prepared other similar variables that were not included in the 
 4. Labor Force Participation<br>
 5. District Median Age <br>
 
-  
+
 
 
 ## Main findings <br>
 1. The Overall Bureaucracy Index significantly predicts school infrastructure and teacher content knowledge. <br>
 2. National Learning Goals predicts teacher level indicators <br>
-3. Mandates and Accountability and Quality of Bureaucracy predict a handfull of school outcomes 
+3. Mandates and Accountability and Quality of Bureaucracy predict a handfull of school outcomes
 4. Otherwise, indicators for aggregate district wealth (dwelling) and existing infrastructure (Pct Electrified) are strong predictors of school outcomes in many, but not all, models
 
 ```{r models,  include=FALSE}
@@ -133,114 +138,114 @@ I have coded and prepared other similar variables that were not included in the 
 
 # explanatory = bi
 lm.bi.1 <- lm_robust(data = md,
-   student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.bi.2 <- lm_robust(data = md,
-   ecd_student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.bi.3 <- lm_robust(data = md,
-   inputs ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   inputs ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.bi.4 <- lm_robust(data = md,
-   infrastructure ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   infrastructure ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.bi.5 <- lm_robust(data = md,
-   intrinsic_motivation ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.bi.6 <- lm_robust(data = md,
-   content_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   content_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.bi.8 <- lm_robust(data = md,
-   operational_manage ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   operational_manage ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.bi.9 <- lm_robust(data = md,
-   instr_leader ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   instr_leader ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.bi.10 <- lm_robust(data = md,
-   principal_knowl_score ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_knowl_score ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.bi.11 <- lm_robust(data = md,
-   principal_manage ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_manage ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 
 # explanatory = nlg
 lm.nlg.1 <- lm_robust(data = md,
-   student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.nlg.2 <- lm_robust(data = md,
-   ecd_student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.nlg.3 <- lm_robust(data = md,
-   inputs ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   inputs ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.nlg.4 <- lm_robust(data = md,
-   infrastructure ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   infrastructure ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.nlg.5 <- lm_robust(data = md,
-   intrinsic_motivation ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.nlg.6 <- lm_robust(data = md,
-   content_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   content_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.nlg.8 <- lm_robust(data = md,
-   operational_manage ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   operational_manage ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.nlg.9 <- lm_robust(data = md,
-   instr_leader ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   instr_leader ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.nlg.10 <- lm_robust(data = md,
-   principal_knowl_score ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_knowl_score ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.nlg.11 <- lm_robust(data = md,
-   principal_manage ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_manage ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 
 # explanatory = ma
 lm.ma.1 <- lm_robust(data = md,
-   student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.ma.2 <- lm_robust(data = md,
-   ecd_student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.ma.3 <- lm_robust(data = md,
-   inputs ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   inputs ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.ma.4 <- lm_robust(data = md,
-   infrastructure ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   infrastructure ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.ma.5 <- lm_robust(data = md,
-   intrinsic_motivation ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.ma.6 <- lm_robust(data = md,
-   content_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   content_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.ma.8 <- lm_robust(data = md,
-   operational_manage ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   operational_manage ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.ma.9 <- lm_robust(data = md,
-   instr_leader ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   instr_leader ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.ma.10 <- lm_robust(data = md,
-   principal_knowl_score ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_knowl_score ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.ma.11 <- lm_robust(data = md,
-   principal_manage ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_manage ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 
 
 # explanatory = qb
 lm.qb.1 <- lm_robust(data = md,
-   student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.qb.2 <- lm_robust(data = md,
-   ecd_student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.qb.3 <- lm_robust(data = md,
-   inputs ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   inputs ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.qb.4 <- lm_robust(data = md,
-   infrastructure ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   infrastructure ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.qb.5 <- lm_robust(data = md,
-   intrinsic_motivation ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.qb.6 <- lm_robust(data = md,
-   content_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   content_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.qb.8 <- lm_robust(data = md,
-   operational_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   operational_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.qb.9 <- lm_robust(data = md,
-   instr_leader ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   instr_leader ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.qb.10 <- lm_robust(data = md,
-   principal_knowl_score ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_knowl_score ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.qb.11 <- lm_robust(data = md,
-   principal_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 
 # explanatory = idm
 lm.idm.1 <- lm_robust(data = md,
-   student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.idm.2 <- lm_robust(data = md,
-   ecd_student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.idm.3 <- lm_robust(data = md,
-   inputs ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   inputs ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.idm.4 <- lm_robust(data = md,
-   infrastructure ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   infrastructure ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.idm.5 <- lm_robust(data = md,
-   intrinsic_motivation ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.idm.6 <- lm_robust(data = md,
-   content_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   content_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.idm.8 <- lm_robust(data = md,
-   operational_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   operational_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.idm.9 <- lm_robust(data = md,
-   instr_leader ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   instr_leader ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.idm.10 <- lm_robust(data = md,
-   principal_knowl_score ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_knowl_score ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 lm.idm.11 <- lm_robust(data = md,
-   principal_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
+   principal_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud  + as.factor(enrolled) + as.factor(countryname), clusters = g2, se_type = "stata")
 
 ```
 
@@ -251,114 +256,114 @@ lm.idm.11 <- lm_robust(data = md,
 
 # explanatory = bi
 lm.per.bi.1 <- lm_robust(data = md.per,
-   student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.bi.2 <- lm_robust(data = md.per,
-   ecd_student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.bi.3 <- lm_robust(data = md.per,
-   inputs ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   inputs ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.bi.4 <- lm_robust(data = md.per,
-   infrastructure ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   infrastructure ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.bi.5 <- lm_robust(data = md.per,
-   intrinsic_motivation ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.bi.6 <- lm_robust(data = md.per,
-   content_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   content_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.bi.8 <- lm_robust(data = md.per,
-   operational_manage ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   operational_manage ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.bi.9 <- lm_robust(data = md.per,
-   instr_leader ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   instr_leader ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.bi.10 <- lm_robust(data = md.per,
-   principal_knowl_score ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_knowl_score ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.bi.11 <- lm_robust(data = md.per,
-   principal_manage ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_manage ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 
 # explanatory = nlg
 lm.per.nlg.1 <- lm_robust(data = md.per,
-   student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.nlg.2 <- lm_robust(data = md.per,
-   ecd_student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.nlg.3 <- lm_robust(data = md.per,
-   inputs ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   inputs ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.nlg.4 <- lm_robust(data = md.per,
-   infrastructure ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   infrastructure ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.nlg.5 <- lm_robust(data = md.per,
-   intrinsic_motivation ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.nlg.6 <- lm_robust(data = md.per,
-   content_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   content_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.nlg.8 <- lm_robust(data = md.per,
-   operational_manage ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   operational_manage ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.nlg.9 <- lm_robust(data = md.per,
-   instr_leader ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   instr_leader ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.nlg.10 <- lm_robust(data = md.per,
-   principal_knowl_score ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_knowl_score ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.nlg.11 <- lm_robust(data = md.per,
-   principal_manage ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_manage ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 
 # explanatory = ma
 lm.per.ma.1 <- lm_robust(data = md.per,
-   student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.ma.2 <- lm_robust(data = md.per,
-   ecd_student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.ma.3 <- lm_robust(data = md.per,
-   inputs ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   inputs ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.ma.4 <- lm_robust(data = md.per,
-   infrastructure ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   infrastructure ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.ma.5 <- lm_robust(data = md.per,
-   intrinsic_motivation ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.ma.6 <- lm_robust(data = md.per,
-   content_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   content_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.ma.8 <- lm_robust(data = md.per,
-   operational_manage ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   operational_manage ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.ma.9 <- lm_robust(data = md.per,
-   instr_leader ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   instr_leader ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.ma.10 <- lm_robust(data = md.per,
-   principal_knowl_score ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_knowl_score ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.ma.11 <- lm_robust(data = md.per,
-   principal_manage ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_manage ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 
 
 # explanatory = qb
 lm.per.qb.1 <- lm_robust(data = md.per,
-   student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.qb.2 <- lm_robust(data = md.per,
-   ecd_student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.qb.3 <- lm_robust(data = md.per,
-   inputs ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   inputs ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.qb.4 <- lm_robust(data = md.per,
-   infrastructure ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   infrastructure ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.qb.5 <- lm_robust(data = md.per,
-   intrinsic_motivation ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.qb.6 <- lm_robust(data = md.per,
-   content_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   content_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.qb.8 <- lm_robust(data = md.per,
-   operational_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   operational_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.qb.9 <- lm_robust(data = md.per,
-   instr_leader ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   instr_leader ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.qb.10 <- lm_robust(data = md.per,
-   principal_knowl_score ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_knowl_score ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.qb.11 <- lm_robust(data = md.per,
-   principal_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 
 # explanatory = idm
 lm.per.idm.1 <- lm_robust(data = md.per,
-   student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.idm.2 <- lm_robust(data = md.per,
-   ecd_student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.idm.3 <- lm_robust(data = md.per,
-   inputs ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   inputs ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.idm.4 <- lm_robust(data = md.per,
-   infrastructure ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   infrastructure ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.idm.5 <- lm_robust(data = md.per,
-   intrinsic_motivation ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.idm.6 <- lm_robust(data = md.per,
-   content_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   content_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.idm.8 <- lm_robust(data = md.per,
-   operational_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   operational_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.idm.9 <- lm_robust(data = md.per,
-   instr_leader ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   instr_leader ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.idm.10 <- lm_robust(data = md.per,
-   principal_knowl_score ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_knowl_score ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.per.idm.11 <- lm_robust(data = md.per,
-   principal_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 
 
 ```
@@ -368,114 +373,114 @@ lm.per.idm.11 <- lm_robust(data = md.per,
 
 # explanatory = bi
 lm.jor.bi.1 <- lm_robust(data = md.jor,
-   student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.bi.2 <- lm_robust(data = md.jor,
-   ecd_student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.bi.3 <- lm_robust(data = md.jor,
-   inputs ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   inputs ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.bi.4 <- lm_robust(data = md.jor,
-   infrastructure ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   infrastructure ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.bi.5 <- lm_robust(data = md.jor,
-   intrinsic_motivation ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.bi.6 <- lm_robust(data = md.jor,
-   content_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   content_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.bi.8 <- lm_robust(data = md.jor,
-   operational_manage ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   operational_manage ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.bi.9 <- lm_robust(data = md.jor,
-   instr_leader ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   instr_leader ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.bi.10 <- lm_robust(data = md.jor,
-   principal_knowl_score ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_knowl_score ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.bi.11 <- lm_robust(data = md.jor,
-   principal_manage ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_manage ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 
 # explanatory = nlg
 lm.jor.nlg.1 <- lm_robust(data = md.jor,
-   student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.nlg.2 <- lm_robust(data = md.jor,
-   ecd_student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.nlg.3 <- lm_robust(data = md.jor,
-   inputs ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   inputs ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.nlg.4 <- lm_robust(data = md.jor,
-   infrastructure ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   infrastructure ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.nlg.5 <- lm_robust(data = md.jor,
-   intrinsic_motivation ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.nlg.6 <- lm_robust(data = md.jor,
-   content_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   content_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.nlg.8 <- lm_robust(data = md.jor,
-   operational_manage ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   operational_manage ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.nlg.9 <- lm_robust(data = md.jor,
-   instr_leader ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   instr_leader ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.nlg.10 <- lm_robust(data = md.jor,
-   principal_knowl_score ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_knowl_score ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.nlg.11 <- lm_robust(data = md.jor,
-   principal_manage ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_manage ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 
 # explanatory = ma
 lm.jor.ma.1 <- lm_robust(data = md.jor,
-   student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.ma.2 <- lm_robust(data = md.jor,
-   ecd_student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.ma.3 <- lm_robust(data = md.jor,
-   inputs ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   inputs ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.ma.4 <- lm_robust(data = md.jor,
-   infrastructure ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   infrastructure ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.ma.5 <- lm_robust(data = md.jor,
-   intrinsic_motivation ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.ma.6 <- lm_robust(data = md.jor,
-   content_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   content_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.ma.8 <- lm_robust(data = md.jor,
-   operational_manage ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   operational_manage ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.ma.9 <- lm_robust(data = md.jor,
-   instr_leader ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   instr_leader ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.ma.10 <- lm_robust(data = md.jor,
-   principal_knowl_score ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_knowl_score ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.ma.11 <- lm_robust(data = md.jor,
-   principal_manage ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_manage ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 
 
 # explanatory = qb
 lm.jor.qb.1 <- lm_robust(data = md.jor,
-   student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.qb.2 <- lm_robust(data = md.jor,
-   ecd_student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.qb.3 <- lm_robust(data = md.jor,
-   inputs ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   inputs ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.qb.4 <- lm_robust(data = md.jor,
-   infrastructure ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   infrastructure ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.qb.5 <- lm_robust(data = md.jor,
-   intrinsic_motivation ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.qb.6 <- lm_robust(data = md.jor,
-   content_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   content_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.qb.8 <- lm_robust(data = md.jor,
-   operational_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   operational_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.qb.9 <- lm_robust(data = md.jor,
-   instr_leader ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   instr_leader ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.qb.10 <- lm_robust(data = md.jor,
-   principal_knowl_score ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_knowl_score ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.qb.11 <- lm_robust(data = md.jor,
-   principal_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 
 # explanatory = idm
 lm.jor.idm.1 <- lm_robust(data = md.jor,
-   student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.idm.2 <- lm_robust(data = md.jor,
-   ecd_student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.idm.3 <- lm_robust(data = md.jor,
-   inputs ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   inputs ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.idm.4 <- lm_robust(data = md.jor,
-   infrastructure ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   infrastructure ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.idm.5 <- lm_robust(data = md.jor,
-   intrinsic_motivation ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.idm.6 <- lm_robust(data = md.jor,
-   content_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   content_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.idm.8 <- lm_robust(data = md.jor,
-   operational_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   operational_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.idm.9 <- lm_robust(data = md.jor,
-   instr_leader ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   instr_leader ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.idm.10 <- lm_robust(data = md.jor,
-   principal_knowl_score ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_knowl_score ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.jor.idm.11 <- lm_robust(data = md.jor,
-   principal_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 
 
 ```
@@ -485,114 +490,114 @@ lm.jor.idm.11 <- lm_robust(data = md.jor,
 
 # explanatory = bi
 lm.rwa.bi.1 <- lm_robust(data = md.rwa,
-   student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.bi.2 <- lm_robust(data = md.rwa,
-   ecd_student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.bi.3 <- lm_robust(data = md.rwa,
-   inputs ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   inputs ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.bi.4 <- lm_robust(data = md.rwa,
-   infrastructure ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   infrastructure ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.bi.5 <- lm_robust(data = md.rwa,
-   intrinsic_motivation ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.bi.6 <- lm_robust(data = md.rwa,
-   content_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   content_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.bi.8 <- lm_robust(data = md.rwa,
-   operational_manage ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   operational_manage ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.bi.9 <- lm_robust(data = md.rwa,
-   instr_leader ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   instr_leader ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.bi.10 <- lm_robust(data = md.rwa,
-   principal_knowl_score ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_knowl_score ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.bi.11 <- lm_robust(data = md.rwa,
-   principal_manage ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_manage ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 
 # explanatory = nlg
 lm.rwa.nlg.1 <- lm_robust(data = md.rwa,
-   student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.nlg.2 <- lm_robust(data = md.rwa,
-   ecd_student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.nlg.3 <- lm_robust(data = md.rwa,
-   inputs ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   inputs ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.nlg.4 <- lm_robust(data = md.rwa,
-   infrastructure ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   infrastructure ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.nlg.5 <- lm_robust(data = md.rwa,
-   intrinsic_motivation ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.nlg.6 <- lm_robust(data = md.rwa,
-   content_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   content_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.nlg.8 <- lm_robust(data = md.rwa,
-   operational_manage ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   operational_manage ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.nlg.9 <- lm_robust(data = md.rwa,
-   instr_leader ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   instr_leader ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.nlg.10 <- lm_robust(data = md.rwa,
-   principal_knowl_score ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_knowl_score ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.nlg.11 <- lm_robust(data = md.rwa,
-   principal_manage ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_manage ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 
 # explanatory = ma
 lm.rwa.ma.1 <- lm_robust(data = md.rwa,
-   student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.ma.2 <- lm_robust(data = md.rwa,
-   ecd_student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.ma.3 <- lm_robust(data = md.rwa,
-   inputs ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   inputs ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.ma.4 <- lm_robust(data = md.rwa,
-   infrastructure ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   infrastructure ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.ma.5 <- lm_robust(data = md.rwa,
-   intrinsic_motivation ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.ma.6 <- lm_robust(data = md.rwa,
-   content_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   content_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.ma.8 <- lm_robust(data = md.rwa,
-   operational_manage ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   operational_manage ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.ma.9 <- lm_robust(data = md.rwa,
-   instr_leader ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   instr_leader ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.ma.10 <- lm_robust(data = md.rwa,
-   principal_knowl_score ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_knowl_score ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.ma.11 <- lm_robust(data = md.rwa,
-   principal_manage ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_manage ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 
 
 # explanatory = qb
 lm.rwa.qb.1 <- lm_robust(data = md.rwa,
-   student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.qb.2 <- lm_robust(data = md.rwa,
-   ecd_student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.qb.3 <- lm_robust(data = md.rwa,
-   inputs ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   inputs ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.qb.4 <- lm_robust(data = md.rwa,
-   infrastructure ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   infrastructure ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.qb.5 <- lm_robust(data = md.rwa,
-   intrinsic_motivation ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.qb.6 <- lm_robust(data = md.rwa,
-   content_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   content_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.qb.8 <- lm_robust(data = md.rwa,
-   operational_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   operational_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.qb.9 <- lm_robust(data = md.rwa,
-   instr_leader ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   instr_leader ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.qb.10 <- lm_robust(data = md.rwa,
-   principal_knowl_score ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_knowl_score ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.qb.11 <- lm_robust(data = md.rwa,
-   principal_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_manage ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 
 # explanatory = idm
 lm.rwa.idm.1 <- lm_robust(data = md.rwa,
-   student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.idm.2 <- lm_robust(data = md.rwa,
-   ecd_student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   ecd_student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.idm.3 <- lm_robust(data = md.rwa,
-   inputs ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   inputs ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.idm.4 <- lm_robust(data = md.rwa,
-   infrastructure ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   infrastructure ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.idm.5 <- lm_robust(data = md.rwa,
-   intrinsic_motivation ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   intrinsic_motivation ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.idm.6 <- lm_robust(data = md.rwa,
-   content_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   content_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.idm.8 <- lm_robust(data = md.rwa,
-   operational_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   operational_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.idm.9 <- lm_robust(data = md.rwa,
-   instr_leader ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   instr_leader ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.idm.10 <- lm_robust(data = md.rwa,
-   principal_knowl_score ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_knowl_score ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 lm.rwa.idm.11 <- lm_robust(data = md.rwa,
-   principal_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
+   principal_manage ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud + ln_gdp + as.factor(enrolled) , clusters = g2, se_type = "stata")
 
 
 ```
@@ -602,66 +607,66 @@ lm.rwa.idm.11 <- lm_robust(data = md.rwa,
 
 # explanatory = bi
 lm.moz.bi.1 <- lm_robust(data = md.moz,
-   student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   student_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 lm.moz.bi.3 <- lm_robust(data = md.moz,
-   inputs ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   inputs ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 lm.moz.bi.4 <- lm_robust(data = md.moz,
-   infrastructure ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   infrastructure ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 lm.moz.bi.6 <- lm_robust(data = md.moz,
-   content_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   content_knowledge ~ bi + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 
 
 # explanatory = nlg
 lm.moz.nlg.1 <- lm_robust(data = md.moz,
-   student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   student_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 
 lm.moz.nlg.3 <- lm_robust(data = md.moz,
-   inputs ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   inputs ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 
 lm.moz.nlg.4 <- lm_robust(data = md.moz,
-   infrastructure ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   infrastructure ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 
 lm.moz.nlg.6 <- lm_robust(data = md.moz,
-   content_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   content_knowledge ~ national_learning_goals + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 
 
 # explanatory = ma
 lm.moz.ma.1 <- lm_robust(data = md.moz,
-   student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   student_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 
 lm.moz.ma.3 <- lm_robust(data = md.moz,
-   inputs ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   inputs ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 
 lm.moz.ma.4 <- lm_robust(data = md.moz,
-   infrastructure ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   infrastructure ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 
 lm.moz.ma.6 <- lm_robust(data = md.moz,
-   content_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   content_knowledge ~ mandates_accountability + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 
 
 
 # explanatory = qb
 lm.moz.qb.1 <- lm_robust(data = md.moz,
-   student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   student_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 
 lm.moz.qb.3 <- lm_robust(data = md.moz,
-   inputs ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   inputs ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 
 lm.moz.qb.4 <- lm_robust(data = md.moz,
-   infrastructure ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   infrastructure ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 
 lm.moz.qb.6 <- lm_robust(data = md.moz,
-   content_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   content_knowledge ~ quality_bureaucracy + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 
 # explanatory = idm
 lm.moz.idm.1 <- lm_robust(data = md.moz,
-   student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   student_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 lm.moz.idm.3 <- lm_robust(data = md.moz,
-   inputs ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   inputs ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 lm.moz.idm.4 <- lm_robust(data = md.moz,
-   infrastructure ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   infrastructure ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 lm.moz.idm.6 <- lm_robust(data = md.moz,
-   content_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
+   content_knowledge ~ impartial_decision_making + pct_urban + pct_lit + pct_schoolage + pct_elec + pct_dwell + night + public + ln_dist_n_stud +  as.factor(enrolled)  , clusters = g2, se_type = "stata")
 
 
 ```
@@ -669,7 +674,7 @@ lm.moz.idm.6 <- lm_robust(data = md.moz,
 
 ## Regression Tables
 
-### Overall 
+### Overall
 
 ```{r bi, warning=FALSE}
 # table 1
@@ -775,7 +780,7 @@ tab_model(lm.idm.1, lm.idm.2, lm.idm.3, lm.idm.4, lm.idm.5, lm.idm.6,
 <br><br><br><br><br>
 
 
-### Peru 
+### Peru
 
 ```{r per-bi, warning=FALSE}
 # table 1
@@ -883,7 +888,7 @@ tab_model(lm.per.idm.1, lm.per.idm.2, lm.per.idm.3, lm.per.idm.4, lm.per.idm.5, 
 
 
 
-### Jordan 
+### Jordan
 
 ```{r jor-bi, warning=FALSE}
 # table 1
@@ -991,7 +996,7 @@ tab_model(lm.jor.idm.1, lm.jor.idm.2, lm.jor.idm.3, lm.jor.idm.4, lm.jor.idm.5, 
 
 
 
-### Rwanda 
+### Rwanda
 
 ```{r rwa-bi, warning=FALSE}
 # table 1
@@ -1101,7 +1106,7 @@ tab_model(lm.rwa.idm.1, lm.rwa.idm.2, lm.rwa.idm.3, lm.rwa.idm.4, lm.rwa.idm.5, 
 
 
 
-### Mozambique 
+### Mozambique
 
 ```{r moz-bi, warning=FALSE}
 # table 1

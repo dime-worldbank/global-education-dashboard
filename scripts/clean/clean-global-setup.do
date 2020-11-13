@@ -59,7 +59,7 @@
 		gl 			sch0 					"B:/main/final_main_school_data.dta"
 		}
 		if (${s6} == 1) {
-		gl 			sch0 					"B:/main/final_main_school_data_mt.dta" 
+		gl 			sch0 					"B:/main/final_main_school_data_mt.dta"
 		}
 
 		gl 			po0 					"B:/main/final_main_po_data.dta"
@@ -179,7 +179,7 @@
 								ADM0_NAME ADM1_NAME ADM2_NAME ADM0_CODE ADM1_CODE ADM2_CODE STR2_YEAR ///
 								EXP2_YEAR STATUS DISP_AREA Shape_Leng Shape_Le_1 Shape_Area ///
 								 total_enrolled  ///
-								   miss_class_admin gdp  
+								   miss_class_admin gdp
 
 		gl 			piipo 		interview__id interview__key office_preload survey_time responsible_fance_planning ///
 		 						responsible_hring_teachers  responsible_none education ///
@@ -205,7 +205,7 @@
 								 enumerator_number enumerator_code
 
 		gl 			 poorder 	`"idpo countryname country g1 g2 ${biall}"'
-		
+
 		gl 			 finalvars  idschool countryname country g1 g2 student_knowledge ecd_student_knowledge ///
 								inputs infrastructure intrinsic_motivation content_knowledge pedagogical_knowledge ///
 								operational_manage instr_leader principal_knowl_score principal_manage math_sk lit_sk ///
@@ -225,6 +225,7 @@
 								proportion_producement_pol pol_personnel_management pol_policy_making pol_policy_implementation ///
 								med_age pct_urban ///
 								pct_school pct_lit pct_edu1 pct_edu2 pct_work pct_schoolage pct_elec pct_dwell enrolled ///
+								public night ///
 								ln_gdp ln_dist_n_stud
 
 

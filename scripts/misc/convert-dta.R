@@ -35,6 +35,8 @@ condl <- c(
   "pct_elec" ,
   "pct_dwell",
   "enrolled",
+  "night", 
+  "public",
   "ln_gdp",
   "ln_dist_n_stud"
 )
