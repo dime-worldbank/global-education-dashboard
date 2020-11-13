@@ -277,11 +277,12 @@ ui <- fluidPage(
 
         tabPanel("Notes",
                  includeMarkdown("notes.md") # %% fix this tomorrow
-
-
-
             )
 
+
+        # tabPanel("Full Regressions",
+        #          includeHTML("basic-regs.html") # %% fix this tomorrow
+        # )
       )
     )
    )
