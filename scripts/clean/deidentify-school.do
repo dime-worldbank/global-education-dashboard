@@ -5,19 +5,18 @@ Function: merges to master dataset, replaces some vars with random id, remove pi
 
 use "${C_sch}", clear
 
+drop total_enrolled // drop this to replace with total_enrolled in using.
+
 							* | 	merge to master 		| *
 
 merge 1:1 	countryname school_code 	/// this will connect two datasets
 			using "${sch0}" 		/// use master dataset
-			, assert(match master) 		/// every single obseration should match perfectly
-			keep(match)			// keep only these variables
+			, assert(match master) 	/// every single obseration should match perfectly
+			 keep(match)			// keep only these variables
 
 			/* note that the variables that don't match are ones that are in the masterdataset,
 			 	and these unmatched variables do not have any shcool info, so we can keep only the matched ones
 				*/
-
-
-
 
 
 
@@ -45,7 +44,7 @@ replace enrolled 		= 4 	if total_enrolled >= 75 & 	total_enrolled < 100
 replace enrolled 		= 5 	if total_enrolled >= 100 & 	total_enrolled < 150
 replace enrolled 		= 6 	if total_enrolled >= 150 & 	total_enrolled < 300
 replace enrolled 		= 7 	if total_enrolled >= 300 & 	total_enrolled < 500
-replace enrolled 		= 8 	if total_enrolled >= 500
+replace enrolled 		= 8 	if total_enrolled >= 500 &  total_enrolled < .
 
 
 

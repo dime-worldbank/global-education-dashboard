@@ -1,0 +1,24 @@
+---
+title: "district-cntrls-sum"
+author: "Tom"
+date: "September 18, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(summarytools)
+
+repo.encrypt <- file.path("B:")
+
+
+# load data 
+load(file.path(repo.encrypt, "main/final_main_data_ipums.Rdata"))
+
+```
+
+## R Markdown
+
+```{r}
+view(sum.av)
+```

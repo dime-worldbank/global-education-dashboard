@@ -1,7 +1,7 @@
 ---
 title: "Basic Regressions"
 author: "Tom"
-date: "September 1, 2020"
+date: "September 21, 2020"
 output: html_document
 runtime: shiny
 ---
@@ -36,9 +36,8 @@ yvars <- c("student_knowledge",
            "impartial_decision_making")
 
 #load data 
-md <- read.dta13(file = "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard/baseline/DataSets/final/merge_district_tdist.dta",
-                 convert.factors = TRUE) %>%
-  select(idschool, countryname, country, g1, g2, yvars)
+md <- read.dta13(file = "C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard/baseline/DataSets/final/final-schools-dataset.dta",
+                 convert.factors = TRUE) 
 
 
 # create new dataset: missing values 
