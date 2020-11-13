@@ -38,3 +38,6 @@
 - It seems this relationship is real for the data in the model, but there's such a large chance that the data is not representative that it may inadvertantly be an artifact of data collection (ie, merging on district in Peru results in only 26 schools there)
 - More specifically, this could be a function of the number of clusters. We see that Peru only has 10 clusters.
 - We also see that Peru is not the only country where the model predicts well for some groups of indicators. In Jordan, variables that measure school operations/management are generally predicted well by National Learning Goals and Quality of Bureaucracy.
+
+
+credit to RColorBrewer for some of the color paletting. 
