@@ -1,5 +1,5 @@
 /*_________________________________________________________________________________________________
-Name: GLOBE_montecarlo.do
+Name: montecarlo.do
 Description: runs full monte carlo simulations and creates output graphs
 Date modified: June, 2020
 Author: Tom Mosher
