@@ -46,14 +46,21 @@ ________________________________________________________________________________
 
 
 
+**** Globals
+
+// public official dataset 
+gl 	GLOBE_po 				"C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard/baseline/DataSets/Deidentified/D_po.dta"  // same as the de-identified dataset
+
+
+// top path for all folders
+gl 	GLOBE_pomcdta		"C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard/out/sampling"
 
 
 
 
 
 
-
-	clear all
+	clear
 
 
 
@@ -949,13 +956,13 @@ foreach v of global contcombo {
 
 
 
-						/* 												*\
+						/* 												*/
 							This plot will create a 'bubble' for each
 						  	district/region-level mean for a given no
 							of observations kept/dropped. the y axis
 							or bubble will measure deviation from the
 							mean bi in the district in which it belongs.
-						\*												*/
+						/*												*/
 							* here a 'bubble' means literal dots.
 
 
@@ -1004,13 +1011,13 @@ foreach v of global contcombo {
 
 
 
-								/* 												*\
+								/* 												*/
 								This plot will create a 'bubble' for each
 								district/region-level mean for a given no
 								of observations kept/dropped. the y axis
 								or bubble will measure deviation from the
 								mean bi in the district in which it belongs.
-								\*												*/
+								/*												*/
 								* here a 'bubble' means literal dots.
 
 
