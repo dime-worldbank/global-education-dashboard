@@ -222,6 +222,7 @@ loc clean	= 1		// reconstruct bi vars
 loc agg		= 1 	// conduct collapsing and merging
 loc misc 	= 0 	// misc data processing, prior merging is necessary.
 loc reg 	= 0 	// run regression panels
+loc mc    = 0   // runs monte carlo simulations and makes output files.
 
 
 * [Global Setup]:
@@ -243,16 +244,21 @@ if (`agg' == 1) {
 }
 
 * [Misc. Data Processing]
-* Collapse by admin unit, merge.
 if (`misc' == 1) {
 	do "${scripts_clone}/misc/main-misc.do"
 }
 
 
 * [exploratory regs ]
-* Collapse by admin unit, merge.
+* sort of superceded, all regs done in R now...
 if (`reg' == 1) {
 	do "${scripts_clone}/reg/main-reg.do"
+}
+
+* [monte carlo simulations.]
+* Collapse by admin unit, merge.
+if (`mc' == 1) {
+	do "${scripts_clone}/misc/montecarlo.do"
 }
 
 *iefolder*3*End_RunDofiles******************************************************
