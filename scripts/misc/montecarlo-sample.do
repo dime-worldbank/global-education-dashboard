@@ -55,7 +55,16 @@ gl 	GLOBE_po 			`"${reprex}/reprex.dta"'  // same as the de-identified dataset
 // top path for all folders
 gl 	GLOBE_pomcdta		"${reprex}/out"		// set to outcome folder
 
-gl lvls 				1 2 3 4 5 6 7 8 9 
+gl 	contcombo			"1 2"
+
+// graph settings 
+global set_mc_graph1		`" xti(`"Observations Kept"') xlab(#6) xmti(##2) ylab(0(.1).5) ymti(##2) legend(pos(6) order(1 `"25th/75th percentile"' 2 `"Mean BI Difference"')) yline(.05 )"'
+global set_mc_graph2		`"xti(`"Observations Kept"') xlab(#10) xscale( range(0(10)100) ) xmti(##2) ylab(0(.1)1.2) ymti(##2) legend(pos(6) order(1 `"-/+ 1 Std. Deviation"' 2 `"Mean BI Difference"'))"'
+global set_mc_graph3 	`"xti(`"Observations Kept"') xlab(#6) xmti(##2) xscale( range(1(1)18) ) ylab(0(.1)1) ymti(##2) legend(pos(6) order(1 `"-/+ 1 Std. Deviation"' 2 `"Mean BI Difference"')) 	yline(0.05)	m(smcircle)  msize(11-pt) mcolor(gray%35) mlcolor(gray%5) caption("Each point represents a simulated mean and darker points indicate greater density")"' // for region
+global set_mc_graph4 	`" xti(`"Observations Kept"') xlab(#5) xmti(##2) xscale( range(1(1)10) ) yscale( range(0(.1)1.2) ) ylab(#5) ymti(##5) legend(pos(6) order(1 `"-/+ 1 Std. Deviation"' 2 `"Mean BI Difference"')) 	yline(0.05)	m(smcircle)  msize(11-pt) mcolor(gray%35) mlcolor(gray%5) caption("Each point represents a simulated mean and darker points indicate greater density")"'  // for districts
+
+
+
 
 // countrynames 
 gl 	pos_1 				"Atlantis"
@@ -611,10 +620,10 @@ version 	15.1
 
 * D1. Define Syntax
 
-syntax, max(integer	1)	/// max no of countries
+syntax, [max(integer 1)	/// max no of countries
 		gov(integer 1)	/// govt_tier, default MINEDU
 		  l(integer 1)	/// admin level
-		var( namelist) // requires a varlist whose values are numeric
+		var( namelist)] // requires a varlist whose values are numeric
 
 
 										/* _____________________________
@@ -644,7 +653,7 @@ syntax, max(integer	1)	/// max no of countries
 
 // ___________________________ declare tempfiles
 
-tempfile c1 c2 c3 c4 ///
+tempfile c1 c2 ///
 			mean sd p25 p75 meantop meanlow
 
 // ___________________________ use the final wide dataset
@@ -695,7 +704,7 @@ forvalues c = 1/`max' {
 use 	`c1', clear
 
 append 	using ///
-		`c2' `c3' `c4'
+		`c2' 
 
 
 // ___________________________ export
@@ -703,7 +712,7 @@ append 	using ///
 save "${GLOBE_pomcdta}/`var'/mc_gov`gov'_finallong.dta", replace
 
 
-tempfile drop 		c1 c2 c3 c4 ///				drop tempfiles for easy recycle later
+tempfile drop 		c1 c2  ///				drop tempfiles for easy recycle later
 			mean sd p25 p75 meantop meanlow
 
 
@@ -734,7 +743,7 @@ tempfile drop 		c1 c2 c3 c4 ///				drop tempfiles for easy recycle later
 
 // ___________________________ declare tempfiles
 
-tempfile c1 c2 c3 c4 ///
+tempfile c1 c2 ///
 		mean sd p25 p75 meantop meanlow
 
 // ___________________________ use the final wide dataset
@@ -785,7 +794,7 @@ restore						// restores to final wide dataset for repeat
 use 	`c1', clear
 
 append 	using ///
-	`c2' `c3' `c4'
+	`c2'
 
 sort 	country g`l' nkeep
 
@@ -795,7 +804,7 @@ sort 	country g`l' nkeep
 save "${GLOBE_pomcdta}/`var'/mc_g`l'_gov`gov'_finallong.dta", replace
 
 
-tempfile drop 		c1 c2 c3 c4 ///				drop tempfiles for easy recycle later
+tempfile drop 		c1 c2 ///				drop tempfiles for easy recycle later
 			mean sd p25 p75 meantop meanlow
 
 
@@ -844,10 +853,10 @@ version 	15.1
 
 * E1. Define Syntax
 
-syntax, max(integer	1)	/// max no of countries
+syntax, [max(integer 1)	/// max no of countries
 		gov(integer 1)	/// govt_tier, default MINEDU
 		l  (integer 1)	/// admin level
-		var( namelist) // requires a varlist whose values are numeric
+		var( namelist)] // requires a varlist whose values are numeric
 
 
 
@@ -863,24 +872,24 @@ syntax, max(integer	1)	/// max no of countries
 	set 	graph off
 
 	* locals
-	loc 		max = 4 		// set to max no of countries
-	loc 		var ${var}
+	*loc 		max = 2 		// set to max no of countries
+	*loc 		var ${var}
 
 
 
 	* 		%% redo this section when you loop through all govt tiers and countries and outcome vars
 	// set to 1 if you want to run that graph set
 	loc			minedu25 = 0	// MinEDU with 25/75 pctile bands
-	loc 		minedusd = 0	// MinEDU with +/- 1 sd bands
-	loc 		region 	 = 0 	// Regional offices points
-	loc 		district = 1	// District offices points
+	loc 		minedusd = 1	// MinEDU with +/- 1 sd bands
+	loc 		region 	 = 1 	// Regional offices points
+	loc 		district = 0	// District offices points
 
 	loc 		regioncountries = "1 2"
 	loc 		districtcountries = "1 2"
 
 
-	// change settings according to predefined globals
-		if 	"`var'" == "minedu" {
+	/* change settings according to predefined globals
+		if 	"`gov'" == "minedu" { //should this not be gov not var
 
 		loc		minedu25 = 0	// MinEDU with 25/75 pctile bands
 		loc 	minedusd = 1	// MinEDU with +/- 1 sd bands
@@ -888,7 +897,7 @@ syntax, max(integer	1)	/// max no of countries
 		loc 	district = 0	// District offices points
 		}
 
-		if 	"`var'" == "region" {
+		if 	"`gov'" == "region" {
 
 		loc		minedu25 = 0	// MinEDU with 25/75 pctile bands
 		loc 	minedusd = 0	// MinEDU with +/- 1 sd bands
@@ -896,15 +905,14 @@ syntax, max(integer	1)	/// max no of countries
 		loc 	district = 0	// District offices points
 		}
 
-		if 	"`var'" == "district" {
+		if 	"`gov'" == "district" {
 
 		loc		minedu25 = 0	// MinEDU with 25/75 pctile bands
 		loc 	minedusd = 0	// MinEDU with +/- 1 sd bands
 		loc 	region 	 = 0 	// Regional offices points
 		loc 	district = 1	// District offices points
 		}
-
-
+*/
 
 
 
@@ -927,20 +935,20 @@ syntax, max(integer	1)	/// max no of countries
 
 
 
-
+ 
 
 foreach v of global contcombo {
 
 
 	twoway 		rcap ///
 				meantop_error meanlow_error nkeep /*x*/ ///
-				if country == `v'					///
+				if country == 1					///
 				, scheme(plotplain)  			///
 				title("${pos_`v'}: Monte Carlo Simulation of MinEdu Sampling Sensitivity") ///
 				${set_mc_graph2}		///
 				||								///		starting scatter 2
 				scatter mean_error nkeep /*x*/	///
-				if country == `v'				///
+				if country == 1				///
 				, m(smcircle)
 
 				graph export 	"${scatters}/mc/sd/`var'/mc_${var}_${pos_`v'}_minedu.png", replace
@@ -964,13 +972,13 @@ foreach v of global contcombo {
 
 
 
-						/* 												*/
+						/* 												/
 							This plot will create a 'bubble' for each
 						  	district/region-level mean for a given no
 							of observations kept/dropped. the y axis
 							or bubble will measure deviation from the
 							mean bi in the district in which it belongs.
-						/*												*/
+						/												*/
 							* here a 'bubble' means literal dots.
 
 
@@ -1019,17 +1027,17 @@ foreach v of global contcombo {
 
 
 
-								/* 												*/
+								/* 												/
 								This plot will create a 'bubble' for each
 								district/region-level mean for a given no
 								of observations kept/dropped. the y axis
 								or bubble will measure deviation from the
 								mean bi in the district in which it belongs.
-								/*												*/
+								/												*/
 								* here a 'bubble' means literal dots.
 
 
-if (`district' == 1) {
+if (`district' == 999) { // dont' run district?
 
 
 	// load dataset
@@ -1290,7 +1298,7 @@ end
 							timer on 1	// turn on timer 1
  use "${GLOBE_po}", clear
 
-	glacier outcome1 outcome2, 	/// bi national_learning_goals mandates_accountability quality_bureaucracy impartial_decision_making 
+	glacier outcome1 outcome2 , 	/// bi national_learning_goals mandates_accountability quality_bureaucracy impartial_decision_making 
 				gov(minedu) /// set to 'minedu', 'district' or 'region'
 				nminedu(2)		/// max no of ppl pulled, deault == 30 (note: cumulative) `pull'
 				nregion(2)	///
