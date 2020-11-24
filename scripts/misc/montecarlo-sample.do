@@ -613,7 +613,7 @@ version 	15.1
 
 syntax, max(integer	1)	/// max no of countries
 		gov(integer 1)	/// govt_tier, default MINEDU
-		l  (integer 1)	/// admin level
+		  l(integer 1)	/// admin level
 		var( namelist) // requires a varlist whose values are numeric
 
 
@@ -1199,7 +1199,7 @@ end
 
 
 
-			denali, 		max(`size')	/// max no of countries %% may just have to write 4 here. SETTINGS
+			denali, 		max(`size')	/// max no of countries . SETTINGS
 							gov(`govt')	/// govt_tier; SETTINGS
 							l  (`admin')	/// admin level, region ==1 district == 2; SETTINGS
 							var( `var') // requires a varlist whose values are numeric; COMMAND
@@ -1292,9 +1292,9 @@ end
 
 	glacier outcome1 outcome2, 	/// bi national_learning_goals mandates_accountability quality_bureaucracy impartial_decision_making 
 				gov(minedu) /// set to 'minedu', 'district' or 'region'
-				nminedu(5)		/// max no of ppl pulled, deault == 30 (note: cumulative) `pull'
-				nregion(5)	///
-				ndistr(5) ///
+				nminedu(2)		/// max no of ppl pulled, deault == 30 (note: cumulative) `pull'
+				nregion(2)	///
+				ndistr(2) ///
 				seed( 123)	/// sets first random seed
 
 
