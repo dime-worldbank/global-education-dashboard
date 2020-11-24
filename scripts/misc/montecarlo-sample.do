@@ -1101,7 +1101,7 @@ end
 		* G1. Define Syntax/arguments
 
 
-		args 	outcome1 outcome2 outcome3 outcome4 outcome5		// any combindation of arglist as varlist is
+		args 	outcome1 outcome2 	// any combindation of arglist as varlist is
 
 		syntax varlist [, ///
 				reps(integer 100)	/// repetitions, default is 100
@@ -1138,7 +1138,7 @@ end
 
 					loc govt 	= 1
 					loc admin	= 1
-					loc contcombo "1 2 3 4"		// replace with all countries
+					loc contcombo "1 2"		
 					loc pull 	= `nminedu'		// transform no pulled to same-named local
 					loc size 	: list sizeof contcombo // store no of countries
 				}
@@ -1147,7 +1147,7 @@ end
 
 					loc govt 	= 2
 					loc admin	= 1
-					loc contcombo "1 3 4"		// exclude JOR
+					loc contcombo "1 2"		
 					loc pull 	= `nregion' 	// transform no pulled to same-named local
 					loc size 	: list sizeof contcombo // store no of countries
 
@@ -1157,7 +1157,7 @@ end
 
 					loc govt 	= 3
 					loc admin	= 2
-					loc contcombo "1 2 3"		// exclude RWA
+					loc contcombo "1 2"		
 					loc pull 	= `ndistrict' 	// transform no pulled to same-named local
 					loc size 	: list sizeof contcombo // store no of countries
 
@@ -1288,7 +1288,8 @@ end
 							timer on 1	// turn on timer 1
  use "${GLOBE_po}", clear
 
-	glacier bi national_learning_goals mandates_accountability quality_bureaucracy impartial_decision_making , 	gov(minedu) /// set to 'minedu', 'district' or 'region'
+	glacier outcome1 outcome2, 	/// bi national_learning_goals mandates_accountability quality_bureaucracy impartial_decision_making 
+				gov(minedu) /// set to 'minedu', 'district' or 'region'
 				nminedu(100)		/// max no of ppl pulled, deault == 30 (note: cumulative) `pull'
 				nregion(30)	///
 				ndistr(30) ///

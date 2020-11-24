@@ -27,21 +27,7 @@ set seed 	47
 
 
 
-// data manipuation
-// idpo country g1 g2 g3 govt_tier `var'
-/* translation of variables 
-
-old | new 
-
-idcode = idpo (public official id)
-married = countryname 
-age = g1 (or code for first level administrative region)
-N/A = g2 (admin level 2, this is constructed)
-N/A = g3  (admin level 3, this is contructed)
-wage = outcome (continuous outcome variable)
-
-*/
-
+** data manipuation 
 
 
 
@@ -57,6 +43,11 @@ replace 	countryname = "Atlantis" 	if country == 1
 replace 	countryname = "Gaia"		if country == 2 
 
 
+// govt_tier 
+bysort 		country:  gen govt_tier 	= runiformint(1,3)
+
+
+
 // g1 
 gen  		g1 = runiformint(1,10)
 replace 	g1 = 10 + g1 	if countryname == "Gaia"
@@ -64,7 +55,7 @@ replace 	g1 = 10 + g1 	if countryname == "Gaia"
 
 
 // g2 
-bysort g1:	gen g2 = runiformint(1,12) 	
+bysort 		g1:			gen g2 			= runiformint(1,12) 	
 
 
 
