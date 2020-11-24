@@ -49,11 +49,11 @@ ________________________________________________________________________________
 **** Globals
 
 // public official dataset 
-gl 	GLOBE_po 				"C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard/baseline/DataSets/Deidentified/D_po.dta"  // same as the de-identified dataset
+gl 	GLOBE_po 			`"${reprex}/reprex.dta"'  // same as the de-identified dataset
 
 
 // top path for all folders
-gl 	GLOBE_pomcdta		"C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/global-edu-dashboard/out/sampling"
+gl 	GLOBE_pomcdta		"${reprex}/out"		// set to outcome folder
 
 
 
