@@ -57,7 +57,13 @@ gl 	GLOBE_pomcdta		"${reprex}/out"		// set to outcome folder
 
 
 
+// countrynames 
+gl 	pos_1 				"Atlantis"
+gl 	pos_2				"Gaia"
 
+
+// scatterplot path 
+gl 	scatters			`"${GLOBE_pomcdta}/scatters"'
 
 
 	clear
