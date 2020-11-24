@@ -55,7 +55,7 @@ gl 	GLOBE_po 			`"${reprex}/reprex.dta"'  // same as the de-identified dataset
 // top path for all folders
 gl 	GLOBE_pomcdta		"${reprex}/out"		// set to outcome folder
 
-
+gl lvls 				1 2 3 4 5 6 7 8 9 
 
 // countrynames 
 gl 	pos_1 				"Atlantis"
@@ -178,9 +178,7 @@ gl 	scatters			`"${GLOBE_pomcdta}/scatters"'
 	**
 		* Program A: simulates bisim`n'
 
-			/* Theory goes as follows:
 
-			*/
 
 	**
 		* A0.  Opening
@@ -273,8 +271,12 @@ gl 	scatters			`"${GLOBE_pomcdta}/scatters"'
 			collapse 	(mean) `var' m0 n			/// where mean of m0 reamins constant, `var' mean altered by drop
 						, by(g`l')				// should be 1 in most cases for minedu
 
-		// A6. return mean, seed and iteration
-			foreach lvl of global lvls {
+		// A6. return mean, seed and iteration %% maybe store the levels here?
+		
+				// store levels of g`l'
+			levelsof	g`l', clean local(lvls)
+			
+			foreach lvl of local lvls {
 
 			sum 		`var' 	if g`l' == `lvl'	// summarize the new `var' after drop `n'
 			post 		`simacadia' 			///		post the results from sum into the summary dataset
@@ -374,7 +376,7 @@ gl 	scatters			`"${GLOBE_pomcdta}/scatters"'
 
 		* B4. Variable creation/maniuplation
 
-		// merge with dataset that has actual `var' mean
+		// merge with dataset that has actual `var' mean %% assert(3) messes up.
 		merge 	m:1 	g`l' ///
 						using `"${GLOBE_pomcdta}/`var'/m0_g`l'_gov`gov'_${pos_`cty'}.dta"' ///
 						, keepus(count m0)		/// only keep the original mean
@@ -873,8 +875,8 @@ syntax, max(integer	1)	/// max no of countries
 	loc 		region 	 = 0 	// Regional offices points
 	loc 		district = 1	// District offices points
 
-	loc 		regioncountries = "1 3 4"
-	loc 		districtcountries = ""
+	loc 		regioncountries = "1 2"
+	loc 		districtcountries = "1 2"
 
 
 	// change settings according to predefined globals
@@ -1250,7 +1252,7 @@ end
 
 
 	*loc 	type 	"minedu"		// set to either: minedu, region, district, no we want to run for all
-	loc 	var 	bi	 // set to the main outcome variable
+	loc 	var 	outcome1	 // set to the main outcome variable
 
 *	*	* 	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*
 	***			***			***			***			***			***			***			***
@@ -1290,9 +1292,9 @@ end
 
 	glacier outcome1 outcome2, 	/// bi national_learning_goals mandates_accountability quality_bureaucracy impartial_decision_making 
 				gov(minedu) /// set to 'minedu', 'district' or 'region'
-				nminedu(100)		/// max no of ppl pulled, deault == 30 (note: cumulative) `pull'
-				nregion(30)	///
-				ndistr(30) ///
+				nminedu(5)		/// max no of ppl pulled, deault == 30 (note: cumulative) `pull'
+				nregion(5)	///
+				ndistr(5) ///
 				seed( 123)	/// sets first random seed
 
 
