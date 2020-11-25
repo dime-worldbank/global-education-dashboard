@@ -48,6 +48,10 @@ ________________________________________________________________________________
 
 **** Globals
 
+// top 
+gl 	reprex 	"C:/Users/WB551206/OneDrive - WBG/Documents/Dashboard/mc-reprex" // <- insert top path here.
+
+
 // public official dataset 
 gl 	GLOBE_po 			`"${reprex}/reprex.dta"'  // same as the de-identified dataset
 
@@ -1298,11 +1302,11 @@ end
 							timer on 1	// turn on timer 1
  use "${GLOBE_po}", clear
 
-	glacier outcome1 outcome2 , 	/// bi national_learning_goals mandates_accountability quality_bureaucracy impartial_decision_making 
+	glacier outcome1  , 	/// two main outcome variables
 				gov(minedu) /// set to 'minedu', 'district' or 'region'
-				nminedu(2)		/// max no of ppl pulled, deault == 30 (note: cumulative) `pull'
-				nregion(2)	///
-				ndistr(2) ///
+				nminedu(20)		/// max no of ppl pulled, deault == 30 (note: cumulative) `pull'
+				nregion(20)	///
+				ndistr(20) ///
 				seed( 123)	/// sets first random seed
 
 
