@@ -1,4 +1,4 @@
-# Notes for 10 Nov
+# Notes for 30 Nov
 
 ## Changes from last time
 
