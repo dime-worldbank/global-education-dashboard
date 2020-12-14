@@ -30,8 +30,8 @@ While the primary data source is raw survey data, there are a number of auxilila
 
 ### Data File Locations 
 There are three main places where data files are kept. The first two are encrypted with VeraCrypt (password protected): <br>
-1. Complete/Raw: `A:/` "Raw" data from Survey Solutions. This is minially processed at sometimes comes as Rdata or .dta files. This folder also contains school enrollment data and IPUMS data. The code intends this folder to be mounted to VeraCrypt in the `A:/` drive slot. <br>
-2. Project_Encrypt: `B:/` Intermediate processed data that is still identifying/needs to be encrypted. Intermediary datasets are in here and well as final Rdata files (which in the project workflow are still identifying.) The code intends this file to be loaded in the `B:/` drive using VeraCrypt.
+1. Complete/Raw: `A:/` "Raw" data from Survey Solutions. Located in `~/A-drive-raw`. This is minially processed at sometimes comes as Rdata or .dta files. This folder also contains school enrollment data and IPUMS data. The code intends this folder to be mounted to VeraCrypt in the `A:/` drive slot. <br>
+2. Project_Encrypt: `B:/` Intermediate processed data that is still identifying/needs to be encrypted. Located in `~/B-drive-processed`. Intermediary datasets are in here and well as final Rdata files (which in the project workflow are still identifying.) The code intends this file to be loaded in the `B:/` drive using VeraCrypt.
 3. Project Repository: This folder structure is created with DIME's iefieldkit and houses all stata files and documents related for data cleaning in stata.  <br>
 
 
