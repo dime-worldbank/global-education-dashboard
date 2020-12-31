@@ -440,9 +440,7 @@ main_po_data.t3$match_dist_school<- main_po_data.t3$ADM2_CODE %in% li.school.ad2
                      # school's district. If this value is also 0, then we will replace
                      # the missing with the country median (this is only the case for
                      # Mozambique)
-                     #
-                     #
-                     # This may %% also have to be changed to g2 but should be ok because it's moz
+
 
 # create country median of rmozambique.
 med.moz <- median(moz.s.roster$n_students)
@@ -459,7 +457,7 @@ main_school_data <-
     main_school_data,
     by.dist.enrollment.short,
     by = "ADM2_CODE",
-	na_matches = 'never', # %% this is where I begin on fri. why are there like 10k obs? is this solution?
+	na_matches = 'never',
     keep = FALSE) %>%
   mutate(
     total_enrolled_colsc = coalesce(total_enrolled, med_stud_school),
